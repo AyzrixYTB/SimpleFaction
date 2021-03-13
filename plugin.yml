@@ -1,0 +1,6 @@
+name: SimpleFaction
+author: Ayzrix
+description: SimpleFaction plugin
+version: 1.0.0
+main: Ayzrix\SimpleFaction\Main
+api: [3.0.0]
