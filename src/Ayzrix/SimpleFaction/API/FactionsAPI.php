@@ -8,6 +8,7 @@ use Ayzrix\SimpleFaction\Utils\Utils;
 use pocketmine\level\Position;
 use pocketmine\Player;
 use pocketmine\Server;
+use pocketmine\utils\Config;
 
 class FactionsAPI {
 
@@ -200,5 +201,66 @@ class FactionsAPI {
         $result = MySQL::getDatabase()->query("SELECT * FROM home WHERE faction='$faction';");
         $array = $result->fetch_Array(MYSQLI_ASSOC);
         return new Position((int)$array['x'], (int)$array['y'], (int)$array['z'], Main::getInstance()->getServer()->getLevelByName($array['world']));
+    }
+
+    /**
+     * @param Player $player
+     * @param string $faction
+     */
+    public static function claimChunk(Player $player, string $faction): void {
+        $chunk = $player->getLevel()->getChunkAtPosition($player);
+        $chunkX = $chunk->getX();
+        $chunkZ = $chunk->getZ();
+        $world = $player->getLevel()->getFolderName();
+        MySQL::query("INSERT INTO claim (faction, x, z, world) VALUES ('$faction', '$chunkX', '$chunkZ', '$world')");
+    }
+
+    /**
+     * @param Player $player
+     * @return bool
+     */
+    public static function isInClaim(Player $player): bool {
+        $chunk = $player->getLevel()->getChunkAtPosition($player);
+        $chunkX = $chunk->getX();
+        $chunkZ = $chunk->getZ();
+        $world = $player->getLevel()->getFolderName();
+        $result = MySQL::getDatabase()->query("SELECT * FROM claim WHERE x='$chunkX' AND z='$chunkZ' and world='$world';");
+        return $result->num_rows > 0 ? true : false;
+    }
+
+    /**
+     * @param Player $player
+     * @return string
+     */
+    public static function getFactionClaim(Player $player): string {
+        $chunk = $player->getLevel()->getChunkAtPosition($player);
+        $chunkX = $chunk->getX();
+        $chunkZ = $chunk->getZ();
+        $world = $player->getLevel()->getFolderName();
+        $result = MySQL::getDatabase()->query("SELECT faction FROM claim WHERE x='$chunkX' AND z='$chunkZ' and world='$world';");
+        $array = $result->fetch_array(MYSQLI_ASSOC);
+        return $array['faction'];
+    }
+
+    /**
+     * @param Player $player
+     * @param string $faction
+     */
+    public static function deleteClaim(Player $player, string $faction) {
+        $chunk = $player->getLevel()->getChunkAtPosition($player);
+        $chunkX = $chunk->getX();
+        $chunkZ = $chunk->getZ();
+        $world = $player->getLevel()->getFolderName();
+        MySQL::query("DELETE FROM claim WHERE faction='$faction' AND x='$chunkX' AND z='$chunkZ' AND world='$world'");
+    }
+
+    /**
+     * @param string $faction
+     * @return int
+     */
+    public static function getClaimCount(string $faction): int {
+        $result = MySQL::getDatabase()->query("SELECT COUNT(faction) FROM claim where faction='$faction'");
+        $array = $result->fetch_array(MYSQLI_ASSOC);
+        return (int)$array['COUNT(faction)']?? 0;
     }
 }

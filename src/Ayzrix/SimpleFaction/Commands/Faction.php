@@ -26,24 +26,24 @@ class Faction extends PluginCommand {
                         if(isset($args[1])) {
                             switch ($args[1]) {
                                 case 2:
-                                $player->sendMessage(Utils::getConfigMessage("HELP_HEADER", array(2, 5)));
-                                $player->sendMessage(Utils::getConfigMessage("HELP_2", array(2, 5)));
+                                    $player->sendMessage(Utils::getConfigMessage("HELP_HEADER", array(2, 5)));
+                                    $player->sendMessage(Utils::getConfigMessage("HELP_2", array(2, 5)));
                                     break;
                                 case 3:
-                                $player->sendMessage(Utils::getConfigMessage("HELP_HEADER", array(3, 5)));
-                                $player->sendMessage(Utils::getConfigMessage("HELP_3", array(2, 5)));
+                                    $player->sendMessage(Utils::getConfigMessage("HELP_HEADER", array(3, 5)));
+                                    $player->sendMessage(Utils::getConfigMessage("HELP_3", array(2, 5)));
                                     break;
                                 case 4:
-                                $player->sendMessage(Utils::getConfigMessage("HELP_HEADER", array(4, 5)));
-                                $player->sendMessage(Utils::getConfigMessage("HELP_4", array(2, 5)));
+                                    $player->sendMessage(Utils::getConfigMessage("HELP_HEADER", array(4, 5)));
+                                    $player->sendMessage(Utils::getConfigMessage("HELP_4", array(2, 5)));
                                     break;
                                 case 5:
-                                $player->sendMessage(Utils::getConfigMessage("HELP_HEADER", array(5, 5)));
-                                $player->sendMessage(Utils::getConfigMessage("HELP_5", array(2, 5)));
+                                    $player->sendMessage(Utils::getConfigMessage("HELP_HEADER", array(5, 5)));
+                                    $player->sendMessage(Utils::getConfigMessage("HELP_5", array(2, 5)));
                                     break;
                                 default:
-                                $player->sendMessage(Utils::getConfigMessage("HELP_HEADER", array(1, 5)));
-                                $player->sendMessage(Utils::getConfigMessage("HELP_1", array(2, 5)));
+                                    $player->sendMessage(Utils::getConfigMessage("HELP_HEADER", array(1, 5)));
+                                    $player->sendMessage(Utils::getConfigMessage("HELP_1", array(2, 5)));
                                     break;
                             }
                         } else {
@@ -53,30 +53,30 @@ class Faction extends PluginCommand {
                         return true;
                     case "create":
                     case "make":
-                    if (isset($args[1])) {
-                        if (ctype_alnum($args[1])) {
-                            if(strlen($args[1]) > Utils::getIntoConfig("min_faction_name_lenght")) {
-                                if (strlen($args[1]) < Utils::getIntoConfig("max_faction_name_lenght")) {
-                                    if (!FactionsAPI::existsFaction($args[1])) {
-                                        if (!FactionsAPI::isInFaction($player)) {
-                                            $player->sendMessage(Utils::getConfigMessage("SUCESSFULL_CREATED", array($args[1])));
-                                            FactionsAPI::createFaction($player, $args[1]);
-                                        } else $player->sendMessage(Utils::getConfigMessage("ALREADY_IN_FACTION"));
-                                    } else $player->sendMessage(Utils::getConfigMessage("FACTION_ALREADY_EXIST"));
-                                } else $player->sendMessage(Utils::getConfigMessage("FACTION_NAME_TOO_LONG"));
-                            } else $player->sendMessage(Utils::getConfigMessage("FACTION_NAME_TOO_SHORT"));
-                        } else $player->sendMessage(Utils::getConfigMessage("INVALID_NAME"));
-                    } else $player->sendMessage(Utils::getConfigMessage("CREATE_USAGE"));
+                        if (isset($args[1])) {
+                            if (ctype_alnum($args[1])) {
+                                if(strlen($args[1]) > Utils::getIntoConfig("min_faction_name_lenght")) {
+                                    if (strlen($args[1]) < Utils::getIntoConfig("max_faction_name_lenght")) {
+                                        if (!FactionsAPI::existsFaction($args[1])) {
+                                            if (!FactionsAPI::isInFaction($player)) {
+                                                $player->sendMessage(Utils::getConfigMessage("SUCESSFULL_CREATED", array($args[1])));
+                                                FactionsAPI::createFaction($player, $args[1]);
+                                            } else $player->sendMessage(Utils::getConfigMessage("ALREADY_IN_FACTION"));
+                                        } else $player->sendMessage(Utils::getConfigMessage("FACTION_ALREADY_EXIST"));
+                                    } else $player->sendMessage(Utils::getConfigMessage("FACTION_NAME_TOO_LONG"));
+                                } else $player->sendMessage(Utils::getConfigMessage("FACTION_NAME_TOO_SHORT"));
+                            } else $player->sendMessage(Utils::getConfigMessage("INVALID_NAME"));
+                        } else $player->sendMessage(Utils::getConfigMessage("CREATE_USAGE"));
                         return true;
                     case "delete":
                     case "del":
                     case "disband":
-                    if (FactionsAPI::isInFaction($player)) {
-                        if (FactionsAPI::getRank($player->getName()) === "Leader") {
-                            $player->sendMessage(Utils::getConfigMessage("SUCESSFULL_DISBAND", array(FactionsAPI::getFaction($player))));
-                            FactionsAPI::disbandFaction($player, FactionsAPI::getFaction($player));
-                        } else $player->sendMessage(Utils::getConfigMessage("ONLY_LEADER"));
-                    } else $player->sendMessage(Utils::getConfigMessage("MUST_BE_IN_FACTION"));
+                        if (FactionsAPI::isInFaction($player)) {
+                            if (FactionsAPI::getRank($player->getName()) === "Leader") {
+                                $player->sendMessage(Utils::getConfigMessage("SUCESSFULL_DISBAND", array(FactionsAPI::getFaction($player))));
+                                FactionsAPI::disbandFaction($player, FactionsAPI::getFaction($player));
+                            } else $player->sendMessage(Utils::getConfigMessage("ONLY_LEADER"));
+                        } else $player->sendMessage(Utils::getConfigMessage("MUST_BE_IN_FACTION"));
                         return true;
                     case "info":
                         if (isset($args[1])) {
@@ -134,9 +134,9 @@ class Faction extends PluginCommand {
                         if (FactionsAPI::isInFaction($player)) {
                             if (FactionsAPI::getRank($player->getName()) === "Leader" or FactionsAPI::getRank($player->getName()) === "Officer") {
                                 if (FactionsAPI::existsHome(FactionsAPI::getFaction($player))) {
-                                        $faction = FactionsAPI::getFaction($player);
-                                        FactionsAPI::deleteHome($faction);
-                                        $player->sendMessage(Utils::getConfigMessage("HOME_DELETE"));
+                                    $faction = FactionsAPI::getFaction($player);
+                                    FactionsAPI::deleteHome($faction);
+                                    $player->sendMessage(Utils::getConfigMessage("HOME_DELETE"));
                                 } else $player->sendMessage(Utils::getConfigMessage("NOT_HAVE_HOME"));
                             } else $player->sendMessage(Utils::getConfigMessage("ONLY_LEADER_OR_OFFICER"));
                         } else $player->sendMessage(Utils::getConfigMessage("MUST_BE_IN_FACTION"));
@@ -148,6 +148,38 @@ class Faction extends PluginCommand {
                                 $player->teleport(FactionsAPI::getHome($faction));
                                 $player->sendMessage(Utils::getConfigMessage("HOME_TELEPORTED"));
                             } else $player->sendMessage(Utils::getConfigMessage("NOT_HAVE_HOME"));
+                        } else $player->sendMessage(Utils::getConfigMessage("MUST_BE_IN_FACTION"));
+                        return true;
+                    case 'claim':
+                        if (FactionsAPI::isInFaction($player)) {
+                            if (FactionsAPI::getRank($player->getName()) === "Leader" or FactionsAPI::getRank($player->getName()) === "Officer") {
+                                if (in_array($player->getLevel()->getFolderName(), Utils::getIntoConfig("faction_worlds"))) {
+                                    if (!FactionsAPI::isInClaim($player)) {
+                                        $faction = FactionsAPI::getFaction($player);
+                                        $claimCount = FactionsAPI::getClaimCount($faction);
+                                        if ($claimCount - 1 < count(Utils::getIntoConfig("claims"))) {
+                                            $powerNeeded = (int)Utils::getIntoConfig("claims")[$claimCount];
+                                            if (FactionsAPI::getPower($faction) >= $powerNeeded) {
+                                                FactionsAPI::claimChunk($player, $faction);
+                                                $player->sendMessage(Utils::getConfigMessage("CLAIM_SUCESS"));
+                                            } else $player->sendMessage(Utils::getConfigMessage("NOT_ENOUGHT_POWER", array($powerNeeded)));
+                                        } else $player->sendMessage(Utils::getConfigMessage("MAX_CLAIM"));
+                                    } else $player->sendMessage(Utils::getConfigMessage("ALREADY_CLAIMED", array(FactionsAPI::getFactionClaim($player))));
+                                } else $player->sendMessage(Utils::getConfigMessage("NOT_FACTION_WORLD"));
+                            } else $player->sendMessage(Utils::getConfigMessage("ONLY_LEADER_OR_OFFICER"));
+                        } else $player->sendMessage(Utils::getConfigMessage("MUST_BE_IN_FACTION"));
+                        return true;
+                    case "unclaim":
+                        if (FactionsAPI::isInFaction($player)) {
+                            if (FactionsAPI::getRank($player->getName()) === "Leader" or FactionsAPI::getRank($player->getName()) === "Officer") {
+                                if (FactionsAPI::isInClaim($player)) {
+                                    $faction = FactionsAPI::getFaction($player);
+                                    if (FactionsAPI::getFactionClaim($player) === $faction) {
+                                        FactionsAPI::deleteClaim($player, $faction);
+                                        $player->sendMessage(Utils::getConfigMessage("UNCLAIM_SUCESS"));
+                                    } else $player->sendMessage(Utils::getConfigMessage("NOT_CLAIM_BY_YOUR_FACTION"));
+                                } else $player->sendMessage(Utils::getConfigMessage("NOT_CLAIM_BY_YOUR_FACTION"));
+                            } else $player->sendMessage(Utils::getConfigMessage("ONLY_LEADER_OR_OFFICER"));
                         } else $player->sendMessage(Utils::getConfigMessage("MUST_BE_IN_FACTION"));
                         return true;
                     case "about":

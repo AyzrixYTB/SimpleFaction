@@ -18,6 +18,15 @@ power_lost_per_death: 1
 
 faction_worlds: ["world"]
 
+# USAGE: "- POWER NEEDED"
+claims:
+  - 100
+  - 500
+  - 800
+  - 1000
+  - 2500
+  - 5000
+
 #--------------------------------------------------
 # LANGUAGE CONFIGURATION
 #--------------------------------------------------
@@ -52,3 +61,9 @@ ALREADY_HAVE_HOME: "{prefix} §cYour faction already have a home !"
 NOT_FACTION_WORLD: "{prefix} §cYou are not in a faction world !"
 HOME_SET: "{prefix} §aYou have successfully created your home !"
 HOME_DELETE: "{prefix} §aYou have successfully deleted your home !"
+CLAIM_SUCESS: "{prefix} §aYou have successfully claim this chunk !"
+NOT_ENOUGHT_POWER: "{prefix} §cYour faction doesn't have enought power, you need §6% §cpower for claim a new chunk."
+ALREADY_CLAIMED: "{prefix} §cThis claim is already claimed by the faction §6% §c!"
+MAX_CLAIM: "{prefix} §cYou have reached the claim limit !"
+NOT_CLAIM_BY_YOUR_FACTION: "{prefix} §cThis chunk is not claimed by your faction !"
+UNCLAIM_SUCESS: "{prefix} §aYou have successfully unclaim this chunk !"
