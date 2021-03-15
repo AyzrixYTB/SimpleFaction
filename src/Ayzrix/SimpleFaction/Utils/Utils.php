@@ -32,7 +32,7 @@ class Utils {
 
     /**
      * @param string $value
-     * @return bool|string|int
+     * @return bool|string|int|array
      */
     public static function getIntoConfig(string $value) {
         $config = Main::getInstance()->getConfig();

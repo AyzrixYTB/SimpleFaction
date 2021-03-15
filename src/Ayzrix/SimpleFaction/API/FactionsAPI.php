@@ -2,8 +2,10 @@
 
 namespace Ayzrix\SimpleFaction\API;
 
+use Ayzrix\SimpleFaction\Main;
 use Ayzrix\SimpleFaction\Utils\MySQL;
 use Ayzrix\SimpleFaction\Utils\Utils;
+use pocketmine\level\Position;
 use pocketmine\Player;
 use pocketmine\Server;
 
@@ -16,8 +18,7 @@ class FactionsAPI {
     public static function isInFaction(Player $player): bool {
         $name = $player->getName();
         $result = MySQL::getDatabase()->query("SELECT player FROM faction WHERE player='$name';");
-        $array = $result->fetch_Array(MYSQLI_ASSOC);
-        return empty($array) === false;
+        return $result->num_rows > 0 ? true : false;
     }
 
     /**
@@ -27,8 +28,7 @@ class FactionsAPI {
     public static function existsFaction($faction): bool {
         $faction = strtolower($faction);
         $result = MySQL::getDatabase()->query("SELECT player FROM faction WHERE lower(faction)='$faction';");
-        $array = $result->fetch_Array(MYSQLI_ASSOC);
-        return empty($array) === false;
+        return $result->num_rows > 0 ? true : false;
     }
 
     /**
@@ -161,5 +161,44 @@ class FactionsAPI {
             }
         }
         return $array;
+    }
+
+    /**
+     * @param string $faction
+     * @return bool
+     */
+    public static function existsHome(string $faction): bool {
+        $faction = strtolower($faction);
+        $result = MySQL::getDatabase()->query("SELECT x FROM home WHERE lower(faction)='$faction';");
+        return $result->num_rows > 0 ? true : false;
+    }
+
+    /**
+     * @param string $faction
+     * @param Position $position
+     */
+    public static function createHome(string $faction, Position $position): void {
+        $x = round($position->getX()) + 0.5;
+        $y = round($position->getY()) + 0.5;
+        $z = round($position->getZ()) + 0.5;
+        $world = $position->getLevel()->getFolderName();
+        MySQL::query("INSERT INTO home (faction, x, y, z, world) VALUES ('$faction', '$x', '$y', '$z', '$world')");
+    }
+
+    /**
+     * @param string $faction
+     */
+    public static function deleteHome(string $faction): void {
+        MySQL::query("DELETE FROM home WHERE faction='$faction'");
+    }
+
+    /**
+     * @param string $faction
+     * @return Position
+     */
+    public static function getHome(string $faction): Position {
+        $result = MySQL::getDatabase()->query("SELECT * FROM home WHERE faction='$faction';");
+        $array = $result->fetch_Array(MYSQLI_ASSOC);
+        return new Position((int)$array['x'], (int)$array['y'], (int)$array['z'], Main::getInstance()->getServer()->getLevelByName($array['world']));
     }
 }

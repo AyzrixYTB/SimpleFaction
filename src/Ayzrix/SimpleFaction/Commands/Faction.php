@@ -117,9 +117,51 @@ class Faction extends PluginCommand {
                             } else $player->sendMessage(Utils::getConfigMessage("MUST_BE_IN_FACTION"));
                         }
                         return true;
-
+                    case "sethome":
+                        if (FactionsAPI::isInFaction($player)) {
+                            if (FactionsAPI::getRank($player->getName()) === "Leader" or FactionsAPI::getRank($player->getName()) === "Officer") {
+                                if (!FactionsAPI::existsHome(FactionsAPI::getFaction($player))) {
+                                    if (in_array($player->getLevel()->getFolderName(), Utils::getIntoConfig("faction_worlds"))) {
+                                        $faction = FactionsAPI::getFaction($player);
+                                        FactionsAPI::createHome($faction, $player->getPosition());
+                                        $player->sendMessage(Utils::getConfigMessage("HOME_SET"));
+                                    } else $player->sendMessage(Utils::getConfigMessage("NOT_FACTION_WORLD"));
+                                } else $player->sendMessage(Utils::getConfigMessage("ALREADY_HAVE_HOME"));
+                            } else $player->sendMessage(Utils::getConfigMessage("ONLY_LEADER_OR_OFFICER"));
+                        } else $player->sendMessage(Utils::getConfigMessage("MUST_BE_IN_FACTION"));
+                        return true;
+                    case "delhome":
+                        if (FactionsAPI::isInFaction($player)) {
+                            if (FactionsAPI::getRank($player->getName()) === "Leader" or FactionsAPI::getRank($player->getName()) === "Officer") {
+                                if (FactionsAPI::existsHome(FactionsAPI::getFaction($player))) {
+                                        $faction = FactionsAPI::getFaction($player);
+                                        FactionsAPI::deleteHome($faction);
+                                        $player->sendMessage(Utils::getConfigMessage("HOME_DELETE"));
+                                } else $player->sendMessage(Utils::getConfigMessage("NOT_HAVE_HOME"));
+                            } else $player->sendMessage(Utils::getConfigMessage("ONLY_LEADER_OR_OFFICER"));
+                        } else $player->sendMessage(Utils::getConfigMessage("MUST_BE_IN_FACTION"));
+                        return true;
+                    case "home":
+                        if (FactionsAPI::isInFaction($player)) {
+                            if (FactionsAPI::existsHome(FactionsAPI::getFaction($player))) {
+                                $faction = FactionsAPI::getFaction($player);
+                                $player->teleport(FactionsAPI::getHome($faction));
+                                $player->sendMessage(Utils::getConfigMessage("HOME_TELEPORTED"));
+                            } else $player->sendMessage(Utils::getConfigMessage("NOT_HAVE_HOME"));
+                        } else $player->sendMessage(Utils::getConfigMessage("MUST_BE_IN_FACTION"));
+                        return true;
+                    case "about":
+                        $player->sendMessage("§c§lPlugin created by Ayzrix.");
+                        $player->sendMessage("§4§lYoutube:§r§f Ayzrix");
+                        $player->sendMessage("§b§lTwitter:§r§f @Ayzrix");
+                        $player->sendMessage("§6§lDownload link:§r§f github.com/AyzrixYTB/SimpleFaction");
+                        return true;
+                    default:
+                        $player->sendMessage(Utils::getConfigMessage("COMMAND_USAGE"));
+                        return true;
                 }
-            }
-        }
+            } else $player->sendMessage(Utils::getConfigMessage("COMMAND_USAGE"));
+        } else $player->sendMessage(Utils::getConfigMessage("PLAYER_ONLY"));
+        return true;
     }
 }

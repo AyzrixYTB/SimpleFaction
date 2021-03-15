@@ -8,12 +8,12 @@
 - [X] Create command
 - [X] Delete command
 - [X] Info command  
-- [ ] Power system
+- [X] Power system
 - [ ] Allies system
-- [ ] About command
+- [X] About command
 - [ ] Promote | Demote commands
 - [ ] Claim system
-- [ ] Home system
+- [X] Home system
 - [ ] Leave command
 - [ ] Kick command
 - [ ] Top command

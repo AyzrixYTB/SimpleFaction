@@ -20,6 +20,7 @@ class MySQL {
     public static function init(): void {
         self::getDatabase()->query("CREATE TABLE IF NOT EXISTS faction (player VARCHAR(255) PRIMARY KEY, faction VARCHAR(255), role VARCHAR(255));");
         self::getDatabase()->query("CREATE TABLE IF NOT EXISTS power (faction VARCHAR(255) PRIMARY KEY, power int);");
+        self::getDatabase()->query("CREATE TABLE IF NOT EXISTS home (faction VARCHAR(255) PRIMARY KEY, x int, y int, z int, world VARCHAR(255));");
     }
 
     /**
