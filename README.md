@@ -11,11 +11,11 @@
 - [X] Power system
 - [ ] Allies system
 - [X] About command
-- [ ] Promote | Demote commands
-- [ ] Claim system
+- [X] Promote | Demote commands
+- [X] Claim system
 - [X] Home system
-- [ ] Leave command
-- [ ] Kick command
+- [X] Leave command
+- [X] Kick command
 - [ ] Top command
 - [ ] Invite | Deny | Accept commands
 - [ ] Map command

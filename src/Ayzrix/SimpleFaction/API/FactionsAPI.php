@@ -8,7 +8,6 @@ use Ayzrix\SimpleFaction\Utils\Utils;
 use pocketmine\level\Position;
 use pocketmine\Player;
 use pocketmine\Server;
-use pocketmine\utils\Config;
 
 class FactionsAPI {
 
@@ -61,6 +60,17 @@ class FactionsAPI {
     public static function getFaction(Player $player): string {
         $name = $player->getName();
         $faction = MySQL::getDatabase()->query("SELECT faction FROM faction WHERE player='$name';");
+        $array = $faction->fetch_Array(MYSQLI_ASSOC);
+        return $array["faction"]?? "";
+    }
+
+    /**
+     * @param string $name
+     * @return string
+     */
+    public static function getPlayerFaction(string $name): string {
+        $name = strtolower($name);
+        $faction = MySQL::getDatabase()->query("SELECT faction FROM faction WHERE lower(player)='$name';");
         $array = $faction->fetch_Array(MYSQLI_ASSOC);
         return $array["faction"]?? "";
     }
@@ -262,5 +272,37 @@ class FactionsAPI {
         $result = MySQL::getDatabase()->query("SELECT COUNT(faction) FROM claim where faction='$faction'");
         $array = $result->fetch_array(MYSQLI_ASSOC);
         return (int)$array['COUNT(faction)']?? 0;
+    }
+
+    /**
+     * @param Player $player
+     */
+    public static function leaveFaction(Player $player): void {
+        $name = $player->getName();
+        MySQL::query("DELETE FROM faction WHERE player = '$name'");
+    }
+
+    /**
+     * @param string $name
+     */
+    public static function kickFaction(string $name): void {
+        $name = strtolower($name);
+        MySQL::query("DELETE FROM faction WHERE lower(player) = '$name'");
+    }
+
+    /**
+     * @param string $name
+     */
+    public static function promoteFaction(string $name): void {
+        $name = strtolower($name);
+        MySQL::query("UPDATE faction SET role = 'Officer' WHERE lower(player)='$name'");
+    }
+
+    /**
+     * @param string $name
+     */
+    public static function demoteFaction(string $name): void {
+        $name = strtolower($name);
+        MySQL::query("UPDATE faction SET role = 'Member' WHERE lower(player)='$name'");
     }
 }

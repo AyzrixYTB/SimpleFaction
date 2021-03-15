@@ -182,6 +182,59 @@ class Faction extends PluginCommand {
                             } else $player->sendMessage(Utils::getConfigMessage("ONLY_LEADER_OR_OFFICER"));
                         } else $player->sendMessage(Utils::getConfigMessage("MUST_BE_IN_FACTION"));
                         return true;
+                    case "leave":
+                        if (FactionsAPI::isInFaction($player)) {
+                            if (FactionsAPI::getRank($player->getName()) !== "Leader") {
+                                FactionsAPI::leaveFaction($player);
+                                $player->sendMessage(Utils::getConfigMessage("LEAVE_SUCESS"));
+                            } else $player->sendMessage(Utils::getConfigMessage("LEADER_CANNOT_LEAVE"));
+                        } else $player->sendMessage(Utils::getConfigMessage("MUST_BE_IN_FACTION"));
+                        return true;
+                    case "kick":
+                        if (isset($args[1])) {
+                            if (FactionsAPI::isInFaction($player)) {
+                                if (FactionsAPI::getRank($player->getName()) === "Leader" or FactionsAPI::getRank($player->getName()) === "Officer") {
+                                    $faction = FactionsAPI::getFaction($player);
+                                    if (FactionsAPI::getPlayerFaction($args[1]) === $faction) {
+                                        if (FactionsAPI::getRank($args[1]) !== "Leader" and FactionsAPI::getRank($args[1]) !== FactionsAPI::getRank($player->getName())) {
+                                            FactionsAPI::kickFaction($args[1]);
+                                            $player->sendMessage(Utils::getConfigMessage("KICK_SUCESS", array($args[1])));
+                                        } else $player->sendMessage(Utils::getConfigMessage("CANNOT_KICK_PLAYER"));
+                                    } else $player->sendMessage(Utils::getConfigMessage("PLAYER_NOT_IN_YOUR_FACTION"));
+                                } else $player->sendMessage(Utils::getConfigMessage("ONLY_LEADER_OR_OFFICER"));
+                            } else $player->sendMessage(Utils::getConfigMessage("MUST_BE_IN_FACTION"));
+                        } else $player->sendMessage(Utils::getConfigMessage("KICK_USAGE"));
+                        return true;
+                    case "promote":
+                        if (isset($args[1])) {
+                            if (FactionsAPI::isInFaction($player)) {
+                                if (FactionsAPI::getRank($player->getName()) === "Leader") {
+                                    $faction = FactionsAPI::getFaction($player);
+                                    if (FactionsAPI::getPlayerFaction($args[1]) === $faction) {
+                                        if (FactionsAPI::getRank($args[1]) === "Member") {
+                                            FactionsAPI::promoteFaction($args[1]);
+                                            $player->sendMessage(Utils::getConfigMessage("PROMOTE_SUCESS", array($args[1])));
+                                        } else $player->sendMessage(Utils::getConfigMessage("PLAYER_ALREADY_OFFICER"));
+                                    } else $player->sendMessage(Utils::getConfigMessage("PLAYER_NOT_IN_YOUR_FACTION", array($args[1])));
+                                } else $player->sendMessage(Utils::getConfigMessage("ONLY_LEADER"));
+                            } else $player->sendMessage(Utils::getConfigMessage("MUST_BE_IN_FACTION"));
+                        } else $player->sendMessage(Utils::getConfigMessage("PROMOTE_USAGE"));
+                        return true;
+                    case "demote":
+                        if (isset($args[1])) {
+                            if (FactionsAPI::isInFaction($player)) {
+                                if (FactionsAPI::getRank($player->getName()) === "Leader") {
+                                    $faction = FactionsAPI::getFaction($player);
+                                    if (FactionsAPI::getPlayerFaction($args[1]) === $faction) {
+                                        if (FactionsAPI::getRank($args[1]) === "Officer") {
+                                            FactionsAPI::demoteFaction($args[1]);
+                                            $player->sendMessage(Utils::getConfigMessage("DEMOTE_SUCESS", array($args[1])));
+                                        } else $player->sendMessage(Utils::getConfigMessage("PLAYER_ALREADY_MEMBER"));
+                                    } else $player->sendMessage(Utils::getConfigMessage("PLAYER_NOT_IN_YOUR_FACTION", array($args[1])));
+                                } else $player->sendMessage(Utils::getConfigMessage("ONLY_LEADER"));
+                            } else $player->sendMessage(Utils::getConfigMessage("MUST_BE_IN_FACTION"));
+                        } else $player->sendMessage(Utils::getConfigMessage("DEMOTE_USAGE"));
+                        return true;
                     case "about":
                         $player->sendMessage("§c§lPlugin created by Ayzrix.");
                         $player->sendMessage("§4§lYoutube:§r§f Ayzrix");
