@@ -11,6 +11,12 @@ use pocketmine\Server;
 
 class FactionsAPI {
 
+    /** @var array $invitation */
+    public static $invitation = [];
+
+    /** @var array $invitationTimeout */
+    public static $invitationTimeout = [];
+
     /**
      * @param Player $player
      * @return bool
@@ -304,5 +310,41 @@ class FactionsAPI {
     public static function demoteFaction(string $name): void {
         $name = strtolower($name);
         MySQL::query("UPDATE faction SET role = 'Member' WHERE lower(player)='$name'");
+    }
+
+    /**
+     * @param Player $player
+     * @param string $faction
+     */
+    public static function sendInvitation(Player $player, string $faction): void {
+        self::$invitation[$player->getName()] = $faction;
+        self::$invitationTimeout[$player->getName()] = time() + (int)Utils::getIntoConfig("invitation_expire_time");
+    }
+
+    /**
+     * @param Player $player
+     */
+    public static function acceptInvitation(Player $player): void {
+        $name = $player->getName();
+        $faction = self::$invitation[$player->getName()];
+        MySQL::query("INSERT INTO faction (player, faction, role) VALUES ('$name', '$faction', 'Member')");
+        foreach (self::getAllPlayers($faction) as $player) {
+            if (Server::getInstance()->getPlayer($player)) {
+                $player = Server::getInstance()->getPlayer($player);
+                if ($player instanceof Player) {
+                    $player->sendMessage(Utils::getConfigMessage("JOIN_FACTION_BROADCAST", array($name)));
+                }
+            }
+        }
+        unset(self::$invitation[$player->getName()]);
+        unset(self::$invitationTimeout[$player->getName()]);
+    }
+
+    /**
+     * @param Player $player
+     */
+    public static function denyInvitation(Player $player): void {
+        unset(self::$invitation[$player->getName()]);
+        unset(self::$invitationTimeout[$player->getName()]);
     }
 }

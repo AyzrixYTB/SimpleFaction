@@ -8,6 +8,7 @@ use Ayzrix\SimpleFaction\Utils\Utils;
 use pocketmine\command\CommandSender;
 use pocketmine\command\PluginCommand;
 use pocketmine\Player;
+use pocketmine\Server;
 
 class Faction extends PluginCommand {
 
@@ -234,6 +235,53 @@ class Faction extends PluginCommand {
                                 } else $player->sendMessage(Utils::getConfigMessage("ONLY_LEADER"));
                             } else $player->sendMessage(Utils::getConfigMessage("MUST_BE_IN_FACTION"));
                         } else $player->sendMessage(Utils::getConfigMessage("DEMOTE_USAGE"));
+                        return true;
+                    case "invite":
+                        if (isset($args[1])) {
+                            if (FactionsAPI::isInFaction($player)) {
+                                if (FactionsAPI::getRank($player->getName()) === "Leader" or FactionsAPI::getRank($player->getName()) === "Officer") {
+                                    if (Server::getInstance()->getPlayer($args[1])) {
+                                        $target = Server::getInstance()->getPlayer($args[1]);
+                                        if ($target instanceof Player) {
+                                            if (!FactionsAPI::isInFaction($target)) {
+                                                $faction = FactionsAPI::getFaction($player);
+                                                FactionsAPI::sendInvitation($target, $faction);
+                                                $target->sendMessage(Utils::getConfigMessage("INVITE_SUCESS_TARGET", array($faction)));
+                                                $player->sendMessage(Utils::getConfigMessage("INVITE_SUCESS", array($target->getName())));
+                                            } else $player->sendMessage(Utils::getConfigMessage("PLAYER_ALREADY_IN_FACTION"));
+                                        } else $player->sendMessage(Utils::getConfigMessage("PLAYER_NOT_ONLINE"));
+                                    } else $player->sendMessage(Utils::getConfigMessage("PLAYER_NOT_ONLINE"));
+                                } else $player->sendMessage(Utils::getConfigMessage("ONLY_LEADER_OR_OFFICER"));
+                            } else $player->sendMessage(Utils::getConfigMessage("MUST_BE_IN_FACTION"));
+                        } else $player->sendMessage(Utils::getConfigMessage("INVITE_USAGE"));
+                        return true;
+                    case "accept":
+                        if (!FactionsAPI::isInFaction($player)) {
+                            if (isset(FactionsAPI::$invitation[$player->getName()])) {
+                                $timer = FactionsAPI::$invitationTimeout[$player->getName()];
+                                $timer = $timer - time();
+                                if ($timer > 0) {
+                                    $faction = FactionsAPI::$invitation[$player->getName()];
+                                    if (count(FactionsAPI::getAllPlayers($faction)) < (int)Utils::getIntoConfig("faction_max_members")) {
+                                        FactionsAPI::acceptInvitation($player);
+                                        $player->sendMessage(Utils::getConfigMessage("ACCEPT_SUCESS", array($faction)));
+                                    } else $player->sendMessage(Utils::getConfigMessage("FACTION_FULL"));
+                                } else $player->sendMessage(Utils::getConfigMessage("INVITATION_EXPIRED"));
+                            } else $player->sendMessage(Utils::getConfigMessage("DONT_HAVE_INVITATION"));
+                        } else $player->sendMessage(Utils::getConfigMessage("ALREADY_IN_FACTION"));
+                    return true;
+                    case "deny":
+                        if (!FactionsAPI::isInFaction($player)) {
+                            if (isset(FactionsAPI::$invitation[$player->getName()])) {
+                                $timer = FactionsAPI::$invitationTimeout[$player->getName()];
+                                $timer = $timer - time();
+                                if ($timer > 0) {
+                                    $faction = FactionsAPI::$invitation[$player->getName()];
+                                    FactionsAPI::denyInvitation($player);
+                                    $player->sendMessage(Utils::getConfigMessage("DENY_SUCESS", array($faction)));
+                                } else $player->sendMessage(Utils::getConfigMessage("INVITATION_EXPIRED"));
+                            } else $player->sendMessage(Utils::getConfigMessage("DONT_HAVE_INVITATION"));
+                        } else $player->sendMessage(Utils::getConfigMessage("ALREADY_IN_FACTION"));
                         return true;
                     case "about":
                         $player->sendMessage("§c§lPlugin created by Ayzrix.");

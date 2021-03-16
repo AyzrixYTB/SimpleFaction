@@ -9,15 +9,16 @@
 - [X] Delete command
 - [X] Info command  
 - [X] Power system
-- [ ] Allies system
 - [X] About command
 - [X] Promote | Demote commands
 - [X] Claim system
 - [X] Home system
 - [X] Leave command
 - [X] Kick command
+- [X] Invite | Deny | Accept commands
+- [ ] Allies system  
 - [ ] Top command
-- [ ] Invite | Deny | Accept commands
+- [ ] Leader command  
 - [ ] Map command
 - [ ] Chat commands
 - [ ] PureChat|PurePerms support
