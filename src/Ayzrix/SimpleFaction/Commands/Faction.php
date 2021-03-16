@@ -9,7 +9,6 @@ use pocketmine\command\CommandSender;
 use pocketmine\command\PluginCommand;
 use pocketmine\Player;
 use pocketmine\Server;
-use pocketmine\utils\TextFormat as TF;
 
 class Faction extends PluginCommand {
 
@@ -24,7 +23,6 @@ class Faction extends PluginCommand {
             if(isset($args[0])) {
                 switch ($args[0]) {
                     case "help":
-                    case "h":
                         if(isset($args[1])) {
                             switch ($args[1]) {
                                 case 2:
@@ -343,6 +341,135 @@ class Faction extends PluginCommand {
                             } else $player->sendMessage(Utils::getConfigMessage("ONLY_LEADER"));
                         } else $player->sendMessage(Utils::getConfigMessage("MUST_BE_IN_FACTION"));
                     } else $player->sendMessage(Utils::getConfigMessage("TRANSFER_USAGE"));
+                        return true;
+                    case "allies":
+                    case "ally":
+                        if (isset($args[1])) {
+                            switch ($args[1]) {
+                                case "add":
+                                    if (FactionsAPI::isInFaction($player)) {
+                                        if (FactionsAPI::getRank($player->getName()) === "Leader") {
+                                            if (isset($args[2])) {
+                                                if (FactionsAPI::existsFaction($args[2])) {
+                                                    $faction1 = FactionsAPI::getFaction($player);
+                                                    $faction2 = $args[2];
+                                                    FactionsAPI::sendAlliesInvitation($faction2, $faction1);
+                                                    $player->sendMessage(Utils::getConfigMessage("ALLIES_INVITE_SUCESS", array($faction2)));
+                                                } else $player->sendMessage(Utils::getConfigMessage("FACTION_NOT_EXIST"));
+                                            } else $player->sendMessage(Utils::getConfigMessage("ALLIES_REMOVE_USAGE"));
+                                        } else $player->sendMessage(Utils::getConfigMessage("ONLY_LEADER"));
+                                    } else $player->sendMessage(Utils::getConfigMessage("MUST_BE_IN_FACTION"));
+                                    return  true;
+                                case "remove":
+                                    if (FactionsAPI::isInFaction($player)) {
+                                        if (FactionsAPI::getRank($player->getName()) === "Leader") {
+                                            if (isset($args[2])) {
+                                                if (FactionsAPI::existsFaction($args[2])) {
+                                                    $faction1 = FactionsAPI::getFaction($player);
+                                                    $faction2 = $args[2];
+                                                    if (FactionsAPI::areAllies($faction1, $faction2)) {
+                                                        FactionsAPI::removeAllies($faction1, $faction2);
+                                                    } else $player->sendMessage(Utils::getConfigMessage("NOT_ALLIES", array($faction2)));
+                                                } else $player->sendMessage(Utils::getConfigMessage("FACTION_NOT_EXIST"));
+                                            } else $player->sendMessage(Utils::getConfigMessage("ALLIES_REMOVE_USAGE"));
+                                        } else $player->sendMessage(Utils::getConfigMessage("ONLY_LEADER"));
+                                    } else $player->sendMessage(Utils::getConfigMessage("MUST_BE_IN_FACTION"));
+                                    return  true;
+                                case "list":
+                                    if (FactionsAPI::isInFaction($player)) {
+                                        $faction = FactionsAPI::getFaction($player);
+                                        $player->sendMessage(Utils::getConfigMessage("ALLIES_LIST_HEADER"));
+                                        $message = Utils::getConfigMessage("ALLIES_LIST");
+                                        $allies = FactionsAPI::getAllies($faction);
+                                        $allieMessage = implode(", ", FactionsAPI::getAllies($faction));
+                                        if (empty($allies)) $allieMessage = "§cNone";
+                                        $message = str_replace("{allies}", $allieMessage, $message);
+                                        $player->sendMessage($message);
+                                    } else $player->sendMessage(Utils::getConfigMessage("MUST_BE_IN_FACTION"));
+                                    return  true;
+                                case "accept":
+                                    if (FactionsAPI::isInFaction($player)) {
+                                        if (FactionsAPI::getRank($player->getName()) === "Leader") {
+                                            $faction = FactionsAPI::getFaction($player);
+                                            if (isset(FactionsAPI::$Alliesinvitation[$faction])) {
+                                                $faction2 = FactionsAPI::$Alliesinvitation[$faction];
+                                                $timer = FactionsAPI::$AlliesinvitationTimeout[$faction];
+                                                $timer = $timer - time();
+                                                if ($timer > 0) {
+                                                    if (FactionsAPI::getAlliesCount($faction) < Utils::getIntoConfig("faction_max_allies")) {
+                                                        if (FactionsAPI::getAlliesCount($faction2) < Utils::getIntoConfig("faction_max_allies")) {
+                                                            FactionsAPI::acceptAlliesInvitation($faction);
+                                                        } else $player->sendMessage(Utils::getConfigMessage("FACTION_MAX_ALLIES", array($faction2)));
+                                                    } else $player->sendMessage(Utils::getConfigMessage("YOUR_FACTION_MAX_ALLIES"));
+                                                } else $player->sendMessage(Utils::getConfigMessage("ALLIES_REQUEST_EXPIRE"));
+                                            } else $player->sendMessage(Utils::getConfigMessage("DONT_HAVE_ALLIES_REQUEST"));
+                                        } else $player->sendMessage(Utils::getConfigMessage("ONLY_LEADER"));
+                                    } else $player->sendMessage(Utils::getConfigMessage("MUST_BE_IN_FACTION"));
+                                    return  true;
+                                case "deny":
+                                    if (FactionsAPI::isInFaction($player)) {
+                                        if (FactionsAPI::getRank($player->getName()) === "Leader") {
+                                            $faction = FactionsAPI::getFaction($player);
+                                            if (isset(FactionsAPI::$Alliesinvitation[$faction])) {
+                                                $timer = FactionsAPI::$AlliesinvitationTimeout[$faction];
+                                                $timer = $timer - time();
+                                                if ($timer > 0) {
+                                                    $player->sendMessage(Utils::getConfigMessage("ALLIES_DENY_SUCESS", array(FactionsAPI::$Alliesinvitation[$faction])));
+                                                    FactionsAPI::denyAlliesInvitation($faction);
+                                                } else $player->sendMessage(Utils::getConfigMessage("ALLIES_REQUEST_EXPIRE"));
+                                            } else $player->sendMessage(Utils::getConfigMessage("DONT_HAVE_ALLIES_REQUEST"));
+                                        } else $player->sendMessage(Utils::getConfigMessage("ONLY_LEADER"));
+                                    } else $player->sendMessage(Utils::getConfigMessage("MUST_BE_IN_FACTION"));
+                                    return  true;
+                                default:
+                                    $player->sendMessage(Utils::getConfigMessage("ALLIES_USAGE"));
+                                    return true;
+                            }
+                        } else $player->sendMessage(Utils::getConfigMessage("ALLIES_USAGE"));
+                        return true;
+                    case "chat":
+                        if (FactionsAPI::isInFaction($player)) {
+                            if (isset($args[1])) {
+                                switch (strtolower($args[1])) {
+                                    case "faction":
+                                    case "fac":
+                                    case "f":
+                                    if (isset(FactionsAPI::$chat[$player->getName()])) {
+                                        if (FactionsAPI::$chat[$player->getName()] !== "FACTION") {
+                                            FactionsAPI::$chat[$player->getName()] = "FACTION";
+                                            $player->sendMessage(Utils::getConfigMessage("CHAT_SUCESS", array("FACTION")));
+                                        } else $player->sendMessage(Utils::getConfigMessage("ALREADY_THIS_CHAT", array("FACTION")));
+                                    } else {
+                                        FactionsAPI::$chat[$player->getName()] = "FACTION";
+                                        $player->sendMessage(Utils::getConfigMessage("CHAT_SUCESS", array("FACTION")));
+                                    }
+                                        break;
+                                    case "alliance":
+                                    case "ally":
+                                    case "a":
+                                    if (isset(FactionsAPI::$chat[$player->getName()])) {
+                                        if (FactionsAPI::$chat[$player->getName()] !== "ALLIANCE") {
+                                            FactionsAPI::$chat[$player->getName()] = "ALLIANCE";
+                                            $player->sendMessage(Utils::getConfigMessage("CHAT_SUCESS", array("ALLIANCE")));
+                                        } else $player->sendMessage(Utils::getConfigMessage("ALREADY_THIS_CHAT", array("ALLIANCE")));
+                                    } else {
+                                        FactionsAPI::$chat[$player->getName()] = "ALLIANCE";
+                                        $player->sendMessage(Utils::getConfigMessage("CHAT_SUCESS", array("ALLIANCE")));
+                                    }
+                                        break;
+                                    case "global":
+                                    case "g":
+                                        if (isset(FactionsAPI::$chat[$player->getName()])) {
+                                            unset(FactionsAPI::$chat[$player->getName()]);
+                                            $player->sendMessage(Utils::getConfigMessage("CHAT_SUCESS", array("GLOBAL")));
+                                        } else $player->sendMessage(Utils::getConfigMessage("ALREADY_THIS_CHAT", array("GLOBAL")));
+                                        break;
+                                    default:
+                                        $player->sendMessage(Utils::getConfigMessage("CHAT_USAGE"));
+                                        break;
+                                }
+                            } else $player->sendMessage(Utils::getConfigMessage("CHAT_USAGE"));
+                        } else $player->sendMessage(Utils::getConfigMessage("MUST_BE_IN_FACTION"));
                         return true;
                     case "about":
                         $player->sendMessage("§c§lPlugin created by Ayzrix.");

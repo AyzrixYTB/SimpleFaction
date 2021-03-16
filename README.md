@@ -19,10 +19,15 @@
 - [X] F info connected color 
 - [X] Top command
 - [X] Leader command
-- [ ] Allies system
+- [X] Multi Provider
+- [X] Damage protection system
+- [X] Claim edit protection system  
+- [X] Allies system
+- [X] Chat commands  
 - [ ] Map command
-- [ ] Chat commands
 - [ ] PureChat|PurePerms support
 - [ ] ScoreHUD support
 - [ ] ChunkBorders command  
+- [ ] Faction's bank system
 - [ ] Admins commands
+- [ ] Messages cleaning
