@@ -5,6 +5,7 @@ namespace Ayzrix\SimpleFaction\API;
 use Ayzrix\SimpleFaction\Main;
 use Ayzrix\SimpleFaction\Utils\MySQL;
 use Ayzrix\SimpleFaction\Utils\Utils;
+use Cult\HCF\CPlayer;
 use pocketmine\level\Position;
 use pocketmine\Player;
 use pocketmine\Server;
@@ -313,6 +314,15 @@ class FactionsAPI {
     }
 
     /**
+     * @param string $name
+     * @param string $faction
+     */
+    public static function transferFaction(string $name, string $faction): void {
+        $name = strtolower($name);
+        MySQL::query("UPDATE faction SET role = 'Leader' WHERE lower(player)='$name'");
+    }
+
+    /**
      * @param Player $player
      * @param string $faction
      */
@@ -346,5 +356,53 @@ class FactionsAPI {
     public static function denyInvitation(Player $player): void {
         unset(self::$invitation[$player->getName()]);
         unset(self::$invitationTimeout[$player->getName()]);
+    }
+
+    public static function getAllPowers() {
+        $result = MySQL::getDatabase()->query("SELECT * FROM power ORDER BY power;");
+        $return = [];
+        foreach($result->fetch_all() as $val){
+            var_dump($val);
+            $return[$val[0]] = (int)$val[1];
+        }
+        $result->close();
+        return $return;
+    }
+
+    /**
+     * @param Player $player
+     * @param int $page
+     */
+    public static function sendFactionTop(Player $player, int $page = 1): void {
+        $factions = self::getAllPowers();
+        $maxpage = intval(abs(count($factions) / 10));
+        $rest = count($factions) % 10;
+        arsort($factions);
+        if ($rest > 0) $maxpage++;
+        if ($page === 0) $page = 1;
+        if ($page > $maxpage) $page = $maxpage;
+        $deptop = (($page - 1) * 10) + 1;
+        $fintop = (($page - 1) * 10) + 11;
+
+        $i = 1;
+        $message = Utils::getConfigMessage("TOP_FACTION_HEADER", array($page, $maxpage));
+
+        foreach ($factions as $faction => $power) {
+            if ($i >= $fintop) break;
+            if ($i < $deptop) {
+                $i++;
+                continue;
+            }
+
+            $memberscount = count(self::getAllPlayers($faction));
+            $line = Utils::getIntoConfig("TOP_FACTION_LINE");
+            $line = str_replace("{index}", $i, $line);
+            $line = str_replace("{faction}", $faction, $line);
+            $line = str_replace("{power}", $power, $line);
+            $line = str_replace("{members}", $memberscount, $line);
+            $message .= PHP_EOL . $line;
+            $i++;
+        }
+        $player->sendMessage($message);
     }
 }

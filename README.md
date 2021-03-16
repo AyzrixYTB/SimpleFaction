@@ -16,9 +16,10 @@
 - [X] Leave command
 - [X] Kick command
 - [X] Invite | Deny | Accept commands
-- [ ] Allies system  
-- [ ] Top command
-- [ ] Leader command  
+- [X] F info connected color 
+- [X] Top command
+- [X] Leader command
+- [ ] Allies system
 - [ ] Map command
 - [ ] Chat commands
 - [ ] PureChat|PurePerms support

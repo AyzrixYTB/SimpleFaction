@@ -9,6 +9,7 @@ use pocketmine\command\CommandSender;
 use pocketmine\command\PluginCommand;
 use pocketmine\Player;
 use pocketmine\Server;
+use pocketmine\utils\TextFormat as TF;
 
 class Faction extends PluginCommand {
 
@@ -85,16 +86,36 @@ class Faction extends PluginCommand {
                                 $faction = $args[1];
                                 $power = FactionsAPI::getPower($faction);
                                 $leader = FactionsAPI::getLeader($faction);
-                                $officers = implode(" ,", FactionsAPI::getOfficers($faction));
-                                $members = implode(" ,", FactionsAPI::getMembers($faction));
+                                if (Server::getInstance()->getPlayer($leader)) {
+                                    $leaderMessage = "§a{$leader}";
+                                } else $leaderMessage = "§c{$leader}";
+
+
+                                $officers = FactionsAPI::getOfficers($faction);
+                                $officerMessage = "";
+                                foreach ($officers as $officer) {
+                                    if (Server::getInstance()->getPlayer($officer)){
+                                        $officerMessage .= "§a{$officer}§f, ";
+                                    } else $officerMessage .= "§c{$officer}§f, ";
+                                }
+                                if($officerMessage === "") $officerMessage = "§cNone";
+
+                                $members = FactionsAPI::getMembers($faction);
+                                $memberMessage = "";
+                                foreach ($members as $member) {
+                                    if (Server::getInstance()->getPlayer($member)){
+                                        $memberMessage .= "§a{$member}§f, ";
+                                    } else $memberMessage .= "§c{$member}§f, ";
+                                }
+                                if($memberMessage === "") $memberMessage = "§cNone";
                                 $memberscount = count(FactionsAPI::getAllPlayers($faction));
                                 $player->sendMessage(Utils::getConfigMessage("FACTION_INFO_HEADER", array($faction)));
                                 $message = Utils::getIntoConfig("FACTON_INFO_CONTENT");
                                 $message = str_replace("{faction}", $faction, $message);
                                 $message = str_replace("{power}", $power, $message);
-                                $message = str_replace("{leader}", $leader, $message);
-                                $message = str_replace("{officers}", $officers, $message);
-                                $message = str_replace("{members}", $members, $message);
+                                $message = str_replace("{leader}", $leaderMessage, $message);
+                                $message = str_replace("{officers}", $officerMessage, $message);
+                                $message = str_replace("{members}", $memberMessage, $message);
                                 $message = str_replace("{memberscount}", $memberscount, $message);
                                 $player->sendMessage($message);
                             } else $player->sendMessage(Utils::getConfigMessage("FACTION_NOT_EXIST"));
@@ -103,16 +124,34 @@ class Faction extends PluginCommand {
                                 $faction = FactionsAPI::getFaction($player);
                                 $power = FactionsAPI::getPower($faction);
                                 $leader = FactionsAPI::getLeader($faction);
-                                $officers = implode(" ,", FactionsAPI::getOfficers($faction));
-                                $members = implode(" ,", FactionsAPI::getMembers($faction));
+                                if (Server::getInstance()->getPlayer($leader)) {
+                                    $leaderMessage = "§a{$leader}";
+                                } else $leaderMessage = "§c{$leader}";
+                                $officers = FactionsAPI::getOfficers($faction);
+                                $officerMessage = "";
+                                foreach ($officers as $officer) {
+                                    if (Server::getInstance()->getPlayer($officer)){
+                                        $officerMessage .= "§a{$officer}§f, ";
+                                    } else $officerMessage .= "§c{$officer}§f, ";
+                                }
+                                if($officerMessage === "") $officerMessage = "§cNone";
+
+                                $members = FactionsAPI::getMembers($faction);
+                                $memberMessage = "";
+                                foreach ($members as $member) {
+                                    if (Server::getInstance()->getPlayer($member)){
+                                        $memberMessage .= "§a{$member}§f, ";
+                                    } else $memberMessage .= "§c{$member}§f, ";
+                                }
+                                if($memberMessage === "") $memberMessage = "§cNone";
                                 $memberscount = count(FactionsAPI::getAllPlayers($faction));
                                 $player->sendMessage(Utils::getConfigMessage("FACTION_INFO_HEADER", array($faction)));
                                 $message = Utils::getIntoConfig("FACTON_INFO_CONTENT");
                                 $message = str_replace("{faction}", $faction, $message);
                                 $message = str_replace("{power}", $power, $message);
-                                $message = str_replace("{leader}", $leader, $message);
-                                $message = str_replace("{officers}", $officers, $message);
-                                $message = str_replace("{members}", $members, $message);
+                                $message = str_replace("{leader}", $leaderMessage, $message);
+                                $message = str_replace("{officers}", $officerMessage, $message);
+                                $message = str_replace("{members}", $memberMessage, $message);
                                 $message = str_replace("{memberscount}", $memberscount, $message);
                                 $player->sendMessage($message);
                             } else $player->sendMessage(Utils::getConfigMessage("MUST_BE_IN_FACTION"));
@@ -282,6 +321,28 @@ class Faction extends PluginCommand {
                                 } else $player->sendMessage(Utils::getConfigMessage("INVITATION_EXPIRED"));
                             } else $player->sendMessage(Utils::getConfigMessage("DONT_HAVE_INVITATION"));
                         } else $player->sendMessage(Utils::getConfigMessage("ALREADY_IN_FACTION"));
+                        return true;
+                    case "top":
+                        if(isset($args[1])) {
+                            FactionsAPI::sendFactionTop($player, (int)$args[1]);
+                        } else FactionsAPI::sendFactionTop($player);
+                        return true;
+                    case "transfer":
+                    case "leader":
+                    if (isset($args[1])) {
+                        if (FactionsAPI::isInFaction($player)) {
+                            if (FactionsAPI::getRank($player->getName()) === "Leader") {
+                                $faction = FactionsAPI::getFaction($player);
+                                if (FactionsAPI::getPlayerFaction($args[1]) === $faction) {
+                                    if (strtolower($args[1]) !== strtolower($player->getName())) {
+                                        FactionsAPI::demoteFaction($player->getName());
+                                        FactionsAPI::transferFaction($args[1], $faction);
+                                        $player->sendMessage(Utils::getConfigMessage("TRANSFER_SUCESS", array($args[1])));
+                                    } else $player->sendMessage(Utils::getConfigMessage("CANNOT_TRANFER_YOURSELF"));
+                                } else $player->sendMessage(Utils::getConfigMessage("PLAYER_NOT_IN_YOUR_FACTION", array($args[1])));
+                            } else $player->sendMessage(Utils::getConfigMessage("ONLY_LEADER"));
+                        } else $player->sendMessage(Utils::getConfigMessage("MUST_BE_IN_FACTION"));
+                    } else $player->sendMessage(Utils::getConfigMessage("TRANSFER_USAGE"));
                         return true;
                     case "about":
                         $player->sendMessage("§c§lPlugin created by Ayzrix.");
