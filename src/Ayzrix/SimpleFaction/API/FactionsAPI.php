@@ -50,10 +50,10 @@ class FactionsAPI {
     }
 
     /**
-     * @param $faction
+     * @param string $faction
      * @return bool
      */
-    public static function existsFaction($faction): bool {
+    public static function existsFaction(string $faction): bool {
         $faction = strtolower($faction);
         $result = Provider::getDatabase()->query("SELECT player FROM faction WHERE lower(faction)='$faction';");
         if (Utils::getProvider() === "mysql") return $result->num_rows > 0 ? true : false;

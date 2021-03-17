@@ -66,8 +66,8 @@ class Faction extends PluginCommand {
                     case "make":
                         if (isset($args[1])) {
                             if (ctype_alnum($args[1])) {
-                                if(strlen($args[1]) > Utils::getIntoConfig("min_faction_name_lenght")) {
-                                    if (strlen($args[1]) < Utils::getIntoConfig("max_faction_name_lenght")) {
+                                if(strlen($args[1]) > (int)Utils::getIntoConfig("min_faction_name_lenght")) {
+                                    if (strlen($args[1]) < (int)Utils::getIntoConfig("max_faction_name_lenght")) {
                                         if (!FactionsAPI::existsFaction($args[1])) {
                                             if (!FactionsAPI::isInFaction($player)) {
                                                 $player->sendMessage(Utils::getMessage($player, "SUCCESSFULL_CREATED", array($args[1])));
@@ -405,8 +405,8 @@ class Faction extends PluginCommand {
                                                 $timer = FactionsAPI::$AlliesinvitationTimeout[$faction];
                                                 $timer = $timer - time();
                                                 if ($timer > 0) {
-                                                    if (FactionsAPI::getAlliesCount($faction) < Utils::getIntoConfig("faction_max_allies")) {
-                                                        if (FactionsAPI::getAlliesCount($faction2) < Utils::getIntoConfig("faction_max_allies")) {
+                                                    if (FactionsAPI::getAlliesCount($faction) < (int)Utils::getIntoConfig("faction_max_allies")) {
+                                                        if (FactionsAPI::getAlliesCount($faction2) < (int)Utils::getIntoConfig("faction_max_allies")) {
                                                             FactionsAPI::acceptAlliesInvitation($faction);
                                                         } else $player->sendMessage(Utils::getMessage($player, "FACTION_MAX_ALLIES", array($faction2)));
                                                     } else $player->sendMessage(Utils::getMessage($player, "YOUR_FACTION_MAX_ALLIES"));

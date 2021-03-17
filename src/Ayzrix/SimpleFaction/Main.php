@@ -28,7 +28,7 @@ class Main extends PluginBase {
     /** @var Main */
     private static $instance;
 
-    /** @var $economyAPI */
+    /** @var EconomyAPI $economyAPI */
     private static $economyAPI;
 
     public function onEnable(): bool {

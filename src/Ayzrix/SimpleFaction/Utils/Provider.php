@@ -25,10 +25,7 @@ class Provider {
             return new \MySQLi(Utils::getIntoConfig("mysql_address"), Utils::getIntoConfig("mysql_user"), Utils::getIntoConfig("mysql_password"), Utils::getIntoConfig("mysql_db"));
         } else return new \SQLite3(Main::getInstance()->getDataFolder() . "SimpleFaction.db");
     }
-
-    /**
-     * @return string
-     */
+    
     public static function init(): void {
         self::getDatabase()->query("CREATE TABLE IF NOT EXISTS faction (player VARCHAR(255) PRIMARY KEY, faction VARCHAR(255), role VARCHAR(255));");
         self::getDatabase()->query("CREATE TABLE IF NOT EXISTS power (faction VARCHAR(255) PRIMARY KEY, power int);");
