@@ -59,7 +59,10 @@ class PlayerListener implements Listener {
         $player = $event->getPlayer();
         $block = $event->getBlock();
         $item = $event->getItem();
-        if (FactionsAPI::isInClaim($player)) {
+        $chunk = $player->getLevel()->getChunkAtPosition($player);
+        $chunkX = $chunk->getX();
+        $chunkZ = $chunk->getZ();
+        if (FactionsAPI::isInClaim($player->getLevel(), $chunkX, $chunkZ)) {
             switch ($block->getId()) {
                 case BlockIds::FENCE_GATE:
                 case BlockIds::ACACIA_FENCE_GATE:
@@ -74,7 +77,7 @@ class PlayerListener implements Listener {
                 case BlockIds::CHEST:
                 case BlockIds::TRAPPED_CHEST:
                     if (FactionsAPI::isInFaction($player)) {
-                        $claimer = FactionsAPI::getFactionClaim($player);
+                        $claimer = FactionsAPI::getFactionClaim($player->getLevel(), $chunkX, $chunkZ);
                         $faction = FactionsAPI::getFaction($player);
                         if ($faction !== $claimer) $event->setCancelled(true);
                     } else $event->setCancelled(true);
@@ -93,7 +96,7 @@ class PlayerListener implements Listener {
                 case ItemIds::STONE_SHOVEL:
                 case ItemIds::WOODEN_SHOVEL:
                     if (FactionsAPI::isInFaction($player)) {
-                        $claimer = FactionsAPI::getFactionClaim($player);
+                        $claimer = FactionsAPI::getFactionClaim($player->getLevel(), $chunkX, $chunkZ);
                         $faction = FactionsAPI::getFaction($player);
                         if ($faction !== $claimer) $event->setCancelled(true);
                     } else $event->setCancelled(true);

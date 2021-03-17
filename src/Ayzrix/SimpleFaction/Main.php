@@ -17,6 +17,7 @@ use Ayzrix\SimpleFaction\Commands\Faction;
 use Ayzrix\SimpleFaction\Events\Listener\BlockListener;
 use Ayzrix\SimpleFaction\Events\Listener\EntityListener;
 use Ayzrix\SimpleFaction\Events\Listener\PlayerListener;
+use Ayzrix\SimpleFaction\Tasks\Async\MapTask;
 use Ayzrix\SimpleFaction\Utils\Provider;
 use Ayzrix\SimpleFaction\Utils\Utils;
 use onebone\economyapi\EconomyAPI;
@@ -36,10 +37,7 @@ class Main extends PluginBase {
         $this->saveDefaultConfig();
         $this->saveResource("lang.yml");
         @mkdir($this->getDataFolder() . "Languages/");
-        foreach ((new Config($this->getDataFolder() . "lang.yml", Config::YAML))->get("languages") as $prefix => $file) {
-            $this->saveResource("Languages/{$file}.yml");
-        }
-
+        foreach ((new Config($this->getDataFolder() . "lang.yml", Config::YAML))->get("languages") as $prefix => $file) $this->saveResource("Languages/{$file}.yml");
         if ((strtolower(Utils::getIntoConfig("PROVIDER")) === "mysql") and (Utils::getIntoConfig("mysql_address") === "SERVER ADDRESS" or Utils::getIntoConfig("mysql_user") === "USER" or Utils::getIntoConfig("mysql_password") === "YOUR PASSWORD" or Utils::getIntoConfig("mysql_db") === "YOUR DB")) {
             $this->getLogger()->error("Error, please setup a valid mysql server");
             $this->getServer()->disablePlugins();
@@ -52,6 +50,7 @@ class Main extends PluginBase {
         $this->getServer()->getPluginManager()->registerEvents(new BlockListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new EntityListener(), $this);
         Provider::init();
+        $this->getScheduler()->scheduleRepeatingTask(new MapTask(), 20*3);
         return true;
     }
 

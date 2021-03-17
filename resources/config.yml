@@ -50,3 +50,4 @@ claims:
 
 PREFIX: "§6[§fSimpleFaction§6]§f"
 PLAYER_ONLY: "{prefix} §cThis command can't be used in the console !"
+MAP_HEADER: "§6--------------------(§f{X}§6, §f{Z}§6)--------------------"

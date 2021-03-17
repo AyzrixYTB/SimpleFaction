@@ -16,9 +16,11 @@ namespace Ayzrix\SimpleFaction\API;
 use Ayzrix\SimpleFaction\Main;
 use Ayzrix\SimpleFaction\Utils\Provider;
 use Ayzrix\SimpleFaction\Utils\Utils;
+use pocketmine\level\Level;
 use pocketmine\level\Position;
 use pocketmine\Player;
 use pocketmine\Server;
+use pocketmine\utils\TextFormat;
 
 class FactionsAPI {
 
@@ -36,6 +38,31 @@ class FactionsAPI {
 
     /** @var array $chat */
     public static $chat = [];
+
+    /** @var array $map */
+    public static $map = [];
+
+    const MAP_KEY_CHARS = "\\/#?ç¬£$%=&^ABCDEFGHJKLMNOPQRSTUVWXYZÄÖÜÆØÅ1234567890abcdeghjmnopqrsuvwxyÿzäöüæøåâêîûô";
+    const MAP_WIDTH = 48;
+    const MAP_HEIGHT = 10;
+    const MAP_KEY_MIDDLE = TextFormat::AQUA . "+";
+    const MAP_KEY_WILDERNESS = TextFormat::GRAY . "-";
+    const MAP_KEY_OVERFLOW = TextFormat::WHITE . "-" . TextFormat::RESET;
+    const MAP_OVERFLOW_MESSAGE = self::MAP_KEY_OVERFLOW . ": Trop de faction (>86) sur la carte.";
+    const DIRECTIONS = [
+        "N" => 'N',
+        "NE" => '/',
+        "E" => 'E',
+        "SE" => '\\',
+        "S" => 'S',
+        "SW" => '/',
+        "W" => 'W',
+        "NW" => '\\',
+        "NONE" => '+'
+    ];
+
+    const COLOR_ACTIVE = TextFormat::GREEN;
+    const COLOR_INACTIVE = TextFormat::RED;
 
     /**
      * @param Player $player
@@ -306,14 +333,13 @@ class FactionsAPI {
     }
 
     /**
-     * @param Player $player
+     * @param Level $level
+     * @param int $chunkX
+     * @param int $chunkZ
      * @return bool
      */
-    public static function isInClaim(Player $player): bool {
-        $chunk = $player->getLevel()->getChunkAtPosition($player);
-        $chunkX = $chunk->getX();
-        $chunkZ = $chunk->getZ();
-        $world = $player->getLevel()->getFolderName();
+    public static function isInClaim(Level $level, int $chunkX, int $chunkZ): bool {
+        $world = $level->getFolderName();
         $result = Provider::getDatabase()->query("SELECT * FROM claim WHERE x='$chunkX' AND z='$chunkZ' and world='$world';");
         if (Utils::getProvider() === "mysql") return $result->num_rows > 0 ? true : false;
         $return = $result->fetchArray(Utils::getAssoc());
@@ -321,21 +347,18 @@ class FactionsAPI {
     }
 
     /**
-     * @param Player $player
+     * @param Level $level
+     * @param int $chunkX
+     * @param int $chunkZ
      * @return string
      */
-    public static function getFactionClaim(Player $player): string {
-        $chunk = $player->getLevel()->getChunkAtPosition($player);
-        $chunkX = $chunk->getX();
-        $chunkZ = $chunk->getZ();
-        $world = $player->getLevel()->getFolderName();
+    public static function getFactionClaim(Level $level, int $chunkX, int $chunkZ): string {
+        $world = $level->getFolderName();
         $result = Provider::getDatabase()->query("SELECT faction FROM claim WHERE x='$chunkX' AND z='$chunkZ' and world='$world';");
         if (Utils::getProvider() === "mysql") {
             $array = $result->fetch_Array(Utils::getAssoc());
-        } else {
-            $array = $result->fetchArray(Utils::getAssoc());
-        }
-        return $array['faction'];
+        } else $array = $result->fetchArray(Utils::getAssoc());
+        return $array['faction']?? "";
     }
 
     /**
@@ -358,9 +381,7 @@ class FactionsAPI {
         $result = Provider::getDatabase()->query("SELECT COUNT(faction) FROM claim where faction='$faction'");
         if (Utils::getProvider() === "mysql") {
             $array = $result->fetch_Array(Utils::getAssoc());
-        } else {
-            $array = $result->fetchArray(Utils::getAssoc());
-        }
+        } else $array = $result->fetchArray(Utils::getAssoc());
         return (int)$array['COUNT(faction)']?? 0;
     }
 
@@ -506,7 +527,7 @@ class FactionsAPI {
             if (Server::getInstance()->getPlayer($player)) {
                 $player = Server::getInstance()->getPlayer($player);
                 if ($player instanceof Player) {
-                    $player->sendMessage(Utils::getMessage($player, "ALLIES_INVITE_SUCESS_TARGET", array($faction2)));
+                    $player->sendMessage(Utils::getMessage($player, "ALLIES_INVITE_SUCCESS_TARGET", array($faction2)));
                 }
             }
         }
@@ -568,7 +589,7 @@ class FactionsAPI {
             if (Server::getInstance()->getPlayer($player)) {
                 $player = Server::getInstance()->getPlayer($player);
                 if ($player instanceof Player) {
-                    $player->sendMessage(Utils::getMessage($player, "ALLIES_REMOVE_SUCESS", array($faction2)));
+                    $player->sendMessage(Utils::getMessage($player, "ALLIES_REMOVE_SUCCESS", array($faction2)));
                 }
             }
         }
@@ -577,7 +598,7 @@ class FactionsAPI {
             if (Server::getInstance()->getPlayer($player)) {
                 $player = Server::getInstance()->getPlayer($player);
                 if ($player instanceof Player) {
-                    $player->sendMessage(Utils::getMessage($player, "ALLIES_REMOVE_SUCESS", array($faction1)));
+                    $player->sendMessage(Utils::getMessage($player, "ALLIES_REMOVE_SUCCESS", array($faction1)));
                 }
             }
         }
@@ -709,5 +730,99 @@ class FactionsAPI {
      */
     public static function setMoney(string $faction, int $amount): void {
         Provider::query("UPDATE bank SET money = '$amount' WHERE faction='$faction'");
+    }
+
+    /**
+     * @param Player $player
+     * @return string[]
+     */
+    public static function getMap(Player $player): array {
+        $center = $player->getLevel()->getChunkAtPosition($player);
+        $height = self::MAP_HEIGHT;
+        $width = self::MAP_WIDTH;
+        $compass = self::getAsciiCompass($player->getYaw());
+        $header = Utils::getIntoConfig("MAP_HEADER");
+        $header = str_replace(["{X}", "{Z}"], [$center->getX(), $center->getZ()], $header);
+        $map = [$header];
+        $legend = [];
+        $characterIndex = 0;
+        $overflown = false;
+
+        for ($dz = 0; $dz < $height; $dz++) {
+            $row = "";
+            for ($dx = 0; $dx < $width; $dx++) {
+                $chunkX = $center->getX() - ($width / 2) + $dx;
+                $chunkZ = $center->getZ() - ($height / 2) + $dz;
+                if ($chunkX === $center->getX() && $chunkZ === $center->getZ()) {
+                    $row .= self::MAP_KEY_MIDDLE;
+                    continue;
+                }
+
+                if (self::isInCLaim($player->getLevel(), $chunkX, $chunkZ)) {
+                    $faction = self::getFactionClaim($player->getLevel(), $chunkX, $chunkZ);
+                    if (($symbol = array_search($faction, $legend)) === false && $overflown) {
+                        $row .= self::MAP_KEY_OVERFLOW;
+                    } else {
+                        if ($symbol === false) $legend[($symbol = self::MAP_KEY_CHARS[$characterIndex++])] = $faction;
+                        if ($characterIndex === strlen(self::MAP_KEY_CHARS)) $overflown = true;
+                        $row .= self::getMapColor($player, $faction) . $symbol;
+                    }
+                } else $row .= self::MAP_KEY_WILDERNESS;
+            }
+
+            if ($dz <= 2) {
+                $row = $compass[$dz] . substr($row, 3 * strlen(self::MAP_KEY_MIDDLE));
+            }
+            $map[] = $row;
+        }
+
+        $map[] = implode(" ", array_map(function (string $character, $faction) use ($player): string {
+            return self::getMapColor($player, $faction) . $character . " §f: " . $faction;
+        }, array_keys($legend), $legend));
+        if ($overflown) $map[] = self::MAP_KEY_OVERFLOW . Utils::getMessage($player, "TOO_MUCH_FACTION");
+        return $map;
+    }
+
+    /**
+     * @param Player $player
+     * @param $faction1
+     * @return string
+     */
+    public static function getMapColor(Player $player, $faction1): string {
+        if (self::isInFaction($player)) {
+            $faction2 = self::getFaction($player);
+            if ($faction1 !== $faction2) {
+                if (!self::areAllies($faction1, $faction2)) {
+                    return TextFormat::RED;
+                } else return TextFormat::YELLOW;
+            } else return TextFormat::GREEN;
+        } else return TextFormat::RED;
+    }
+
+    /**
+     * @param float $degrees
+     * @return array
+     */
+    public static function getAsciiCompass(float $degrees): array {
+        $rows = [["NW", "N", "NE"], ["W", "NONE", "E"], ["SW", "S", "SE"]];
+        $direction = self::getDirectionsByDegrees($degrees);
+        return array_map(function (array $directions) use ($direction): string {
+            $row = "";
+            foreach ($directions as $d) {
+                $row .= ($direction === $d ? self::COLOR_ACTIVE : self::COLOR_INACTIVE) . self::DIRECTIONS[$d];
+            }
+            return $row;
+        }, $rows);
+    }
+
+    /**
+     * @param float $degrees
+     * @return string
+     */
+    public static function getDirectionsByDegrees(float $degrees): string {
+        $degrees = ($degrees - 157) % 360;
+        if ($degrees < 0) $degrees += 360;
+
+        return array_keys(self::DIRECTIONS)[(int)floor($degrees / 45)];
     }
 }

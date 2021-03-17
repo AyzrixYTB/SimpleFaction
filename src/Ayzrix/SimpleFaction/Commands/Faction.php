@@ -20,6 +20,7 @@ use pocketmine\command\CommandSender;
 use pocketmine\command\PluginCommand;
 use pocketmine\Player;
 use pocketmine\Server;
+use pocketmine\utils\TextFormat;
 
 class Faction extends PluginCommand {
 
@@ -201,7 +202,10 @@ class Faction extends PluginCommand {
                         if (FactionsAPI::isInFaction($player)) {
                             if (FactionsAPI::getRank($player->getName()) === "Leader" or FactionsAPI::getRank($player->getName()) === "Officer") {
                                 if (in_array($player->getLevel()->getFolderName(), Utils::getIntoConfig("faction_worlds"))) {
-                                    if (!FactionsAPI::isInClaim($player)) {
+                                    $chunk = $player->getLevel()->getChunkAtPosition($player);
+                                    $chunkX = $chunk->getX();
+                                    $chunkZ = $chunk->getZ();
+                                    if (!FactionsAPI::isInClaim($player->getLevel(), $chunkX, $chunkZ)) {
                                         $faction = FactionsAPI::getFaction($player);
                                         $claimCount = FactionsAPI::getClaimCount($faction);
                                         if ($claimCount - 1 < count(Utils::getIntoConfig("claims"))) {
@@ -211,7 +215,7 @@ class Faction extends PluginCommand {
                                                 $player->sendMessage(Utils::getMessage($player, "CLAIM_SUCCESS"));
                                             } else $player->sendMessage(Utils::getMessage($player, "NOT_ENOUGHT_POWER", array($powerNeeded)));
                                         } else $player->sendMessage(Utils::getMessage($player, "MAX_CLAIM"));
-                                    } else $player->sendMessage(Utils::getMessage($player, "ALREADY_CLAIMED", array(FactionsAPI::getFactionClaim($player))));
+                                    } else $player->sendMessage(Utils::getMessage($player, "ALREADY_CLAIMED", array(FactionsAPI::getFactionClaim($player->getLevel(), $chunkX, $chunkZ))));
                                 } else $player->sendMessage(Utils::getMessage($player, "NOT_FACTION_WORLD"));
                             } else $player->sendMessage(Utils::getMessage($player, "ONLY_LEADER_OR_OFFICER"));
                         } else $player->sendMessage(Utils::getMessage($player, "MUST_BE_IN_FACTION"));
@@ -219,9 +223,12 @@ class Faction extends PluginCommand {
                     case "unclaim":
                         if (FactionsAPI::isInFaction($player)) {
                             if (FactionsAPI::getRank($player->getName()) === "Leader" or FactionsAPI::getRank($player->getName()) === "Officer") {
-                                if (FactionsAPI::isInClaim($player)) {
+                                $chunk = $player->getLevel()->getChunkAtPosition($player);
+                                $chunkX = $chunk->getX();
+                                $chunkZ = $chunk->getZ();
+                                if (FactionsAPI::isInClaim($player->getLevel(), $chunkX, $chunkZ)) {
                                     $faction = FactionsAPI::getFaction($player);
-                                    if (FactionsAPI::getFactionClaim($player) === $faction) {
+                                    if (FactionsAPI::getFactionClaim($player->getLevel(), $chunkX, $chunkZ) === $faction) {
                                         FactionsAPI::deleteClaim($player, $faction);
                                         $player->sendMessage(Utils::getMessage($player, "UNCLAIM_SUCCESS"));
                                     } else $player->sendMessage(Utils::getMessage($player, "NOT_CLAIM_BY_YOUR_FACTION"));
@@ -536,6 +543,27 @@ class Faction extends PluginCommand {
                             } else $player->sendMessage(Utils::getMessage($player, "LANG_NOT_EXIST"));
                         } else $player->sendMessage(Utils::getMessage($player, "LANG_USAGE", array($langs)));
                         return true;
+                    case "map":
+                        if (isset($args[1])) {
+                            switch (strtolower($args[1])) {
+                                case "on":
+                                    if (!isset(FactionsAPI::$map[$player->getName()])) {
+                                        FactionsAPI::$map[$player->getName()] = true;
+                                        $player->sendMessage(Utils::getMessage($player, "MAP_ON_SUCCESS"));
+                                    } else $player->sendMessage(Utils::getMessage($player, "MAP_ALREADY_ON"));
+                                    break;
+                                case "off":
+                                    if (isset(FactionsAPI::$map[$player->getName()])) {
+                                        unset(FactionsAPI::$map[$player->getName()]);
+                                        $player->sendMessage(Utils::getMessage($player, "MAP_OFF_SUCCESS"));
+                                    } else $player->sendMessage(Utils::getMessage($player, "MAP_ALREADY_OFF"));
+                                    break;
+                                default:
+                                    $player->sendMessage(Utils::getMessage($player, "MAP_USAGE"));
+                                    break;
+                            }
+                        } else $player->sendMessage(implode(TextFormat::EOL, FactionsAPI::getMap($player)));
+                        return true;
                     case "admin":
                         if ($player->hasPermission("simplefaction.admin")) {
                             if (isset($args[1])) {
@@ -589,8 +617,11 @@ class Faction extends PluginCommand {
                                         } else $player->sendMessage(Utils::getMessage($player, "ADMIN_RENAME_USAGE"));
                                         break;
                                     case "unclaim":
-                                        if (FactionsAPI::isInClaim($player)) {
-                                            $faction = FactionsAPI::getFactionClaim($player);
+                                        $chunk = $player->getLevel()->getChunkAtPosition($player);
+                                        $chunkX = $chunk->getX();
+                                        $chunkZ = $chunk->getZ();
+                                        if (FactionsAPI::isInClaim($player->getLevel(), $chunkX, $chunkZ)) {
+                                            $faction = FactionsAPI::getFactionClaim($player->getLevel(), $chunkX, $chunkZ);
                                             FactionsAPI::deleteClaim($player, $faction);
                                             $player->sendMessage(Utils::getMessage($player, "ADMIN_UNCLAIM_SUCCESS"));
                                         } else $player->sendMessage(Utils::getMessage($player, "ADMIN_NOT_IN_CLAIM"));
