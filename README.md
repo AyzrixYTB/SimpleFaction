@@ -35,7 +35,6 @@
 |---------------------------|---------------------------------------|---------|
 | `/f map`                  | Add the /f map command.               | command |
 | `/f border`               | Add /f border command.                | command |
-| `PureChat & PurePerms`    | Add purechat and pureperms support.   | support |
 | `Multi-Language Support`  | Add multi language support            | support |
 | `Message cleaning`        | Clean all message.                    | clean   |
 
@@ -59,9 +58,9 @@
 | EconomyAPI    | Bank system   |[Download](https://poggit.pmmp.io/p/EconomyAPI)|
 
 ## Additional plugins
-| Name              | Usage                 | Download                                              |
-|-------------------|-----------------------|-------------------------------------------------------| 
-| PureChat          | Chat integration      |[Download](https://poggit.pmmp.io/p/PureChat)          |
-| ScoreHUD          | Scoreboard integration|[Download](https://poggit.pmmp.io/p/ScoreHud)          |
-| EssentialsFaction | Chat integration      |[Download](https://github.com/Zoumi-Dev/FacEssential)  |
+| Name              | Usage                         | Download                                                   |
+|-------------------|-------------------------------|------------------------------------------------------------| 
+| PureChat          | Chat integration              | [Download](https://github.com/AyzrixYTB/PureChat-UPDATED)  |
+| ScoreHUD          | Scoreboard integration        | [Download](https://poggit.pmmp.io/p/ScoreHud)              |
+| EssentialsFaction | Chat & Scoreboard integration | [Download](https://github.com/Zoumi-Dev/FacEssential)      |
 
