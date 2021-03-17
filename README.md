@@ -16,6 +16,7 @@
 | `/f top`       | Shows the top factions.                                  | <font color="#03fc73"> everyone       |
 | `/f bank`      | Manage your faction's bank.                              | <font color="#03fc73"> everyone       |
 | `/f leave`     | Leave your current faction.                              | <font color="#03fc73"> everyone       |
+| `/f map`       | Show the nearby claims.                                  | <font color="#03fc73"> everyone       |
 | `/f claim`     | Claim a chunk.                                           | <font color="#fca503"> officers       |
 | `/f unclaim`   | Unclaim your claim.                                      | <font color="#fca503"> officers       |
 | `/f invite`    | Invite a player into your faction.                       | <font color="#fca503"> officers       |
@@ -31,11 +32,10 @@
 
 ## Future additions
 
-| Name                      | Description                           | Type    |
-|---------------------------|---------------------------------------|---------|
-| `/f map`                  | Add the /f map command.               | command |
-| `/f border`               | Add /f border command.                | command |
-| `Message cleaning`        | Clean all message.                    | clean   |
+| Name          | Description                           | Type      |
+|---------------|---------------------------------------|-----------|
+| `/f border`   | Add /f border command.                | command   |
+| `UI System`   | Add an UI extension plugin.           | extension |
 
 ## Features
 
@@ -63,6 +63,12 @@
 | PureChat          | Chat integration              | [Download](https://github.com/AyzrixYTB/PureChat-UPDATED)  |
 | ScoreHUD          | Scoreboard integration        | [Download](https://poggit.pmmp.io/p/ScoreHud)              |
 | EssentialsFaction | Chat & Scoreboard integration | [Download](https://github.com/Zoumi-Dev/FacEssential)      |
+
+## Translators
+- **English** - @Ayzrix & Se7en-dev.
+- **French** - @Ayzrix.
+- **German** - Soon.  
+- **Spanish** - Soon.
 
 ## Config
 ```
@@ -117,4 +123,3 @@ claims:
 
 PREFIX: "§6[§fSimpleFaction§6]§f"
 PLAYER_ONLY: "{prefix} §cThis command can't be used in the console !"```
-
