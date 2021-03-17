@@ -1,5 +1,15 @@
 <?php
 
+/***
+ *       _____ _                 _      ______         _   _
+ *      / ____(_)               | |    |  ____|       | | (_)
+ *     | (___  _ _ __ ___  _ __ | | ___| |__ __ _  ___| |_ _  ___  _ __
+ *      \___ \| | '_ ` _ \| '_ \| |/ _ \  __/ _` |/ __| __| |/ _ \| '_ \
+ *      ____) | | | | | | | |_) | |  __/ | | (_| | (__| |_| | (_) | | | |
+ *     |_____/|_|_| |_| |_| .__/|_|\___|_|  \__,_|\___|\__|_|\___/|_| |_|
+ *                        | |
+ *                        |_|
+ */
 namespace Ayzrix\SimpleFaction\Utils;
 
 use Ayzrix\SimpleFaction\Main;
@@ -24,6 +34,7 @@ class Provider {
         self::getDatabase()->query("CREATE TABLE IF NOT EXISTS power (faction VARCHAR(255) PRIMARY KEY, power int);");
         self::getDatabase()->query("CREATE TABLE IF NOT EXISTS home (faction VARCHAR(255) PRIMARY KEY, x int, y int, z int, world VARCHAR(255));");
         self::getDatabase()->query("CREATE TABLE IF NOT EXISTS bank (faction VARCHAR(255) PRIMARY KEY, money int);");
+        self::getDatabase()->query("CREATE TABLE IF NOT EXISTS lang (player VARCHAR(255) PRIMARY KEY, lang VARCHAR(255));");
         if (Utils::getProvider() === "mysql") {
             self::getDatabase()->query("CREATE TABLE IF NOT EXISTS claim (ID INT PRIMARY KEY NOT NULL AUTO_INCREMENT, faction VARCHAR(255), x int, z int, world VARCHAR(255));");
         } else self::getDatabase()->query("CREATE TABLE IF NOT EXISTS claim (ID INT PRIMARY KEY, faction VARCHAR(255), x int, z int, world VARCHAR(255));");

@@ -35,7 +35,6 @@
 |---------------------------|---------------------------------------|---------|
 | `/f map`                  | Add the /f map command.               | command |
 | `/f border`               | Add /f border command.                | command |
-| `Multi-Language Support`  | Add multi language support            | support |
 | `Message cleaning`        | Clean all message.                    | clean   |
 
 ## Features
@@ -46,6 +45,7 @@
 | `MySQL Support`           | ✔               | ❌         | ✔            |
 | `Async Queries`           | ✔               | ❌         | ✔            |
 | `Editable message`        | ✔               | ❌         | ✔            |
+| `Multiple claim`          | ✔               | ❌         | ✔            |                  
 | `Multi-Language Support`  | ✔               | ❌         | ✔            |
 | `Economy System`          | ✔               | ❌         | ✔            |
 | `EconomyAPI Support`      | ✔               | ❌         | ✔            |
@@ -63,4 +63,58 @@
 | PureChat          | Chat integration              | [Download](https://github.com/AyzrixYTB/PureChat-UPDATED)  |
 | ScoreHUD          | Scoreboard integration        | [Download](https://poggit.pmmp.io/p/ScoreHud)              |
 | EssentialsFaction | Chat & Scoreboard integration | [Download](https://github.com/Zoumi-Dev/FacEssential)      |
+
+## Config
+```
+#     _____ _                 _      ______         _   _
+#    / ____(_)               | |    |  ____|       | | (_)
+#   | (___  _ _ __ ___  _ __ | | ___| |__ __ _  ___| |_ _  ___  _ __
+#    \___ \| | '_ ` _ \| '_ \| |/ _ \  __/ _` |/ __| __| |/ _ \| '_ \
+#    ____) | | | | | | | |_) | |  __/ | | (_| | (__| |_| | (_) | | | |
+#   |_____/|_|_| |_| |_| .__/|_|\___|_|  \__,_|\___|\__|_|\___/|_| |_|
+#                      | |
+#                      |_|
+#
+
+# SQLITE | MYSQL
+PROVIDER: "SQLITE"
+
+mysql_address: "SERVER ADDRESS"
+mysql_user: "USER"
+mysql_password: "YOUR PASSWORD"
+mysql_db: "YOUR DB"
+
+broadcast_message_created: true
+broadcast_message_disband: true
+
+min_faction_name_lenght: 3
+max_faction_name_lenght: 16
+
+power_gain_per_kill: 1
+power_lost_per_death: 1
+
+faction_worlds: ["world"]
+
+# TRUE = ENABLE | FALSE = DISABLE
+faction_pvp: false
+alliance_pvp: false
+
+# expire in seconds
+invitation_expire_time: 30
+allies_invitation_expire_time: 60
+
+faction_max_members: 20
+faction_max_allies: 2
+
+# USAGE: "- POWER NEEDED"
+claims:
+  - 100
+  - 500
+  - 800
+  - 1000
+  - 2500
+  - 5000
+
+PREFIX: "§6[§fSimpleFaction§6]§f"
+PLAYER_ONLY: "{prefix} §cThis command can't be used in the console !"```
 

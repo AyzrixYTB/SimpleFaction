@@ -1,5 +1,16 @@
 <?php
 
+/***
+ *       _____ _                 _      ______         _   _
+ *      / ____(_)               | |    |  ____|       | | (_)
+ *     | (___  _ _ __ ___  _ __ | | ___| |__ __ _  ___| |_ _  ___  _ __
+ *      \___ \| | '_ ` _ \| '_ \| |/ _ \  __/ _` |/ __| __| |/ _ \| '_ \
+ *      ____) | | | | | | | |_) | |  __/ | | (_| | (__| |_| | (_) | | | |
+ *     |_____/|_|_| |_| |_| .__/|_|\___|_|  \__,_|\___|\__|_|\___/|_| |_|
+ *                        | |
+ *                        |_|
+ */
+
 namespace Ayzrix\SimpleFaction\API;
 
 use Ayzrix\SimpleFaction\Main;
@@ -59,7 +70,13 @@ class FactionsAPI {
         Provider::query("INSERT INTO faction (player, faction, role) VALUES ('$name', '$faction', 'Leader')");
         Provider::query("INSERT INTO power (faction, power) VALUES ('$faction', 0)");
         Provider::query("INSERT INTO bank (faction, money) VALUES ('$faction', 0)");
-        if (Utils::getIntoConfig("broadcast_message_created") === true) Server::getInstance()->broadcastMessage(Utils::getConfigMessage("FACTION_CREATE_BROADCAST", array($name, $faction)));
+        if (Utils::getIntoConfig("broadcast_message_created") === true) {
+            foreach (Server::getInstance()->getOnlinePlayers() as $player) {
+                if ($player instanceof Player) {
+                    $player->sendMessage(Utils::getMessage($player, "FACTION_CREATE_BROADCAST", array($name, $faction)));
+                }
+            }
+        }
     }
 
     /**
@@ -74,7 +91,13 @@ class FactionsAPI {
         Provider::query("DELETE FROM claim WHERE faction='$faction'");
         Provider::query("DELETE FROM allies WHERE faction1='$faction' OR faction2='$faction'");
         Provider::query("DELETE FROM bank WHERE faction='$faction'");
-        if (Utils::getIntoConfig("broadcast_message_disband") === true) Server::getInstance()->broadcastMessage(Utils::getConfigMessage("FACTION_DISBAND_BROADCAST", array($name, $faction)));
+        if (Utils::getIntoConfig("broadcast_message_disband") === true) {
+            foreach (Server::getInstance()->getOnlinePlayers() as $player) {
+                if ($player instanceof Player) {
+                    $player->sendMessage(Utils::getMessage($player, "FACTION_DISBAND_BROADCAST", array($name, $faction)));
+                }
+            }
+        }
     }
 
     /**
@@ -402,7 +425,7 @@ class FactionsAPI {
             if (Server::getInstance()->getPlayer($player)) {
                 $player = Server::getInstance()->getPlayer($player);
                 if ($player instanceof Player) {
-                    $player->sendMessage(Utils::getConfigMessage("JOIN_FACTION_BROADCAST", array($name)));
+                    $player->sendMessage(Utils::getMessage($player, "JOIN_FACTION_BROADCAST", array($name)));
                 }
             }
         }
@@ -453,7 +476,7 @@ class FactionsAPI {
         $fintop = (($page - 1) * 10) + 11;
 
         $i = 1;
-        $message = Utils::getConfigMessage("TOP_FACTION_HEADER", array($page, $maxpage));
+        $message = Utils::getMessage($player, "TOP_FACTION_HEADER", array($page, $maxpage));
 
         foreach ($factions as $faction => $power) {
             if ($i >= $fintop) break;
@@ -463,7 +486,7 @@ class FactionsAPI {
             }
 
             $memberscount = count(self::getAllPlayers($faction));
-            $line = Utils::getIntoConfig("TOP_FACTION_LINE");
+            $line = Utils::getMessage($player, "TOP_FACTION_LINE");
             $line = str_replace(["{index}", "{faction}", "{power}", "{members}"], [$i, $faction, $power, $memberscount], $line);
             $message .= PHP_EOL . $line;
             $i++;
@@ -483,7 +506,7 @@ class FactionsAPI {
             if (Server::getInstance()->getPlayer($player)) {
                 $player = Server::getInstance()->getPlayer($player);
                 if ($player instanceof Player) {
-                    $player->sendMessage(Utils::getConfigMessage("ALLIES_INVITE_SUCESS_TARGET", array($faction2)));
+                    $player->sendMessage(Utils::getMessage($player, "ALLIES_INVITE_SUCESS_TARGET", array($faction2)));
                 }
             }
         }
@@ -499,7 +522,7 @@ class FactionsAPI {
             if (Server::getInstance()->getPlayer($player)) {
                 $player = Server::getInstance()->getPlayer($player);
                 if ($player instanceof Player) {
-                    $player->sendMessage(Utils::getConfigMessage("NEW_ALLIANCE_FACTION_BROADCAST", array($faction2)));
+                    $player->sendMessage(Utils::getMessage($player, "NEW_ALLIANCE_FACTION_BROADCAST", array($faction2)));
                 }
             }
         }
@@ -508,7 +531,7 @@ class FactionsAPI {
             if (Server::getInstance()->getPlayer($player)) {
                 $player = Server::getInstance()->getPlayer($player);
                 if ($player instanceof Player) {
-                    $player->sendMessage(Utils::getConfigMessage("NEW_ALLIANCE_FACTION_BROADCAST", array($faction)));
+                    $player->sendMessage(Utils::getMessage($player, "NEW_ALLIANCE_FACTION_BROADCAST", array($faction)));
                 }
             }
         }
@@ -545,7 +568,7 @@ class FactionsAPI {
             if (Server::getInstance()->getPlayer($player)) {
                 $player = Server::getInstance()->getPlayer($player);
                 if ($player instanceof Player) {
-                    $player->sendMessage(Utils::getConfigMessage("ALLIES_REMOVE_SUCESS", array($faction2)));
+                    $player->sendMessage(Utils::getMessage($player, "ALLIES_REMOVE_SUCESS", array($faction2)));
                 }
             }
         }
@@ -554,7 +577,7 @@ class FactionsAPI {
             if (Server::getInstance()->getPlayer($player)) {
                 $player = Server::getInstance()->getPlayer($player);
                 if ($player instanceof Player) {
-                    $player->sendMessage(Utils::getConfigMessage("ALLIES_REMOVE_SUCESS", array($faction1)));
+                    $player->sendMessage(Utils::getMessage($player, "ALLIES_REMOVE_SUCESS", array($faction1)));
                 }
             }
         }
@@ -601,7 +624,7 @@ class FactionsAPI {
         foreach (self::getAllPlayers($faction) as $target) {
             $target = Server::getInstance()->getPlayer($target);
             if ($target instanceof Player) {
-                $msg = Utils::getConfigMessage("FACTION_SAY");
+                $msg = Utils::getMessage($target, "FACTION_SAY");
                 $msg = str_replace(["{player}", "{faction}", "{message}", "{rank}"], [$player->getName(), $faction, $message, self::getRank($player->getName())], $msg);
                 $target->sendMessage($msg);
             }
@@ -615,7 +638,7 @@ class FactionsAPI {
                 foreach (self::getAllPlayers($ally) as $target) {
                     $target = Server::getInstance()->getPlayer($target);
                     if ($target instanceof Player) {
-                        $msg = Utils::getConfigMessage("ALLY_SAY");
+                        $msg = Utils::getMessage($target, "ALLY_SAY");
                         $msg = str_replace(["{player}", "{faction}", "{message}", "{rank}"], [$player->getName(), $faction, $message, self::getRank($player->getName())], $msg);
                         $target->sendMessage($msg);
                     }
@@ -626,7 +649,7 @@ class FactionsAPI {
         foreach (self::getAllPlayers($faction) as $target) {
             $target = Server::getInstance()->getPlayer($target);
             if ($target instanceof Player) {
-                $msg = Utils::getConfigMessage("ALLY_SAY");
+                $msg = Utils::getMessage($target, "ALLY_SAY");
                 $msg = str_replace(["{player}", "{faction}", "{message}", "{rank}"], [$player->getName(), $faction, $message, self::getRank($player->getName())], $msg);
                 $target->sendMessage($msg);
             }

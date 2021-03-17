@@ -1,5 +1,16 @@
 <?php
 
+/***
+ *       _____ _                 _      ______         _   _
+ *      / ____(_)               | |    |  ____|       | | (_)
+ *     | (___  _ _ __ ___  _ __ | | ___| |__ __ _  ___| |_ _  ___  _ __
+ *      \___ \| | '_ ` _ \| '_ \| |/ _ \  __/ _` |/ __| __| |/ _ \| '_ \
+ *      ____) | | | | | | | |_) | |  __/ | | (_| | (__| |_| | (_) | | | |
+ *     |_____/|_|_| |_| |_| .__/|_|\___|_|  \__,_|\___|\__|_|\___/|_| |_|
+ *                        | |
+ *                        |_|
+ */
+
 namespace Ayzrix\SimpleFaction\Events\Listener;
 
 use Ayzrix\SimpleFaction\API\FactionsAPI;
@@ -10,10 +21,18 @@ use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerChatEvent;
 use pocketmine\event\player\PlayerDeathEvent;
 use pocketmine\event\player\PlayerInteractEvent;
+use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\item\ItemIds;
 use pocketmine\Player;
 
 class PlayerListener implements Listener {
+
+    public function PlayerJoin(PlayerJoinEvent $event) {
+        $player = $event->getPlayer();
+        if (!Utils::hasLanguages($player)) {
+            Utils::setLanguages($player, Utils::getIntoLang("default-language"));
+        }
+    }
 
     public function PlayerDeath(PlayerDeathEvent $event) {
         $player = $event->getPlayer();
