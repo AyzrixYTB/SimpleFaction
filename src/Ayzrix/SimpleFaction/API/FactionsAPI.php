@@ -58,6 +58,7 @@ class FactionsAPI {
         $name = $player->getName();
         Provider::query("INSERT INTO faction (player, faction, role) VALUES ('$name', '$faction', 'Leader')");
         Provider::query("INSERT INTO power (faction, power) VALUES ('$faction', 0)");
+        Provider::query("INSERT INTO bank (faction, money) VALUES ('$faction', 0)");
         if (Utils::getIntoConfig("broadcast_message_created") === true) Server::getInstance()->broadcastMessage(Utils::getConfigMessage("FACTION_CREATE_BROADCAST", array($name, $faction)));
     }
 
@@ -72,6 +73,7 @@ class FactionsAPI {
         Provider::query("DELETE FROM home WHERE faction='$faction'");
         Provider::query("DELETE FROM claim WHERE faction='$faction'");
         Provider::query("DELETE FROM allies WHERE faction1='$faction' OR faction2='$faction'");
+        Provider::query("DELETE FROM bank WHERE faction='$faction'");
         if (Utils::getIntoConfig("broadcast_message_disband") === true) Server::getInstance()->broadcastMessage(Utils::getConfigMessage("FACTION_DISBAND_BROADCAST", array($name, $faction)));
     }
 
@@ -462,10 +464,7 @@ class FactionsAPI {
 
             $memberscount = count(self::getAllPlayers($faction));
             $line = Utils::getIntoConfig("TOP_FACTION_LINE");
-            $line = str_replace("{index}", $i, $line);
-            $line = str_replace("{faction}", $faction, $line);
-            $line = str_replace("{power}", $power, $line);
-            $line = str_replace("{members}", $memberscount, $line);
+            $line = str_replace(["{index}", "{faction}", "{power}", "{members}"], [$i, $faction, $power, $memberscount], $line);
             $message .= PHP_EOL . $line;
             $i++;
         }
@@ -603,10 +602,7 @@ class FactionsAPI {
             $target = Server::getInstance()->getPlayer($target);
             if ($target instanceof Player) {
                 $msg = Utils::getConfigMessage("FACTION_SAY");
-                $msg = str_replace("{player}", $player->getName(), $msg);
-                $msg = str_replace("{faction}", $faction, $msg);
-                $msg = str_replace("{message}", $message, $msg);
-                $msg = str_replace("{rank}", self::getRank($player->getName()), $msg);
+                $msg = str_replace(["{player}", "{faction}", "{message}", "{rank}"], [$player->getName(), $faction, $message, self::getRank($player->getName())], $msg);
                 $target->sendMessage($msg);
             }
         }
@@ -620,10 +616,7 @@ class FactionsAPI {
                     $target = Server::getInstance()->getPlayer($target);
                     if ($target instanceof Player) {
                         $msg = Utils::getConfigMessage("ALLY_SAY");
-                        $msg = str_replace("{player}", $player->getName(), $msg);
-                        $msg = str_replace("{faction}", $faction, $msg);
-                        $msg = str_replace("{message}", $message, $msg);
-                        $msg = str_replace("{rank}", self::getRank($player->getName()), $msg);
+                        $msg = str_replace(["{player}", "{faction}", "{message}", "{rank}"], [$player->getName(), $faction, $message, self::getRank($player->getName())], $msg);
                         $target->sendMessage($msg);
                     }
                 }
@@ -634,10 +627,7 @@ class FactionsAPI {
             $target = Server::getInstance()->getPlayer($target);
             if ($target instanceof Player) {
                 $msg = Utils::getConfigMessage("ALLY_SAY");
-                $msg = str_replace("{player}", $player->getName(), $msg);
-                $msg = str_replace("{faction}", $faction, $msg);
-                $msg = str_replace("{message}", $message, $msg);
-                $msg = str_replace("{rank}", self::getRank($player->getName()), $msg);
+                $msg = str_replace(["{player}", "{faction}", "{message}", "{rank}"], [$player->getName(), $faction, $message, self::getRank($player->getName())], $msg);
                 $target->sendMessage($msg);
             }
         }
@@ -654,5 +644,47 @@ class FactionsAPI {
         Provider::query("UPDATE claim SET faction='$name' WHERE faction='$faction'");
         Provider::query("UPDATE allies SET faction1='$name' WHERE faction1='$faction'");
         Provider::query("UPDATE allies SET faction2='$name' WHERE faction2='$faction'");
+    }
+
+    /**
+     * @param string $faction
+     * @return int
+     */
+    public static function getMoney(string $faction): int {
+        $return = Provider::getDatabase()->query("SELECT money FROM bank WHERE faction='$faction';");
+        if (Utils::getProvider() === "mysql") {
+            $array = $return->fetch_Array(Utils::getAssoc());
+        } else {
+            $array = $return->fetchArray(Utils::getAssoc());
+        }
+        return $array["money"]?? 0;
+    }
+
+    /**
+     * @param string $faction
+     * @param int $amount
+     */
+    public static function addMoney(string $faction, int $amount): void {
+        Provider::query("UPDATE bank SET money = money + '$amount' WHERE faction='$faction'");
+    }
+
+    /**
+     * @param string $faction
+     * @param int $amount
+     */
+    public static function removeMoney(string $faction, int $amount): void {
+        if(self::getMoney($faction) - $amount <= 0) {
+            self::setMoney($faction, 0);
+            return;
+        }
+        Provider::query("UPDATE bank SET money = money - '$amount' WHERE faction='$faction'");
+    }
+
+    /**
+     * @param string $faction
+     * @param int $amount
+     */
+    public static function setMoney(string $faction, int $amount): void {
+        Provider::query("UPDATE bank SET money = '$amount' WHERE faction='$faction'");
     }
 }

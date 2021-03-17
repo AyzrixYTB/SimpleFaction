@@ -8,12 +8,16 @@ use Ayzrix\SimpleFaction\Events\Listener\EntityListener;
 use Ayzrix\SimpleFaction\Events\Listener\PlayerListener;
 use Ayzrix\SimpleFaction\Utils\Provider;
 use Ayzrix\SimpleFaction\Utils\Utils;
+use onebone\economyapi\EconomyAPI;
 use pocketmine\plugin\PluginBase;
 
 class Main extends PluginBase {
 
     /** @var Main */
     private static $instance;
+
+    /** @var $economyAPI */
+    private static $economyAPI;
 
     public function onEnable(): bool {
         self::$instance = $this;
@@ -25,6 +29,7 @@ class Main extends PluginBase {
             return false;
         }
 
+        self::$economyAPI = EconomyAPI::getInstance();
         $this->getServer()->getCommandMap()->register("simplefaction", new Faction($this));
         $this->getServer()->getPluginManager()->registerEvents(new PlayerListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new BlockListener(), $this);
@@ -38,5 +43,12 @@ class Main extends PluginBase {
      */
     public static function getInstance(): Main {
         return self::$instance;
+    }
+
+    /**
+     * @return EconomyAPI
+     */
+    public static function getEconomy(): EconomyAPI {
+        return self::$economyAPI;
     }
 }
