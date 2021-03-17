@@ -2,32 +2,53 @@
 
 ###### Simple faction plugin replacing FactionsPro which is no longer updated.
 
-### Todo list
+## Commands
 
-- [X] Help command
-- [X] Create command
-- [X] Delete command
-- [X] Info command  
-- [X] Power system
-- [X] About command
-- [X] Promote | Demote commands
-- [X] Claim system
-- [X] Home system
-- [X] Leave command
-- [X] Kick command
-- [X] Invite | Deny | Accept commands
-- [X] F info connected color 
-- [X] Top command
-- [X] Leader command
-- [X] Multi Provider
-- [X] Damage protection system
-- [X] Claim edit protection system  
-- [X] Allies system
-- [X] Chat commands  
-- [ ] Map command
-- [ ] PureChat|PurePerms support
-- [ ] ScoreHUD support
-- [ ] ChunkBorders command  
-- [ ] Faction's bank system
-- [ ] Admins commands
-- [ ] Messages cleaning
+| Command Name   | Command Description                                      | Available for |
+|----------------|----------------------------------------------------------|---------------|
+| `/f help`      | Allows you to teleport to a player.                      | everyone      |
+| `/f create`    | Create a faction.                                        | everyone      |
+| `/f delete`    | Delete your faction.                                     | leader        |
+| `/f info`      | Get information on a faction.                            | everyone      |
+| `/f allies`    | Manage your faction's alliance.                          | leader        |
+| `/f claim`     | Claim a chunk.                                           | officers      |
+| `/f unclaim`   | Unclaim your claim.                                      | officers      |
+| `/f invite`    | Invite a player into your faction.                       | officers      |
+| `/f accept`    | Accept faction invitation.                               | everyone      |
+| `/f deny`      | Deny faction invitation.                                 | everyone      |
+| `/f chat`      | Change your chatting configuration.                      | everyone      |
+| `/f kick`      | Kicks a player from your faction.                        | officers      |
+| `/f leave`     | Leave your current faction.                              | everyone      |
+| `/f sethome`   | Sets your faction home.                                  | officers      |
+| `/f delhome`   | Removes your faction home.                               | officers      |
+| `/f home`      | Quick way to get to your faction's home.                 | everyone      |
+| `/f promote`   |  Promote a member.                                       | leader        |
+| `/f demote`    | Demote an officer.                                       | leader        |
+| `/f top`       | Allows you to open a craftingtable.                      | everyone      |
+| `/f transfer`  | Shows the top factions.                                  | leader        |
+
+## Future additions
+
+| Name                      | Description                                              | Type    |
+|---------------------------|----------------------------------------------------------|---------|
+| `/f map`                  | Add the /f map command.                      | command |
+| `PureChat & PurePerms`    | Add purechat and pureperms support.                                        | support |
+| `ScoreHUD`                | Add ScoreHUD support.                                     | support |
+| `/f border`               | Add /f border command.                            | command |
+| `/f bank`                 | Add /f bank command.                          | command |
+| `/f admin`                | Add /f admin command.                                           | command |
+| `Message cleaning`        | Clean all message.                                      | clean   |
+| `Multi-Language Support`  | Add multi language support    | support |
+
+## Features
+
+| Feature                   | SimpleFaction   | FactionsPro| PiggyFactions| 
+|---------------------------|-----------------|------------|--------------|
+| `SQLite3 Support`         | ✔               | ✔         | ✔            |
+| `MySQL Support`           | ✔               | ❌         | ✔            |
+| `Async Queries`           | ✔               | ❌         | ✔            |
+| `Economy System`          | ✔               | ❌         | ✔            |
+| `ScoreHUD Support`        | ✔               | ❌         | ❌            |
+| `Simplicity`              | ✔               | ✔         | ❌            |
+| `Editable message`        | ✔               | ❌         | ✔            |
+| `Multi-Language Support`  | ✔               | ❌          | ✔           |
