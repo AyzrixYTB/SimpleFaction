@@ -24,8 +24,8 @@
 | `/f home`      | Quick way to get to your faction's home.                 | everyone      |
 | `/f promote`   |  Promote a member.                                       | leader        |
 | `/f demote`    | Demote an officer.                                       | leader        |
-| `/f top`       | Allows you to open a craftingtable.                      | everyone      |
-| `/f transfer`  | Shows the top factions.                                  | leader        |
+| `/f top`       | Shows the top factions.                      | everyone      |
+| `/f transfer`  | Make a new player the leader.                                  | leader        |
 
 ## Future additions
 
