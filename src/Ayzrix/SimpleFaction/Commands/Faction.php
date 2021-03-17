@@ -471,6 +471,69 @@ class Faction extends PluginCommand {
                             } else $player->sendMessage(Utils::getConfigMessage("CHAT_USAGE"));
                         } else $player->sendMessage(Utils::getConfigMessage("MUST_BE_IN_FACTION"));
                         return true;
+                    case "admin":
+                        if ($player->hasPermission("simplefaction.admin")) {
+                            if (isset($args[1])) {
+                                switch ($args[1]) {
+                                    case "addpower":
+                                        if (isset($args[2]) and isset($args[3])) {
+                                            if (FactionsAPI::existsFaction($args[2])) {
+                                                if (is_numeric($args[3])) {
+                                                    FactionsAPI::addPower($args[2], (int)$args[3]);
+                                                    $player->sendMessage(Utils::getConfigMessage("ADMIN_ADDPOWER_SUCCESS", array((int)$args[3])));
+                                                } else $player->sendMessage(Utils::getConfigMessage("ENTER_VALID_NUMBER"));
+                                            } else $player->sendMessage(Utils::getConfigMessage("FACTION_NOT_EXIST"));
+                                        } else $player->sendMessage(Utils::getConfigMessage("ADMIN_ADDPOWER_USAGE"));
+                                        break;
+                                    case "removepower":
+                                        if (isset($args[2]) and isset($args[3])) {
+                                            if (FactionsAPI::existsFaction($args[2])) {
+                                                if (is_numeric($args[3])) {
+                                                    FactionsAPI::removePower($args[2], (int)$args[3]);
+                                                    $player->sendMessage(Utils::getConfigMessage("ADMIN_REMOVEPOWER_SUCCESS", array((int)$args[3])));
+                                                } else $player->sendMessage(Utils::getConfigMessage("ENTER_VALID_NUMBER"));
+                                            } else $player->sendMessage(Utils::getConfigMessage("FACTION_NOT_EXIST"));
+                                        } else $player->sendMessage(Utils::getConfigMessage("ADMIN_REMOVEPOWER_USAGE"));
+                                        break;
+                                    case "setpower":
+                                        if (isset($args[2]) and isset($args[3])) {
+                                            if (FactionsAPI::existsFaction($args[2])) {
+                                                if (is_numeric($args[3])) {
+                                                    FactionsAPI::setPower($args[2], (int)$args[3]);
+                                                    $player->sendMessage(Utils::getConfigMessage("ADMIN_SETPOWER_SUCCESS", array((int)$args[3])));
+                                                } else $player->sendMessage(Utils::getConfigMessage("ENTER_VALID_NUMBER"));
+                                            } else $player->sendMessage(Utils::getConfigMessage("FACTION_NOT_EXIST"));
+                                        } else $player->sendMessage(Utils::getConfigMessage("ADMIN_SETPOWER_USAGE"));
+                                        break;
+                                    case "delete":
+                                        if (isset($args[2])) {
+                                            if (FactionsAPI::existsFaction($args[2])) {
+                                                FactionsAPI::disbandFaction($player, $args[2]);
+                                                $player->sendMessage(Utils::getConfigMessage("ADMIN_DELETE_SUCCESS"));
+                                            } else $player->sendMessage(Utils::getConfigMessage("FACTION_NOT_EXIST"));
+                                        } else $player->sendMessage(Utils::getConfigMessage("ADMIN_DELETE_USAGE"));
+                                        break;
+                                    case "rename":
+                                        if (isset($args[2]) and isset($args[3])) {
+                                            if (FactionsAPI::existsFaction($args[2])) {
+                                                if (!FactionsAPI::existsFaction($args[3])) {
+                                                    FactionsAPI::renameFaction($args[2], $args[3]);
+                                                    $player->sendMessage(Utils::getConfigMessage("ADMIN_RENAME_SUCCESS", array($args[3])));
+                                                } else $player->sendMessage(Utils::getConfigMessage("FACTION_ALREADY_EXIST"));
+                                            } else $player->sendMessage(Utils::getConfigMessage("FACTION_NOT_EXIST"));
+                                        } else $player->sendMessage(Utils::getConfigMessage("ADMIN_RENAME_USAGE"));
+                                        break;
+                                    case "unclaim":
+                                        if (FactionsAPI::isInClaim($player)) {
+                                            $faction = FactionsAPI::getFactionClaim($player);
+                                            FactionsAPI::deleteClaim($player, $faction);
+                                            $player->sendMessage(Utils::getConfigMessage("ADMIN_UNCLAIM_SUCCESS"));
+                                        } else $player->sendMessage(Utils::getConfigMessage("ADMIN_NOT_IN_CLAIM"));
+                                        break;
+                                }
+                            } else $player->sendMessage(Utils::getConfigMessage("ADMIN_USAGE"));
+                        } else $player->sendMessage("§cYou don't have the permission to use this command");
+                        break;
                     case "about":
                         $player->sendMessage("§c§lPlugin created by Ayzrix.");
                         $player->sendMessage("§4§lYoutube:§r§f Ayzrix");

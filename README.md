@@ -24,8 +24,9 @@
 | `/f home`      | Quick way to get to your faction's home.                 | everyone      |
 | `/f promote`   |  Promote a member.                                       | leader        |
 | `/f demote`    | Demote an officer.                                       | leader        |
-| `/f top`       | Shows the top factions.                      | everyone      |
-| `/f transfer`  | Make a new player the leader.                                  | leader        |
+| `/f top`       | Shows the top factions.                                  | everyone      |
+| `/f transfer`  | Make a new player the leader.                            | leader        |
+| `/f admin`     | Manage all factions.                                     | staff       |
 
 ## Future additions
 
@@ -33,10 +34,8 @@
 |---------------------------|----------------------------------------------------------|---------|
 | `/f map`                  | Add the /f map command.                      | command |
 | `PureChat & PurePerms`    | Add purechat and pureperms support.                                        | support |
-| `ScoreHUD`                | Add ScoreHUD support.                                     | support |
 | `/f border`               | Add /f border command.                            | command |
 | `/f bank`                 | Add /f bank command.                          | command |
-| `/f admin`                | Add /f admin command.                                           | command |
 | `Message cleaning`        | Clean all message.                                      | clean   |
 | `Multi-Language Support`  | Add multi language support    | support |
 

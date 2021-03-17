@@ -642,4 +642,17 @@ class FactionsAPI {
             }
         }
     }
+
+    /**
+     * @param string $faction
+     * @param string $name
+     */
+    public static function renameFaction(string $faction, string $name): void {
+        Provider::query("UPDATE faction SET faction='$name' WHERE faction='$faction'");
+        Provider::query("UPDATE power SET faction='$name' WHERE faction='$faction'");
+        Provider::query("UPDATE home SET faction='$name' WHERE faction='$faction'");
+        Provider::query("UPDATE claim SET faction='$name' WHERE faction='$faction'");
+        Provider::query("UPDATE allies SET faction1='$name' WHERE faction1='$faction'");
+        Provider::query("UPDATE allies SET faction2='$name' WHERE faction2='$faction'");
+    }
 }
