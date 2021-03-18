@@ -51,8 +51,9 @@ class Main extends PluginBase {
 
     public function onEnable() {
         @mkdir($this->getDataFolder() . "Languages/");
-        foreach ((new Config($this->getDataFolder() . "lang.yml", Config::YAML))->get("languages") as $prefix => $file) $this->saveResource("Languages/{$file}.yml");
-
+        foreach ((new Config($this->getDataFolder() . "lang.yml", Config::YAML))->get("languages") as $prefix => $file) {
+            $this->saveResource("Languages/{$file}.yml");
+        }
         self::$economyAPI = EconomyAPI::getInstance();
         $this->getServer()->getCommandMap()->register("simplefaction", new Faction($this));
         $this->getServer()->getPluginManager()->registerEvents(new PlayerListener(), $this);
