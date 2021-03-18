@@ -13,7 +13,9 @@
 
 namespace Ayzrix\SimpleFaction\Utils;
 
+use Ayzrix\SimpleFaction\API\FactionsAPI;
 use Ayzrix\SimpleFaction\Main;
+use Ayzrix\SimpleFaction\Tasks\Async\QueryTask;
 use pocketmine\Player;
 use pocketmine\utils\Config;
 
@@ -32,7 +34,7 @@ class Utils {
      * @return string
      */
     public static function getMessage(Player $player, string $text, array $args = array()): string {
-        $lang = self::getLanguages($player);
+        $lang = FactionsAPI::getLanguages($player);
         $file = self::getIntoLang("languages")[$lang];
         $config = new Config(Main::getInstance()->getDataFolder() . "Languages/{$file}.yml", Config::YAML);
         $message = $config->get($text);
@@ -46,64 +48,10 @@ class Utils {
     }
 
     /**
-     * @return int
-     */
-    public static function getAssoc(): int {
-        if (self::getProvider() === "mysql") {
-            return MYSQLI_ASSOC;
-        } else return SQLITE3_ASSOC;
-    }
-
-    /**
      * @return string
      */
     public static function getProvider(): string {
         return strtolower(self::getIntoConfig("PROVIDER"));
-    }
-
-    /**
-     * @param Player $player
-     * @return bool
-     */
-    public static function hasLanguages(Player $player): bool {
-        $name = $player->getName();
-        $result = Provider::getDatabase()->query("SELECT lang FROM lang WHERE player='$name';");
-        if (Utils::getProvider() === "mysql") return $result->num_rows > 0 ? true : false;
-        $return = $result->fetchArray(Utils::getAssoc());
-        return empty($return) === false;
-    }
-
-    /**
-     * @param Player $player
-     * @param string $lang
-     */
-    public static function setLanguages(Player $player, string $lang): void {
-        $name = $player->getName();
-        Provider::query("INSERT INTO lang (player, lang) VALUES ('$name', '$lang')");
-    }
-
-    /**
-     * @param Player $player
-     * @return string
-     */
-    public static function getLanguages(Player $player): string {
-        $name = $player->getName();
-        $faction = Provider::getDatabase()->query("SELECT lang FROM lang WHERE player='$name';");
-        if (Utils::getProvider() === "mysql") {
-            $array = $faction->fetch_Array(Utils::getAssoc());
-        } else {
-            $array = $faction->fetchArray(Utils::getAssoc());
-        }
-        return $array["lang"]?? self::getIntoLang("default-language");
-    }
-
-    /**
-     * @param Player $player
-     * @param string $lang
-     */
-    public static function changeLanguages(Player $player, string $lang): void {
-        $name = $player->getName();
-        Provider::query("UPDATE lang SET lang = '$lang' WHERE player='$name'");
     }
 
     /**
@@ -122,5 +70,12 @@ class Utils {
     public static function getIntoLang(string $value) {
         $config = new Config(Main::getInstance()->getDataFolder() . "lang.yml", Config::YAML);
         return $config->get($value);
+    }
+
+    /**
+     * @param string $text
+     */
+    public static function query(string $text): void {
+        Main::getInstance()->getServer()->getAsyncPool()->submitTask(new QueryTask($text));
     }
 }

@@ -21,7 +21,7 @@ class BlockListener implements Listener {
 
     public function BlockBreak(BlockBreakEvent $event) {
         $player = $event->getPlayer();
-        $chunk = $player->getLevel()->getChunkAtPosition($player);
+        $chunk = $player->getLevel()->getChunkAtPosition($event->getBlock());
         $chunkX = $chunk->getX();
         $chunkZ = $chunk->getZ();
         if (FactionsAPI::isInClaim($player->getLevel(), $chunkX, $chunkZ)) {
@@ -35,7 +35,7 @@ class BlockListener implements Listener {
 
     public function BlockPlace(BlockBreakEvent $event) {
         $player = $event->getPlayer();
-        $chunk = $player->getLevel()->getChunkAtPosition($player);
+        $chunk = $player->getLevel()->getChunkAtPosition($event->getBlock());
         $chunkX = $chunk->getX();
         $chunkZ = $chunk->getZ();
         if (FactionsAPI::isInClaim($player->getLevel(), $chunkX, $chunkZ)) {

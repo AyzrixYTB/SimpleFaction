@@ -16,7 +16,10 @@ default-language: EN
 languages:
   "EN": "en_EN"
   "FR": "fr_FR"
+  "SPA": "spa_SPA" 	
 
 languages-fullname:
   "EN": "English"
   "FR": "Français"
+  "SPA": "Española"
+	

@@ -13,27 +13,29 @@
 
 namespace Ayzrix\SimpleFaction\Tasks\Async;
 
+use Ayzrix\SimpleFaction\Main;
 use Ayzrix\SimpleFaction\Utils\Utils;
 use pocketmine\scheduler\AsyncTask;
 
 class QueryTask extends AsyncTask {
 
     private $text;
-    private $hostname;
-    private $user;
-    private $password;
-    private $database;
+    private $provider;
+    private $db;
 
     public function __construct(string $text) {
+        $this->provider = Utils::getProvider();
         $this->text = $text;
-        $this->hostname = Utils::getIntoConfig("mysql_address");
-        $this->user = Utils::getIntoConfig("mysql_user");
-        $this->password = Utils::getIntoConfig("mysql_password");
-        $this->database = Utils::getIntoConfig("mysql_db");
+        if ($this->provider === "mysql") {
+            $this->db = array(Utils::getIntoConfig("mysql_address"), Utils::getIntoConfig("mysql_user"), Utils::getIntoConfig("mysql_password"), Utils::getIntoConfig("mysql_db"));
+        } else $this->db = array(Main::getInstance()->getDataFolder() . "SimpleFaction.db");
     }
 
     public function onRun() {
-        $db = new \MySQLi($this->hostname, $this->user, $this->password, $this->database);
+        $provider = $this->provider;
+        if ($provider === "mysql") {
+            $db = new \MySQLi($this->db[0], $this->db[1], $this->db[2], $this->db[3]);
+        } else $db = new \SQLite3($this->db[0]);
         $db->query($this->text);
     }
 }

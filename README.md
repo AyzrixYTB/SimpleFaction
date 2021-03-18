@@ -1,3 +1,4 @@
+[![Discord](https://img.shields.io/discord/800828802921529355.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/wuNvKw948n)
 # SimpleFaction
 
 ###### Simple faction plugin replacing FactionsPro which is no longer updated.
@@ -33,10 +34,12 @@
 
 ## Future additions
 
-| Name          | Description                                           | Type      |
-|---------------|-------------------------------------------------------|-----------|
-| `LibAsynql`   | Replace all mysql query to libasynql query.           | databases |
-| `UI System`   | Add an UI extension plugin.                           | extension |
+| Name              | Description                                           | Type      |
+|-------------------|-------------------------------------------------------|-----------|
+| `/f here`         | Show claims informations.                             | command   |
+| `/f admon (bank)` | Manage factions banks.                                | command   |
+| `/f who (player)` | Check the informations of a faction by a player name. | command   |
+| `UI System`       | Add an UI extension plugin.                           | extension |
 
 ## Features
 
@@ -68,8 +71,8 @@
 ## Translators
 - **English** - @Ayzrix & Se7en-dev.
 - **French** - @Ayzrix.
-- **German** - Soon.  
-- **Spanish** - Soon.
+- **Spanish** - @Santi.
+- **German** - Soon.
 
 ## Config
 ```
@@ -123,4 +126,5 @@ claims:
   - 5000
 
 PREFIX: "§6[§fSimpleFaction§6]§f"
-PLAYER_ONLY: "{prefix} §cThis command can't be used in the console !"```
+PLAYER_ONLY: "{prefix} §cThis command can't be used in the console !"
+MAP_HEADER: "§6--------------------(§f{X}§6, §f{Z}§6)--------------------"```

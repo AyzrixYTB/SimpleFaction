@@ -537,7 +537,7 @@ class Faction extends PluginCommand {
                         $langs = substr($langs, 2);
                         if (isset($args[1])) {
                             if (isset(Utils::getIntoLang("languages")[$args[1]])) {
-                                Utils::changeLanguages($player, $args[1]);
+                                FactionsAPI::setLanguages($player, $args[1]);
                                 $fullName = Utils::getIntoLang("languages-fullname")[$args[1]];
                                 $player->sendMessage(Utils::getMessage($player, "LANG_CHANGE_SUCCESS", array($fullName)));
                             } else $player->sendMessage(Utils::getMessage($player, "LANG_NOT_EXIST"));

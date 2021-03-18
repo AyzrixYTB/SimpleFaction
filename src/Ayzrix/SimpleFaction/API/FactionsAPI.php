@@ -14,7 +14,6 @@
 namespace Ayzrix\SimpleFaction\API;
 
 use Ayzrix\SimpleFaction\Main;
-use Ayzrix\SimpleFaction\Utils\Provider;
 use Ayzrix\SimpleFaction\Utils\Utils;
 use pocketmine\level\Level;
 use pocketmine\level\Position;
@@ -23,6 +22,21 @@ use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 
 class FactionsAPI {
+
+    /** @var array $faction */
+    public static $faction = [];
+
+    /** @var array $player */
+    public static $player = [];
+
+    /** @var array $home */
+    public static $home = [];
+
+    /** @var array $lang */
+    public static $lang = [];
+
+    /** @var array $claim */
+    public static $claim = [];
 
     /** @var array $invitation */
     public static $invitation = [];
@@ -72,11 +86,7 @@ class FactionsAPI {
      * @return bool
      */
     public static function isInFaction(Player $player): bool {
-        $name = $player->getName();
-        $result = Provider::getDatabase()->query("SELECT player FROM faction WHERE player='$name';");
-        if (Utils::getProvider() === "mysql") return $result->num_rows > 0 ? true : false;
-        $return = $result->fetchArray(Utils::getAssoc());
-        return empty($return) === false;
+        return isset(self::$player[$player->getName()]);
     }
 
     /**
@@ -85,10 +95,12 @@ class FactionsAPI {
      */
     public static function existsFaction(string $faction): bool {
         $faction = strtolower($faction);
-        $result = Provider::getDatabase()->query("SELECT player FROM faction WHERE lower(faction)='$faction';");
-        if (Utils::getProvider() === "mysql") return $result->num_rows > 0 ? true : false;
-        $return = $result->fetchArray(Utils::getAssoc());
-        return empty($return) === false;
+        foreach (self::$faction as $key => $value) {
+            if (strtolower($key) === $faction) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -96,17 +108,9 @@ class FactionsAPI {
      * @param string $faction
      */
     public static function createFaction(Player $player, string $faction): void {
-        $name = $player->getName();
-        Provider::query("INSERT INTO faction (player, faction, role) VALUES ('$name', '$faction', 'Leader')");
-        Provider::query("INSERT INTO power (faction, power) VALUES ('$faction', 0)");
-        Provider::query("INSERT INTO bank (faction, money) VALUES ('$faction', 0)");
-        if (Utils::getIntoConfig("broadcast_message_created") === true) {
-            foreach (Server::getInstance()->getOnlinePlayers() as $player) {
-                if ($player instanceof Player) {
-                    $player->sendMessage(Utils::getMessage($player, "FACTION_CREATE_BROADCAST", array($name, $faction)));
-                }
-            }
-        }
+        self::$faction[$faction] = array("players" => array($player->getName()), "power" => 0, "money" => 0, "allies" => array());
+        self::$player[$player->getName()] = array("faction" => $faction, "role" => "Leader");
+        self::$claim[$faction] = array();
     }
 
     /**
@@ -115,12 +119,17 @@ class FactionsAPI {
      */
     public static function disbandFaction(Player $player, string $faction): void {
         $name = $player->getName();
-        Provider::query("DELETE FROM faction WHERE faction = '$faction'");
-        Provider::query("DELETE FROM power WHERE faction='$faction'");
-        Provider::query("DELETE FROM home WHERE faction='$faction'");
-        Provider::query("DELETE FROM claim WHERE faction='$faction'");
-        Provider::query("DELETE FROM allies WHERE faction1='$faction' OR faction2='$faction'");
-        Provider::query("DELETE FROM bank WHERE faction='$faction'");
+
+        if (isset(self::$faction[$faction]))unset(self::$faction[$faction]);
+        if (isset(self::$home[$faction])) unset(self::$home[$faction]);
+        if (isset(self::$claim[$faction])) unset(self::$claim[$faction]);
+
+        foreach (self::$player as $player => $value) {
+            if ($value["faction"] === $faction) {
+                unset(self::$player[$faction]);
+            }
+        }
+
         if (Utils::getIntoConfig("broadcast_message_disband") === true) {
             foreach (Server::getInstance()->getOnlinePlayers() as $player) {
                 if ($player instanceof Player) {
@@ -136,13 +145,7 @@ class FactionsAPI {
      */
     public static function getFaction(Player $player): string {
         $name = $player->getName();
-        $faction = Provider::getDatabase()->query("SELECT faction FROM faction WHERE player='$name';");
-        if (Utils::getProvider() === "mysql") {
-            $array = $faction->fetch_Array(Utils::getAssoc());
-        } else {
-            $array = $faction->fetchArray(Utils::getAssoc());
-        }
-        return $array["faction"]?? "";
+        return self::$player[$name]["faction"]?? "";
     }
 
     /**
@@ -150,14 +153,7 @@ class FactionsAPI {
      * @return string
      */
     public static function getPlayerFaction(string $name): string {
-        $name = strtolower($name);
-        $faction = Provider::getDatabase()->query("SELECT faction FROM faction WHERE lower(player)='$name';");
-        if (Utils::getProvider() === "mysql") {
-            $array = $faction->fetch_Array(Utils::getAssoc());
-        } else {
-            $array = $faction->fetchArray(Utils::getAssoc());
-        }
-        return $array["faction"]?? "";
+        return self::$player[$name]["faction"]?? "";
     }
 
     /**
@@ -165,13 +161,7 @@ class FactionsAPI {
      * @return string
      */
     public static function getRank(string $name): string {
-        $faction = Provider::getDatabase()->query("SELECT role FROM faction WHERE player='$name';");
-        if (Utils::getProvider() === "mysql") {
-            $array = $faction->fetch_Array(Utils::getAssoc());
-        } else {
-            $array = $faction->fetchArray(Utils::getAssoc());
-        }
-        return $array["role"]?? "";
+        return self::$player[$name]["role"]?? "";
     }
 
     /**
@@ -179,13 +169,7 @@ class FactionsAPI {
      * @return int
      */
     public static function getPower(string $faction): int {
-        $return = Provider::getDatabase()->query("SELECT power FROM power WHERE faction='$faction';");
-        if (Utils::getProvider() === "mysql") {
-            $array = $return->fetch_Array(Utils::getAssoc());
-        } else {
-            $array = $return->fetchArray(Utils::getAssoc());
-        }
-        return $array["power"]?? 0;
+        return self::$faction[$faction]["power"]?? 0;
     }
 
     /**
@@ -193,7 +177,7 @@ class FactionsAPI {
      * @param int $amount
      */
     public static function addPower(string $faction, int $amount): void {
-        Provider::query("UPDATE power SET power = power + '$amount' WHERE faction='$faction'");
+        self::$faction[$faction]["power"] = self::getPower($faction) + $amount;
     }
 
     /**
@@ -201,11 +185,7 @@ class FactionsAPI {
      * @param int $amount
      */
     public static function removePower(string $faction, int $amount): void {
-       if(self::getPower($faction) - $amount <= 0) {
-           self::setPower($faction, 0);
-           return;
-       }
-        Provider::query("UPDATE power SET power = power - '$amount' WHERE faction='$faction'");
+        self::$faction[$faction]["power"] = self::getPower($faction) - $amount;
     }
 
     /**
@@ -213,7 +193,7 @@ class FactionsAPI {
      * @param int $amount
      */
     public static function setPower(string $faction, int $amount): void {
-        Provider::query("UPDATE power SET power = '$amount' WHERE faction='$faction'");
+        self::$faction[$faction]["power"] = $amount;
     }
 
     /**
@@ -221,19 +201,7 @@ class FactionsAPI {
      * @return array
      */
     public static function getAllPlayers(string $faction): array {
-        $res = Provider::getDatabase()->query("SELECT player FROM faction WHERE faction='$faction'");
-        $return = [];
-
-        if (Utils::getProvider() === "mysql") {
-            while ($resultArr = $res->fetch_Array(Utils::getAssoc())) {
-                $return[] = $resultArr['player'];
-            }
-        } else {
-            while ($resultArr = $res->fetchArray(Utils::getAssoc())) {
-                $return[] = $resultArr['player'];
-            }
-        }
-        return $return;
+        return self::$faction[$faction]["players"];
     }
 
     /**
@@ -241,13 +209,12 @@ class FactionsAPI {
      * @return string
      */
     public static function getLeader(string $faction): string {
-        $return = Provider::getDatabase()->query("SELECT player FROM faction WHERE faction='$faction' AND role = 'Leader';");
-        if (Utils::getProvider() === "mysql") {
-            $array = $return->fetch_Array(Utils::getAssoc());
-        } else {
-            $array = $return->fetchArray(Utils::getAssoc());
+        foreach (self::getAllPlayers($faction) as $player) {
+            if (self::getRank($player) === "Leader") {
+                return $player;
+            }
         }
-        return $array['player'];
+        return "";
     }
 
     /**
@@ -283,11 +250,7 @@ class FactionsAPI {
      * @return bool
      */
     public static function existsHome(string $faction): bool {
-        $faction = strtolower($faction);
-        $result = Provider::getDatabase()->query("SELECT x FROM home WHERE lower(faction)='$faction';");
-        if (Utils::getProvider() === "mysql") return $result->num_rows > 0 ? true : false;
-        $return = $result->fetchArray(Utils::getAssoc());
-        return empty($return) === false;
+        return isset(self::$home[$faction]);
     }
 
     /**
@@ -299,14 +262,14 @@ class FactionsAPI {
         $y = round($position->getY()) + 0.5;
         $z = round($position->getZ()) + 0.5;
         $world = $position->getLevel()->getFolderName();
-        Provider::query("INSERT INTO home (faction, x, y, z, world) VALUES ('$faction', '$x', '$y', '$z', '$world')");
+        self::$home[$faction] = array($x, $y, $z, $world);
     }
 
     /**
      * @param string $faction
      */
     public static function deleteHome(string $faction): void {
-        Provider::query("DELETE FROM home WHERE faction='$faction'");
+        if (isset(self::$home[$faction])) unset(self::$home[$faction]);
     }
 
     /**
@@ -314,13 +277,8 @@ class FactionsAPI {
      * @return Position
      */
     public static function getHome(string $faction): Position {
-        $result = Provider::getDatabase()->query("SELECT * FROM home WHERE faction='$faction';");
-        if (Utils::getProvider() === "mysql") {
-            $array = $result->fetch_Array(Utils::getAssoc());
-        } else {
-            $array = $result->fetchArray(Utils::getAssoc());
-        }
-        return new Position((int)$array['x'], (int)$array['y'], (int)$array['z'], Main::getInstance()->getServer()->getLevelByName($array['world']));
+        $array = self::$home[$faction];
+        return new Position((int)$array[0], (int)$array[1], (int)$array[2], Main::getInstance()->getServer()->getLevelByName($array[3]));
     }
 
     /**
@@ -332,7 +290,9 @@ class FactionsAPI {
         $chunkX = $chunk->getX();
         $chunkZ = $chunk->getZ();
         $world = $player->getLevel()->getFolderName();
-        Provider::query("INSERT INTO claim (faction, x, z, world) VALUES ('$faction', '$chunkX', '$chunkZ', '$world')");
+        $claims = self::$claim[$faction];
+        array_push($claims, "{$chunkX}:{$chunkZ}:{$world}");
+        self::$claim[$faction] = $claims;
     }
 
     /**
@@ -343,10 +303,11 @@ class FactionsAPI {
      */
     public static function isInClaim(Level $level, int $chunkX, int $chunkZ): bool {
         $world = $level->getFolderName();
-        $result = Provider::getDatabase()->query("SELECT * FROM claim WHERE x='$chunkX' AND z='$chunkZ' and world='$world';");
-        if (Utils::getProvider() === "mysql") return $result->num_rows > 0 ? true : false;
-        $return = $result->fetchArray(Utils::getAssoc());
-        return empty($return) === false;
+        $array = [];
+        foreach (self::$claim as $faction => $claims) {
+            $array = array_merge($array, $claims);
+        }
+        return in_array("{$chunkX}:{$chunkZ}:{$world}", $array);
     }
 
     /**
@@ -357,11 +318,12 @@ class FactionsAPI {
      */
     public static function getFactionClaim(Level $level, int $chunkX, int $chunkZ): string {
         $world = $level->getFolderName();
-        $result = Provider::getDatabase()->query("SELECT faction FROM claim WHERE x='$chunkX' AND z='$chunkZ' and world='$world';");
-        if (Utils::getProvider() === "mysql") {
-            $array = $result->fetch_Array(Utils::getAssoc());
-        } else $array = $result->fetchArray(Utils::getAssoc());
-        return $array['faction']?? "";
+        foreach (self::$claim as $faction => $claims) {
+            foreach ($claims as $claim) {
+               if ($claim === "{$chunkX}:{$chunkZ}:{$world}") return $faction;
+            }
+        }
+        return "";
     }
 
     /**
@@ -373,7 +335,8 @@ class FactionsAPI {
         $chunkX = $chunk->getX();
         $chunkZ = $chunk->getZ();
         $world = $player->getLevel()->getFolderName();
-        Provider::query("DELETE FROM claim WHERE faction='$faction' AND x='$chunkX' AND z='$chunkZ' AND world='$world'");
+        $claim = self::$claim[$faction];
+        unset($claim["{$chunkX}:{$chunkZ}:{$world}"]);
     }
 
     /**
@@ -381,11 +344,7 @@ class FactionsAPI {
      * @return int
      */
     public static function getClaimCount(string $faction): int {
-        $result = Provider::getDatabase()->query("SELECT COUNT(faction) FROM claim where faction='$faction'");
-        if (Utils::getProvider() === "mysql") {
-            $array = $result->fetch_Array(Utils::getAssoc());
-        } else $array = $result->fetchArray(Utils::getAssoc());
-        return (int)$array['COUNT(faction)']?? 0;
+        return count(self::$claim[$faction]);
     }
 
     /**
@@ -393,7 +352,10 @@ class FactionsAPI {
      */
     public static function leaveFaction(Player $player): void {
         $name = $player->getName();
-        Provider::query("DELETE FROM faction WHERE player = '$name'");
+        $array = self::$faction[self::getFaction($player)]["players"];
+        unset($array[$name]);
+        self::$faction[self::getFaction($player)]["players"] = $array;
+        unset(self::$player[$name]);
     }
 
     /**
@@ -401,32 +363,31 @@ class FactionsAPI {
      */
     public static function kickFaction(string $name): void {
         $name = strtolower($name);
-        Provider::query("DELETE FROM faction WHERE lower(player) = '$name'");
+        $array = self::$faction[self::getPlayerFaction($name)]["players"];
+        unset($array[$name]);
+        self::$faction[self::getPlayerFaction($name)]["players"] = $array;
+        unset(self::$player[$name]);
     }
 
     /**
      * @param string $name
      */
     public static function promoteFaction(string $name): void {
-        $name = strtolower($name);
-        Provider::query("UPDATE faction SET role = 'Officer' WHERE lower(player)='$name'");
+        self::$player[$name]["role"] = "Officer";
     }
 
     /**
      * @param string $name
      */
     public static function demoteFaction(string $name): void {
-        $name = strtolower($name);
-        Provider::query("UPDATE faction SET role = 'Member' WHERE lower(player)='$name'");
+        self::$player[$name]["role"] = "Member";
     }
 
     /**
      * @param string $name
-     * @param string $faction
      */
-    public static function transferFaction(string $name, string $faction): void {
-        $name = strtolower($name);
-        Provider::query("UPDATE faction SET role = 'Leader' WHERE lower(player)='$name'");
+    public static function transferFaction(string $name): void {
+        self::$player[$name]["role"] = "Leader";
     }
 
     /**
@@ -444,7 +405,10 @@ class FactionsAPI {
     public static function acceptInvitation(Player $player): void {
         $name = $player->getName();
         $faction = self::$invitation[$player->getName()];
-        Provider::query("INSERT INTO faction (player, faction, role) VALUES ('$name', '$faction', 'Member')");
+        self::$player[$name] = array("faction" => $faction, "role" => "Member");
+        $array = self::$faction[$faction]["players"];
+        array_push($array, $name);
+        self::$faction[$faction]["players"] = $array;
         foreach (self::getAllPlayers($faction) as $player) {
             if (Server::getInstance()->getPlayer($player)) {
                 $player = Server::getInstance()->getPlayer($player);
@@ -469,17 +433,9 @@ class FactionsAPI {
      * @return array
      */
     public static function getAllPowers(): array {
-        $result = Provider::getDatabase()->query("SELECT * FROM power ORDER BY power;");
         $return = [];
-        if (Utils::getProvider() === "mysql") {
-            foreach($result->fetch_all() as $val){
-                $return[$val[0]] = (int)$val[1];
-            }
-            $result->close();
-        } else {
-            while ($val = $result->fetchArray(Utils::getAssoc())) {
-                $return[$val['faction']] = (int)$val['power'];
-            }
+        foreach (self::$faction as $faction => $value) {
+            $return[$faction] = $value["power"];
         }
         return $return;
     }
@@ -541,7 +497,15 @@ class FactionsAPI {
      */
     public static function acceptAlliesInvitation(string $faction): void {
         $faction2 = self::$Alliesinvitation[$faction];
-        Provider::query("INSERT INTO allies (faction1, faction2) VALUES ('$faction', '$faction2')");
+
+        $allies = self::$faction[$faction]["allies"];
+        array_push($allies, $faction2);
+        self::$faction[$faction]["allies"] = $allies;
+
+        $allies = self::$faction[$faction2]["allies"];
+        array_push($allies, $faction);
+        self::$faction[$faction2]["allies"] = $allies;
+
         foreach (self::getAllPlayers($faction) as $player) {
             if (Server::getInstance()->getPlayer($player)) {
                 $player = Server::getInstance()->getPlayer($player);
@@ -577,10 +541,7 @@ class FactionsAPI {
      * @return bool
      */
     public static function areAllies(string $faction1, string $faction2): bool {
-        $result = Provider::getDatabase()->query("SELECT ID FROM allies WHERE (faction1 = '$faction1' AND faction2 = '$faction2') OR (faction1 = '$faction2' AND faction2 = '$faction1');");
-        if (Utils::getProvider() === "mysql") return $result->num_rows > 0 ? true : false;
-        $return = $result->fetchArray(Utils::getAssoc());
-        return empty($return) === false;
+        return in_array($faction2, self::$faction[$faction1]["allies"]);
     }
 
     /**
@@ -605,7 +566,14 @@ class FactionsAPI {
                 }
             }
         }
-        Provider::query("DELETE FROM allies WHERE (faction1='$faction1' AND faction2='$faction2') OR (faction1='$faction2' AND faction2='$faction1')");
+
+        $allies = self::$faction[$faction1]["allies"];
+        unset($allies[array_search($faction2, $allies)]);
+        self::$faction[$faction1]["allies"] = $allies;
+
+        $allies = self::$faction[$faction2]["allies"];
+        unset($allies[array_search($faction1, $allies)]);
+        self::$faction[$faction2]["allies"] = $allies;
     }
 
     /**
@@ -613,13 +581,7 @@ class FactionsAPI {
      * @return int
      */
     public static function getAlliesCount(string $faction): int {
-        $result = Provider::getDatabase()->query("SELECT COUNT(ID) FROM allies WHERE faction1='$faction' OR faction2='$faction'");
-        if (Utils::getProvider() === "mysql") {
-            $array = $result->fetch_Array(Utils::getAssoc());
-        } else {
-            $array = $result->fetchArray(Utils::getAssoc());
-        }
-        return (int)$array['COUNT(ID)']?? 0;
+        return count(self::$faction[$faction]["allies"]);
     }
 
     /**
@@ -627,20 +589,7 @@ class FactionsAPI {
      * @return array
      */
     public static function getAllies(string $faction): array {
-        $result = Provider::getDatabase()->query("SELECT faction2 FROM allies WHERE faction1='$faction'");
-        $return = [];
-
-        if (Utils::getProvider() === "mysql") {
-            while ($resultArr = $result->fetch_Array(Utils::getAssoc())) $return[] = $resultArr['faction2'];
-        } else while ($resultArr = $result->fetchArray(Utils::getAssoc())) $return[] = $resultArr['faction2'];
-
-        $result = Provider::getDatabase()->query("SELECT faction1 FROM allies WHERE faction2='$faction'");
-
-        if (Utils::getProvider() === "mysql") {
-            while ($resultArr = $result->fetch_Array(Utils::getAssoc())) $return[] = $resultArr['faction1'];
-        } else while ($resultArr = $result->fetchArray(Utils::getAssoc())) $return[] = $resultArr['faction1'];
-
-        return $return;
+        return self::$faction[$faction]["allies"];
     }
 
     public static function factionMessage(Player $player, string $message) {
@@ -685,12 +634,18 @@ class FactionsAPI {
      * @param string $name
      */
     public static function renameFaction(string $faction, string $name): void {
-        Provider::query("UPDATE faction SET faction='$name' WHERE faction='$faction'");
-        Provider::query("UPDATE power SET faction='$name' WHERE faction='$faction'");
-        Provider::query("UPDATE home SET faction='$name' WHERE faction='$faction'");
-        Provider::query("UPDATE claim SET faction='$name' WHERE faction='$faction'");
-        Provider::query("UPDATE allies SET faction1='$name' WHERE faction1='$faction'");
-        Provider::query("UPDATE allies SET faction2='$name' WHERE faction2='$faction'");
+        $faction = self::$faction[$faction];
+        self::$faction[$name] = $faction;
+        unset(self::$faction[$faction]);
+        if (self::existsHome($faction)) {
+            $home = self::$home[$faction];
+            self::$home[$name] = $home;
+            unset(self::$home[$faction]);
+        }
+
+        $claims = self::$claim[$faction];
+        $claims[$name] = $claims;
+        unset(self::$claim[$faction]);
     }
 
     /**
@@ -698,13 +653,7 @@ class FactionsAPI {
      * @return int
      */
     public static function getMoney(string $faction): int {
-        $return = Provider::getDatabase()->query("SELECT money FROM bank WHERE faction='$faction';");
-        if (Utils::getProvider() === "mysql") {
-            $array = $return->fetch_Array(Utils::getAssoc());
-        } else {
-            $array = $return->fetchArray(Utils::getAssoc());
-        }
-        return $array["money"]?? 0;
+        return self::$faction[$faction]["money"];
     }
 
     /**
@@ -712,7 +661,7 @@ class FactionsAPI {
      * @param int $amount
      */
     public static function addMoney(string $faction, int $amount): void {
-        Provider::query("UPDATE bank SET money = money + '$amount' WHERE faction='$faction'");
+        self::$faction[$faction]["money"] = self::getMoney($faction) + $amount;
     }
 
     /**
@@ -724,7 +673,7 @@ class FactionsAPI {
             self::setMoney($faction, 0);
             return;
         }
-        Provider::query("UPDATE bank SET money = money - '$amount' WHERE faction='$faction'");
+        self::$faction[$faction]["money"] = self::getMoney($faction) - $amount;
     }
 
     /**
@@ -732,7 +681,7 @@ class FactionsAPI {
      * @param int $amount
      */
     public static function setMoney(string $faction, int $amount): void {
-        Provider::query("UPDATE bank SET money = '$amount' WHERE faction='$faction'");
+        self::$faction[$faction]["money"] = $amount;
     }
 
     /**
@@ -827,5 +776,32 @@ class FactionsAPI {
         if ($degrees < 0) $degrees += 360;
 
         return array_keys(self::DIRECTIONS)[(int)floor($degrees / 45)];
+    }
+
+    /**
+     * @param Player $player
+     * @return bool
+     */
+    public static function hasLanguages(Player $player): bool {
+        $name = $player->getName();
+        return isset(self::$lang[$name]);
+    }
+
+    /**
+     * @param Player $player
+     * @param string $lang
+     */
+    public static function setLanguages(Player $player, string $lang): void {
+        $name = $player->getName();
+        self::$lang[$name] = $lang;
+    }
+
+    /**
+     * @param Player $player
+     * @return string
+     */
+    public static function getLanguages(Player $player): string {
+        $name = $player->getName();
+        return self::$lang[$name];
     }
 }

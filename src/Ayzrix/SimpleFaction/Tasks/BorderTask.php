@@ -15,8 +15,6 @@ namespace Ayzrix\SimpleFaction\Tasks;
 
 use Ayzrix\SimpleFaction\API\FactionsAPI;
 use pocketmine\level\particle\DustParticle;
-
-use pocketmine\level\particle\RedstoneParticle;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\scheduler\Task;

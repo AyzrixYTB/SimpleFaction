@@ -29,8 +29,8 @@ class PlayerListener implements Listener {
 
     public function PlayerJoin(PlayerJoinEvent $event) {
         $player = $event->getPlayer();
-        if (!Utils::hasLanguages($player)) {
-            Utils::setLanguages($player, Utils::getIntoLang("default-language"));
+        if (!FactionsAPI::hasLanguages($player)) {
+            FactionsAPI::setLanguages($player, Utils::getIntoLang("default-language"));
         }
     }
 
@@ -59,7 +59,7 @@ class PlayerListener implements Listener {
         $player = $event->getPlayer();
         $block = $event->getBlock();
         $item = $event->getItem();
-        $chunk = $player->getLevel()->getChunkAtPosition($player);
+        $chunk = $player->getLevel()->getChunkAtPosition($event->getBlock());
         $chunkX = $chunk->getX();
         $chunkZ = $chunk->getZ();
         if (FactionsAPI::isInClaim($player->getLevel(), $chunkX, $chunkZ)) {
