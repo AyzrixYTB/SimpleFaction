@@ -17,6 +17,7 @@
 | `/f bank`      | Manage your faction's bank.                              | <font color="#03fc73"> everyone       |
 | `/f leave`     | Leave your current faction.                              | <font color="#03fc73"> everyone       |
 | `/f map`       | Show the nearby claims.                                  | <font color="#03fc73"> everyone       |
+| `/f border`    | Show the chunk border limit.                             | <font color="#03fc73"> everyone       |
 | `/f claim`     | Claim a chunk.                                           | <font color="#fca503"> officers       |
 | `/f unclaim`   | Unclaim your claim.                                      | <font color="#fca503"> officers       |
 | `/f invite`    | Invite a player into your faction.                       | <font color="#fca503"> officers       |
@@ -34,7 +35,6 @@
 
 | Name          | Description                           | Type      |
 |---------------|---------------------------------------|-----------|
-| `/f border`   | Add /f border command.                | command   |
 | `UI System`   | Add an UI extension plugin.           | extension |
 
 ## Features
