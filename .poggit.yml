@@ -1,8 +1,10 @@
 --- # Poggit-CI Manifest. Open the CI at https://poggit.pmmp.io/ci/AyzrixYTB/SimpleFaction
-build-by-default: true
 branches:
-- main
+  - master
 projects:
   SimpleFaction:
     path: ""
+    libs:
+      - src: poggit/libasynql/libasynql
+        version: ^3.3.1
 ...
