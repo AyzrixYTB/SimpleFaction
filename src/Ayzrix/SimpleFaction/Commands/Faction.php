@@ -564,6 +564,15 @@ class Faction extends PluginCommand {
                             }
                         } else $player->sendMessage(implode(TextFormat::EOL, FactionsAPI::getMap($player)));
                         return true;
+                    case "border":
+                        if (isset(FactionsAPI::$border[$player->getName()])) {
+                            unset(FactionsAPI::$border[$player->getName()]);
+                            $player->sendMessage(Utils::getMessage($player, "BORDER_DESACTIVATED"));
+                        } else {
+                            FactionsAPI::$border[$player->getName()] = true;
+                            $player->sendMessage(Utils::getMessage($player, "BORDER_ACTIVATED"));
+                        }
+                        return true;
                     case "admin":
                         if ($player->hasPermission("simplefaction.admin")) {
                             if (isset($args[1])) {
