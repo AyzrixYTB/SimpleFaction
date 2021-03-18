@@ -350,7 +350,7 @@ class Faction extends PluginCommand {
                                 if (FactionsAPI::getPlayerFaction($args[1]) === $faction) {
                                     if (strtolower($args[1]) !== strtolower($player->getName())) {
                                         FactionsAPI::demoteFaction($player->getName());
-                                        FactionsAPI::transferFaction($args[1], $faction);
+                                        FactionsAPI::transferFaction($args[1]);
                                         $player->sendMessage(Utils::getMessage($player, "TRANSFER_SUCCESS", array($args[1])));
                                     } else $player->sendMessage(Utils::getMessage($player, "CANNOT_TRANFER_YOURSELF"));
                                 } else $player->sendMessage(Utils::getMessage($player, "PLAYER_NOT_IN_YOUR_FACTION", array($args[1])));

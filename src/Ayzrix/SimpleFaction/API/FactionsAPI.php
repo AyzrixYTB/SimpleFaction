@@ -740,7 +740,7 @@ class FactionsAPI {
      * @param $faction1
      * @return string
      */
-    public static function getMapColor(Player $player, $faction1): string {
+    public static function getMapColor(Player $player, string $faction1): string {
         if (self::isInFaction($player)) {
             $faction2 = self::getFaction($player);
             if ($faction1 !== $faction2) {
