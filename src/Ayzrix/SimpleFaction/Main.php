@@ -18,6 +18,7 @@ use Ayzrix\SimpleFaction\Events\Listener\BlockListener;
 use Ayzrix\SimpleFaction\Events\Listener\EntityListener;
 use Ayzrix\SimpleFaction\Events\Listener\PlayerListener;
 use Ayzrix\SimpleFaction\Tasks\Async\MapTask;
+use Ayzrix\SimpleFaction\Tasks\BorderTask;
 use Ayzrix\SimpleFaction\Utils\Provider;
 use Ayzrix\SimpleFaction\Utils\Utils;
 use onebone\economyapi\EconomyAPI;
@@ -51,6 +52,7 @@ class Main extends PluginBase {
         $this->getServer()->getPluginManager()->registerEvents(new EntityListener(), $this);
         Provider::init();
         $this->getScheduler()->scheduleRepeatingTask(new MapTask(), 20*3);
+        $this->getScheduler()->scheduleRepeatingTask(new BorderTask(), 15);
         return true;
     }
 

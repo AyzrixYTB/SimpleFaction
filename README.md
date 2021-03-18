@@ -33,9 +33,10 @@
 
 ## Future additions
 
-| Name          | Description                           | Type      |
-|---------------|---------------------------------------|-----------|
-| `UI System`   | Add an UI extension plugin.           | extension |
+| Name          | Description                                           | Type      |
+|---------------|-------------------------------------------------------|-----------|
+| `LibAsynql`   | Replace all mysql query to libasynql query.           | databases |
+| `UI System`   | Add an UI extension plugin.                           | extension |
 
 ## Features
 
