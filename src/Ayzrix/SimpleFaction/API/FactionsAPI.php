@@ -737,7 +737,7 @@ class FactionsAPI {
 
     /**
      * @param Player $player
-     * @param $faction1
+     * @param string $faction1
      * @return string
      */
     public static function getMapColor(Player $player, string $faction1): string {

@@ -40,21 +40,44 @@ class LoadItTask extends AsyncTask {
                 $db = new \MySQLi($this->db[0], $this->db[1], $this->db[2], $this->db[3]);
 
                 $data = $db->prepare("SELECT faction, players, power, money, allies, claims FROM faction");
+                /**
+                 * @param string $faction
+                 * @param string $players
+                 * @param int $power
+                 * @param int $money
+                 * @param string $allies
+                 */
                 $data->bind_result($faction, $players, $power, $money, $allies);
                 $data->execute();
                 while ($data->fetch()) $results["faction"][$faction] = array(unserialize(base64_decode($players)), $power, $money, unserialize(base64_decode($allies)), unserialize(base64_decode($claims)));
 
                 $data = $db->prepare("SELECT player, faction, role FROM player");
+                /**
+                 * @param string $player
+                 * @param string $faction
+                 * @param string $role
+                 */
                 $data->bind_result($player, $faction, $role);
                 $data->execute();
                 while ($data->fetch()) $results["player"][$player] = array($faction, $role);
 
                 $data = $db->prepare("SELECT faction, x, y, z, world FROM home");
+                /**
+                 * @param string $faction
+                 * @param int $x
+                 * @param int $y
+                 * @param int $z
+                 * @param string $world
+                 */
                 $data->bind_result($faction, $x, $y, $z, $world);
                 $data->execute();
                 while ($data->fetch()) $results["home"][$faction] = array($x, $y, $z, $world);
 
                 $data = $db->prepare("SELECT player, lang FROM lang");
+                /**
+                 * @param string $player
+                 * @param string $lang
+                 */
                 $data->bind_result($player, $lang);
                 if (!$data->execute());
                 while ($data->fetch()) $results["lang"][$player] = $lang;
@@ -92,13 +115,16 @@ class LoadItTask extends AsyncTask {
         $result = $this->getResult();
 
         if(!empty($result)) {
-            foreach ($result["faction"] as $key => $array) {
-                FactionsAPI::$faction[$key] = array("players" => $array[0], "power" => $array[1], "money" => $array[2], "allies" => $array[3]);
-                FactionsAPI::$claim[$key] = $array[4];
+            if (isset($result["faction"])) {
+                foreach ($result["faction"] as $key => $array) {
+                    FactionsAPI::$faction[$key] = array("players" => $array[0], "power" => $array[1], "money" => $array[2], "allies" => $array[3]);
+                    FactionsAPI::$claim[$key] = $array[4];
+                }
             }
-
-            foreach ($result["player"] as $key => $array) {
-                FactionsAPI::$player[$key] = array("faction" => $array[0], "role" => $array[1]);
+            if (isset($result["player"])) {
+                foreach ($result["player"] as $key => $array) {
+                    FactionsAPI::$player[$key] = array("faction" => $array[0], "role" => $array[1]);
+                }
             }
 
             if (isset($result["home"])) {
@@ -107,8 +133,10 @@ class LoadItTask extends AsyncTask {
                 }
             }
 
-            foreach ($result["lang"] as $key => $lang) {
-                FactionsAPI::$lang[$key] = $lang;
+            if (isset($result["lang"])) {
+                foreach ($result["lang"] as $key => $lang) {
+                    FactionsAPI::$lang[$key] = $lang;
+                }
             }
         }
     }

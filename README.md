@@ -67,6 +67,7 @@
 | PureChat          | Chat integration              | [Download](https://github.com/AyzrixYTB/PureChat-UPDATED)  |
 | ScoreHUD          | Scoreboard integration        | [Download](https://poggit.pmmp.io/p/ScoreHud)              |
 | EssentialsFaction | Chat & Scoreboard integration | [Download](https://github.com/Zoumi-Dev/FacEssential)      |
+| Scoreboard        | Scoreboard integration        | [Download](https://github.com/AyzrixYTB/Scoreboard)        |
 
 ## Translators
 - **English** - @Ayzrix & Se7en-dev.
