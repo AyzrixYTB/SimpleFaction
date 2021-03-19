@@ -573,6 +573,15 @@ class Faction extends PluginCommand {
                             $player->sendMessage(Utils::getMessage($player, "BORDER_ACTIVATED"));
                         }
                         return true;
+                    case "here":
+                        $chunk = $player->getLevel()->getChunkAtPosition($player);
+                        $chunkX = $chunk->getX();
+                        $chunkZ = $chunk->getZ();
+                        if (FactionsAPI::isInClaim($player->getLevel(), $chunkX, $chunkZ)) {
+                            $faction = FactionsAPI::getFactionClaim($player->getLevel(), $chunkX, $chunkZ);
+                            $player->sendMessage(Utils::getMessage($player, "HERE_SUCCESS", array($faction, $faction)));
+                        } else $player->sendMessage(Utils::getMessage($player, "HERE_NOT_CLAIMED"));
+                        return true;
                     case "admin":
                         if ($player->hasPermission("simplefaction.admin")) {
                             if (isset($args[1])) {

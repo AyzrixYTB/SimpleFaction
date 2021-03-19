@@ -19,6 +19,7 @@
 | `/f leave`     | Leave your current faction.                              | <font color="#03fc73"> everyone       |
 | `/f map`       | Show the nearby claims.                                  | <font color="#03fc73"> everyone       |
 | `/f border`    | Show the chunk border limit.                             | <font color="#03fc73"> everyone       |
+| `/f here  `    | Show claims informations.                             | <font color="#03fc73"> everyone       |
 | `/f claim`     | Claim a chunk.                                           | <font color="#fca503"> officers       |
 | `/f unclaim`   | Unclaim your claim.                                      | <font color="#fca503"> officers       |
 | `/f invite`    | Invite a player into your faction.                       | <font color="#fca503"> officers       |
@@ -36,8 +37,7 @@
 
 | Name              | Description                                           | Type      |
 |-------------------|-------------------------------------------------------|-----------|
-| `/f here`         | Show claims informations.                             | command   |
-| `/f admon (bank)` | Manage factions banks.                                | command   |
+| `/f admin (bank)` | Manage factions banks.                                | command   |
 | `/f who (player)` | Check the informations of a faction by a player name. | command   |
 | `UI System`       | Add an UI extension plugin.                           | extension |
 
@@ -128,4 +128,5 @@ claims:
 
 PREFIX: "§6[§fSimpleFaction§6]§f"
 PLAYER_ONLY: "{prefix} §cThis command can't be used in the console !"
-MAP_HEADER: "§6--------------------(§f{X}§6, §f{Z}§6)--------------------"```
+MAP_HEADER: "§6--------------------(§f{X}§6, §f{Z}§6)--------------------"
+```
