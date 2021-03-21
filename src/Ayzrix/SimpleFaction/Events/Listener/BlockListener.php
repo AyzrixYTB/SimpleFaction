@@ -14,36 +14,46 @@
 namespace Ayzrix\SimpleFaction\Events\Listener;
 
 use Ayzrix\SimpleFaction\API\FactionsAPI;
+use Ayzrix\SimpleFaction\Utils\Utils;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\Listener;
+use pocketmine\level\format\Chunk;
 
 class BlockListener implements Listener {
 
     public function BlockBreak(BlockBreakEvent $event) {
         $player = $event->getPlayer();
-        $chunk = $player->getLevel()->getChunkAtPosition($event->getBlock());
-        $chunkX = $chunk->getX();
-        $chunkZ = $chunk->getZ();
-        if (FactionsAPI::isInClaim($player->getLevel(), $chunkX, $chunkZ)) {
-            if (FactionsAPI::isInFaction($player)) {
-                $claimer = FactionsAPI::getFactionClaim($player->getLevel(), $chunkX, $chunkZ);
-                $faction = FactionsAPI::getFaction($player);
-                if ($faction !== $claimer) $event->setCancelled(true);
-            } else $event->setCancelled(true);
+        if (in_array($player->getLevel()->getFolderName(), Utils::getIntoConfig("faction_worlds"))) {
+            $chunk = $player->getLevel()->getChunkAtPosition($event->getBlock());
+            if ($chunk instanceof Chunk) {
+                $chunkX = $chunk->getX();
+                $chunkZ = $chunk->getZ();
+                if (FactionsAPI::isInClaim($player->getLevel(), $chunkX, $chunkZ)) {
+                    if (FactionsAPI::isInFaction($player)) {
+                        $claimer = FactionsAPI::getFactionClaim($player->getLevel(), $chunkX, $chunkZ);
+                        $faction = FactionsAPI::getFaction($player);
+                        if ($faction !== $claimer) $event->setCancelled(true);
+                    } else $event->setCancelled(true);
+                }
+            }
         }
     }
 
     public function BlockPlace(BlockBreakEvent $event) {
         $player = $event->getPlayer();
-        $chunk = $player->getLevel()->getChunkAtPosition($event->getBlock());
-        $chunkX = $chunk->getX();
-        $chunkZ = $chunk->getZ();
-        if (FactionsAPI::isInClaim($player->getLevel(), $chunkX, $chunkZ)) {
-            if (FactionsAPI::isInFaction($player)) {
-                $claimer = FactionsAPI::getFactionClaim($player->getLevel(), $chunkX, $chunkZ);
-                $faction = FactionsAPI::getFaction($player);
-                if ($faction !== $claimer) $event->setCancelled(true);
-            } else $event->setCancelled(true);
+        if (in_array($player->getLevel()->getFolderName(), Utils::getIntoConfig("faction_worlds"))) {
+            $chunk = $player->getLevel()->getChunkAtPosition($event->getBlock());
+            if ($chunk instanceof Chunk) {
+                $chunkX = $chunk->getX();
+                $chunkZ = $chunk->getZ();
+                if (FactionsAPI::isInClaim($player->getLevel(), $chunkX, $chunkZ)) {
+                    if (FactionsAPI::isInFaction($player)) {
+                        $claimer = FactionsAPI::getFactionClaim($player->getLevel(), $chunkX, $chunkZ);
+                        $faction = FactionsAPI::getFaction($player);
+                        if ($faction !== $claimer) $event->setCancelled(true);
+                    } else $event->setCancelled(true);
+                }
+            }
         }
     }
 }

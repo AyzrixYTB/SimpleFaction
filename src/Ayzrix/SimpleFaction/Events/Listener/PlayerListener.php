@@ -23,6 +23,7 @@ use pocketmine\event\player\PlayerDeathEvent;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\item\ItemIds;
+use pocketmine\level\format\Chunk;
 use pocketmine\Player;
 
 class PlayerListener implements Listener {
@@ -59,47 +60,51 @@ class PlayerListener implements Listener {
         $player = $event->getPlayer();
         $block = $event->getBlock();
         $item = $event->getItem();
-        $chunk = $player->getLevel()->getChunkAtPosition($event->getBlock());
-        $chunkX = $chunk->getX();
-        $chunkZ = $chunk->getZ();
-        if (FactionsAPI::isInClaim($player->getLevel(), $chunkX, $chunkZ)) {
-            switch ($block->getId()) {
-                case BlockIds::FENCE_GATE:
-                case BlockIds::ACACIA_FENCE_GATE:
-                case BlockIds::BIRCH_FENCE_GATE:
-                case BlockIds::DARK_OAK_FENCE_GATE:
-                case BlockIds::SPRUCE_FENCE_GATE:
-                case BlockIds::JUNGLE_FENCE_GATE:
-                case BlockIds::IRON_TRAPDOOR:
-                case BlockIds::WOODEN_TRAPDOOR:
-                case BlockIds::TRAPDOOR:
-                case BlockIds::OAK_FENCE_GATE:
-                case BlockIds::CHEST:
-                case BlockIds::TRAPPED_CHEST:
-                    if (FactionsAPI::isInFaction($player)) {
-                        $claimer = FactionsAPI::getFactionClaim($player->getLevel(), $chunkX, $chunkZ);
-                        $faction = FactionsAPI::getFaction($player);
-                        if ($faction !== $claimer) $event->setCancelled(true);
-                    } else $event->setCancelled(true);
-            }
+        if (in_array($player->getLevel()->getFolderName(), Utils::getIntoConfig("faction_worlds"))) {
+            $chunk = $player->getLevel()->getChunkAtPosition($event->getBlock());
+            if ($chunk instanceof Chunk) {
+                $chunkX = $chunk->getX();
+                $chunkZ = $chunk->getZ();
+                if (FactionsAPI::isInClaim($player->getLevel(), $chunkX, $chunkZ)) {
+                    switch ($block->getId()) {
+                        case BlockIds::FENCE_GATE:
+                        case BlockIds::ACACIA_FENCE_GATE:
+                        case BlockIds::BIRCH_FENCE_GATE:
+                        case BlockIds::DARK_OAK_FENCE_GATE:
+                        case BlockIds::SPRUCE_FENCE_GATE:
+                        case BlockIds::JUNGLE_FENCE_GATE:
+                        case BlockIds::IRON_TRAPDOOR:
+                        case BlockIds::WOODEN_TRAPDOOR:
+                        case BlockIds::TRAPDOOR:
+                        case BlockIds::OAK_FENCE_GATE:
+                        case BlockIds::CHEST:
+                        case BlockIds::TRAPPED_CHEST:
+                            if (FactionsAPI::isInFaction($player)) {
+                                $claimer = FactionsAPI::getFactionClaim($player->getLevel(), $chunkX, $chunkZ);
+                                $faction = FactionsAPI::getFaction($player);
+                                if ($faction !== $claimer) $event->setCancelled(true);
+                            } else $event->setCancelled(true);
+                    }
 
-            switch ($item->getId()) {
-                case ItemIds::BUCKET:
-                case ItemIds::DIAMOND_HOE:
-                case ItemIds::GOLD_HOE:
-                case ItemIds::IRON_HOE:
-                case ItemIds::STONE_HOE:
-                case ItemIds::WOODEN_HOE:
-                case ItemIds::DIAMOND_SHOVEL:
-                case ItemIds::GOLD_SHOVEL:
-                case ItemIds::IRON_SHOVEL:
-                case ItemIds::STONE_SHOVEL:
-                case ItemIds::WOODEN_SHOVEL:
-                    if (FactionsAPI::isInFaction($player)) {
-                        $claimer = FactionsAPI::getFactionClaim($player->getLevel(), $chunkX, $chunkZ);
-                        $faction = FactionsAPI::getFaction($player);
-                        if ($faction !== $claimer) $event->setCancelled(true);
-                    } else $event->setCancelled(true);
+                    switch ($item->getId()) {
+                        case ItemIds::BUCKET:
+                        case ItemIds::DIAMOND_HOE:
+                        case ItemIds::GOLD_HOE:
+                        case ItemIds::IRON_HOE:
+                        case ItemIds::STONE_HOE:
+                        case ItemIds::WOODEN_HOE:
+                        case ItemIds::DIAMOND_SHOVEL:
+                        case ItemIds::GOLD_SHOVEL:
+                        case ItemIds::IRON_SHOVEL:
+                        case ItemIds::STONE_SHOVEL:
+                        case ItemIds::WOODEN_SHOVEL:
+                            if (FactionsAPI::isInFaction($player)) {
+                                $claimer = FactionsAPI::getFactionClaim($player->getLevel(), $chunkX, $chunkZ);
+                                $faction = FactionsAPI::getFaction($player);
+                                if ($faction !== $claimer) $event->setCancelled(true);
+                            } else $event->setCancelled(true);
+                    }
+                }
             }
         }
     }
