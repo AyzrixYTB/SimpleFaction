@@ -35,11 +35,12 @@
 
 ## Future additions
 
-| Name              | Description                                           | Type      |
-|-------------------|-------------------------------------------------------|-----------|
-| `/f admin (bank)` | Manage factions banks.                                | command   |
-| `/f who (player)` | Check the informations of a faction by a player name. | command   |
-| `UI System`       | Add an UI extension plugin.                           | extension |
+| Name              | Description                                               | Type      |
+|-------------------|-----------------------------------------------------------|-----------|
+| `/f admin (bank)` | Manage factions banks.                                    | command   |
+| `/f who (player)` | Check the informations of a faction by a player name.     | command   |
+| `Safezone system` | Allows you to create safezones that cannot be claimed.    | system    |
+| `UI System`       | Add an UI extension plugin.                               | extension |
 
 ## Features
 
@@ -56,18 +57,14 @@
 | `ScoreHUD Support`        | ✔               | ❌         | ❌            |
 | `Simplicity`              | ✔               | ✔         | ❌            |
 
-## Depencies
-| Name          | Usage         | Download                                      |
-|---------------|---------------|-----------------------------------------------| 
-| EconomyAPI    | Bank system   |[Download](https://poggit.pmmp.io/p/EconomyAPI)|
-
 ## Additional plugins
-| Name              | Usage                         | Download                                                   |
-|-------------------|-------------------------------|------------------------------------------------------------| 
-| PureChat          | Chat integration              | [Download](https://github.com/AyzrixYTB/PureChat-UPDATED)  |
-| ScoreHUD          | Scoreboard integration        | [Download](https://poggit.pmmp.io/p/ScoreHud)              |
-| EssentialsFaction | Chat & Scoreboard integration | [Download](https://github.com/Zoumi-Dev/FacEssential)      |
-| Scoreboard        | Scoreboard integration        | [Download](https://github.com/AyzrixYTB/Scoreboard)        |
+| Name              | Usage                         | Download                                                      |
+|-------------------|-------------------------------|---------------------------------------------------------------| 
+| PureChat          | Chat integration              | [Download](https://github.com/AyzrixYTB/PureChat-UPDATED)     |
+| ScoreHUD          | Scoreboard integration        | [Download](https://poggit.pmmp.io/p/ScoreHud)                 |
+| EssentialsFaction | Chat & Scoreboard integration | [Download](https://github.com/Zoumi-Dev/FacEssential)         |
+| Scoreboard        | Scoreboard integration        | [Download](https://github.com/AyzrixYTB/Scoreboard)           |
+| EconomyAPI        | Bank system                   | [Download](https://poggit.pmmp.io/p/EconomyAPI)               |
 
 ## Translators
 - **English** - @Ayzrix & Se7en-dev.
@@ -90,34 +87,50 @@
 # SQLITE | MYSQL
 PROVIDER: "SQLITE"
 
+# Edit this only if 'PROVIDER' is on MYSQL
 mysql_address: "SERVER ADDRESS"
 mysql_user: "USER"
 mysql_password: "YOUR PASSWORD"
 mysql_db: "YOUR DB"
 
+# Broadcast created system.
 broadcast_message_created: true
 broadcast_message_disband: true
 
+# Activate or deactivate the bank system (/f bank)
+economy_system: false
+
+# Faction name limit.
 min_faction_name_lenght: 3
 max_faction_name_lenght: 16
 
+# Power gained per kill and lost per death.
 power_gain_per_kill: 1
 power_lost_per_death: 1
 
+# Worlds where the players can claim.
 faction_worlds: ["world"]
 
 # TRUE = ENABLE | FALSE = DISABLE
 faction_pvp: false
 alliance_pvp: false
 
-# expire in seconds
+# Time in seconds before invitations expire
 invitation_expire_time: 30
 allies_invitation_expire_time: 60
 
+# Max members in a faction.
 faction_max_members: 20
+
+# Max allies in a faction.
 faction_max_allies: 2
 
-# USAGE: "- POWER NEEDED"
+# Default power in a faction
+default_power: 0
+
+# Powers required for each claim.
+# One - = 1 claim. If you setup 2 -, the max claim number would be 2.
+# Usage: - POWERS NEEDED
 claims:
   - 100
   - 500
@@ -126,7 +139,11 @@ claims:
   - 2500
   - 5000
 
+# Prefix usable in languages. {prefix}
 PREFIX: "§6[§fSimpleFaction§6]§f"
 PLAYER_ONLY: "{prefix} §cThis command can't be used in the console !"
 MAP_HEADER: "§6--------------------(§f{X}§6, §f{Z}§6)--------------------"
+
+# Banned faction names
+banned_names: ["op", "staff", "admin", "fuck", "shit"]
 ```

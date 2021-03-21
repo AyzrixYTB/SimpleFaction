@@ -39,28 +39,30 @@ class Main extends PluginBase {
         self::$instance = $this;
         $this->saveDefaultConfig();
         $this->saveResource("lang.yml");
-
-        if ((strtolower(Utils::getIntoConfig("PROVIDER")) === "mysql") and (Utils::getIntoConfig("mysql_address") === "SERVER ADDRESS" or Utils::getIntoConfig("mysql_user") === "USER" or Utils::getIntoConfig("mysql_password") === "YOUR PASSWORD" or Utils::getIntoConfig("mysql_db") === "YOUR DB")) {
-            $this->getLogger()->error("Error, please setup a valid mysql server");
-            $this->getServer()->getPluginManager()->disablePlugin($this);
-            return;
-        }
-
         $this->initDatabase();
     }
 
     public function onEnable() {
         @mkdir($this->getDataFolder() . "Languages/");
-        foreach ((new Config($this->getDataFolder() . "lang.yml", Config::YAML))->get("languages") as $prefix => $file) {
+        foreach (Utils::getIntoLang("languages") as $prefix => $file) {
             $this->saveResource("Languages/{$file}.yml");
         }
-        self::$economyAPI = EconomyAPI::getInstance();
         $this->getServer()->getCommandMap()->register("simplefaction", new Faction($this));
         $this->getServer()->getPluginManager()->registerEvents(new PlayerListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new BlockListener(), $this);
         $this->getServer()->getPluginManager()->registerEvents(new EntityListener(), $this);
         $this->getScheduler()->scheduleRepeatingTask(new MapTask(), 20*3);
         $this->getScheduler()->scheduleRepeatingTask(new BorderTask(), 15);
+
+        if (Utils::getIntoConfig("economy_system") === true) {
+            $economy = $this->getServer()->getPluginManager()->getPlugin("EconomyAPI");
+            if (is_null($economy)) {
+                $this->getLogger()->notice("Please install a valid version of EconomyAPI");
+                $this->getServer()->getPluginManager()->disablePlugin($this);
+                return;
+            }
+            self::$economyAPI = EconomyAPI::getInstance();
+        }
     }
 
     public function onDisable() {

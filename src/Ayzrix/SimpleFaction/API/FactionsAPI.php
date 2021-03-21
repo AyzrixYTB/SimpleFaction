@@ -108,7 +108,7 @@ class FactionsAPI {
      * @param string $faction
      */
     public static function createFaction(Player $player, string $faction): void {
-        self::$faction[$faction] = array("players" => array($player->getName()), "power" => 0, "money" => 0, "allies" => array());
+        self::$faction[$faction] = array("players" => array($player->getName()), "power" => (int)Utils::getIntoConfig("default_power"), "money" => 0, "allies" => array());
         self::$player[$player->getName()] = array("faction" => $faction, "role" => "Leader");
         self::$claim[$faction] = array();
     }

@@ -69,12 +69,14 @@ class Faction extends PluginCommand {
                             if (ctype_alnum($args[1])) {
                                 if(strlen($args[1]) > (int)Utils::getIntoConfig("min_faction_name_lenght")) {
                                     if (strlen($args[1]) < (int)Utils::getIntoConfig("max_faction_name_lenght")) {
-                                        if (!FactionsAPI::existsFaction($args[1])) {
-                                            if (!FactionsAPI::isInFaction($player)) {
-                                                $player->sendMessage(Utils::getMessage($player, "SUCCESSFULL_CREATED", array($args[1])));
-                                                FactionsAPI::createFaction($player, $args[1]);
-                                            } else $player->sendMessage(Utils::getMessage($player, "ALREADY_IN_FACTION"));
-                                        } else $player->sendMessage(Utils::getMessage($player, "FACTION_ALREADY_EXIST"));
+                                        if (!in_array(strtolower($args[1]), Utils::getIntoConfig("banned_names"))) {
+                                            if (!FactionsAPI::existsFaction($args[1])) {
+                                                if (!FactionsAPI::isInFaction($player)) {
+                                                    $player->sendMessage(Utils::getMessage($player, "SUCCESSFULL_CREATED", array($args[1])));
+                                                    FactionsAPI::createFaction($player, $args[1]);
+                                                } else $player->sendMessage(Utils::getMessage($player, "ALREADY_IN_FACTION"));
+                                            } else $player->sendMessage(Utils::getMessage($player, "FACTION_ALREADY_EXIST"));
+                                        } else $player->sendMessage(Utils::getMessage($player, "FACTION_NAME_BANNED"));
                                     } else $player->sendMessage(Utils::getMessage($player, "FACTION_NAME_TOO_LONG"));
                                 } else $player->sendMessage(Utils::getMessage($player, "FACTION_NAME_TOO_SHORT"));
                             } else $player->sendMessage(Utils::getMessage($player, "INVALID_NAME"));
@@ -223,16 +225,18 @@ class Faction extends PluginCommand {
                     case "unclaim":
                         if (FactionsAPI::isInFaction($player)) {
                             if (FactionsAPI::getRank($player->getName()) === "Leader" or FactionsAPI::getRank($player->getName()) === "Officer") {
-                                $chunk = $player->getLevel()->getChunkAtPosition($player);
-                                $chunkX = $chunk->getX();
-                                $chunkZ = $chunk->getZ();
-                                if (FactionsAPI::isInClaim($player->getLevel(), $chunkX, $chunkZ)) {
-                                    $faction = FactionsAPI::getFaction($player);
-                                    if (FactionsAPI::getFactionClaim($player->getLevel(), $chunkX, $chunkZ) === $faction) {
-                                        FactionsAPI::deleteClaim($player, $faction);
-                                        $player->sendMessage(Utils::getMessage($player, "UNCLAIM_SUCCESS"));
+                                if (in_array($player->getLevel()->getFolderName(), Utils::getIntoConfig("faction_worlds"))) {
+                                    $chunk = $player->getLevel()->getChunkAtPosition($player);
+                                    $chunkX = $chunk->getX();
+                                    $chunkZ = $chunk->getZ();
+                                    if (FactionsAPI::isInClaim($player->getLevel(), $chunkX, $chunkZ)) {
+                                        $faction = FactionsAPI::getFaction($player);
+                                        if (FactionsAPI::getFactionClaim($player->getLevel(), $chunkX, $chunkZ) === $faction) {
+                                            FactionsAPI::deleteClaim($player, $faction);
+                                            $player->sendMessage(Utils::getMessage($player, "UNCLAIM_SUCCESS"));
+                                        } else $player->sendMessage(Utils::getMessage($player, "NOT_CLAIM_BY_YOUR_FACTION"));
                                     } else $player->sendMessage(Utils::getMessage($player, "NOT_CLAIM_BY_YOUR_FACTION"));
-                                } else $player->sendMessage(Utils::getMessage($player, "NOT_CLAIM_BY_YOUR_FACTION"));
+                                } else $player->sendMessage(Utils::getMessage($player, "NOT_FACTION_WORLD"));
                             } else $player->sendMessage(Utils::getMessage($player, "ONLY_LEADER_OR_OFFICER"));
                         } else $player->sendMessage(Utils::getMessage($player, "MUST_BE_IN_FACTION"));
                         return true;
@@ -488,48 +492,50 @@ class Faction extends PluginCommand {
                         } else $player->sendMessage(Utils::getMessage($player, "MUST_BE_IN_FACTION"));
                         return true;
                     case "bank":
-                        if (isset($args[1])) {
-                            if (FactionsAPI::isInFaction($player)) {
-                                switch($args[1]) {
-                                    case "deposit":
-                                    case "d":
-                                        if (isset($args[2])) {
+                        if (Utils::getIntoConfig("economy_system") === true) {
+                            if (isset($args[1])) {
+                                if (FactionsAPI::isInFaction($player)) {
+                                    switch ($args[1]) {
+                                        case "deposit":
+                                        case "d":
+                                            if (isset($args[2])) {
+                                                $faction = FactionsAPI::getFaction($player);
+                                                $money = (int)$args[2];
+                                                if ($money > 0) {
+                                                    if (Main::getEconomy()->myMoney($player) >= $money) {
+                                                        FactionsAPI::addMoney($faction, $money);
+                                                        Main::getEconomy()->reduceMoney($player, $money);
+                                                        $player->sendMessage(Utils::getMessage($player, "BANK_DEPOST_SUCCESS", array($money)));
+                                                    } else $player->sendMessage(Utils::getMessage($player, "NOT_ENOUGH_MONEY"));
+                                                } else $player->sendMessage(Utils::getMessage($player, "ENTER_VALID_NUMBER"));
+                                            } else $player->sendMessage(Utils::getMessage($player, "BANK_DEPOSIT_USAGE"));
+                                            break;
+                                        case "withdraw":
+                                        case "w":
+                                            if (FactionsAPI::getRank($player->getName()) !== "Member") {
+                                                if (isset($args[2])) {
+                                                    $faction = FactionsAPI::getFaction($player);
+                                                    $money = (int)$args[2];
+                                                    if ($money > 0) {
+                                                        if (FactionsAPI::getMoney($faction) >= $money) {
+                                                            FactionsAPI::removeMoney($faction, $money);
+                                                            Main::getEconomy()->addMoney($player, $money);
+                                                            $player->sendMessage(Utils::getMessage($player, "BANK_WITHDRAW_SUCCESS", array($money)));
+                                                        } else $player->sendMessage(Utils::getMessage($player, "FACTION_NOT_ENOUGH_MONEY"));
+                                                    } else $player->sendMessage(Utils::getMessage($player, "ENTER_VALID_NUMBER"));
+                                                } else $player->sendMessage(Utils::getMessage($player, "BANK_WITHDRAW_USAGE"));
+                                            } else $player->sendMessage(Utils::getMessage($player, "ONLY_LEADER_OR_OFFICER"));
+                                            break;
+                                        case "status":
+                                        case "s":
                                             $faction = FactionsAPI::getFaction($player);
-                                            $money = (int)$args[2];
-                                            if ($money > 0) {
-                                                if (Main::getEconomy()->myMoney($player) >= $money) {
-                                                    FactionsAPI::addMoney($faction, $money);
-                                                    Main::getEconomy()->reduceMoney($player, $money);
-                                                    $player->sendMessage(Utils::getMessage($player, "BANK_DEPOST_SUCCESS", array($money)));
-                                                } else $player->sendMessage(Utils::getMessage($player, "NOT_ENOUGH_MONEY"));
-                                            } else $player->sendMessage(Utils::getMessage($player, "ENTER_VALID_NUMBER"));
-                                        } else $player->sendMessage(Utils::getMessage($player, "BANK_DEPOSIT_USAGE"));
-                                        break;
-                                    case "withdraw":
-                                    case "w":
-                                    if (FactionsAPI::getRank($player->getName()) !== "Member") {
-                                        if (isset($args[2])) {
-                                            $faction = FactionsAPI::getFaction($player);
-                                            $money = (int)$args[2];
-                                            if ($money > 0) {
-                                                if (FactionsAPI::getMoney($faction) >= $money) {
-                                                    FactionsAPI::removeMoney($faction, $money);
-                                                    Main::getEconomy()->addMoney($player, $money);
-                                                    $player->sendMessage(Utils::getMessage($player, "BANK_WITHDRAW_SUCCESS", array($money)));
-                                                } else $player->sendMessage(Utils::getMessage($player, "FACTION_NOT_ENOUGH_MONEY"));
-                                            } else $player->sendMessage(Utils::getMessage($player, "ENTER_VALID_NUMBER"));
-                                        } else $player->sendMessage(Utils::getMessage($player, "BANK_WITHDRAW_USAGE"));
-                                    } else $player->sendMessage(Utils::getMessage($player, "ONLY_LEADER_OR_OFFICER"));
-                                        break;
-                                    case "status":
-                                    case "s":
-                                        $faction = FactionsAPI::getFaction($player);
-                                        $money = FactionsAPI::getMoney($faction);
-                                        $player->sendMessage(Utils::getMessage($player, "BANK_STATUS", array($money)));
-                                        break;
-                                }
-                            } else $player->sendMessage(Utils::getMessage($player, "MUST_BE_IN_FACTION"));
-                        } else $player->sendMessage(Utils::getMessage($player, "BANK_USAGE"));
+                                            $money = FactionsAPI::getMoney($faction);
+                                            $player->sendMessage(Utils::getMessage($player, "BANK_STATUS", array($money)));
+                                            break;
+                                    }
+                                } else $player->sendMessage(Utils::getMessage($player, "MUST_BE_IN_FACTION"));
+                            } else $player->sendMessage(Utils::getMessage($player, "BANK_USAGE"));
+                        }
                         return true;
                     case "lang":
                         $langs = "";
@@ -574,13 +580,15 @@ class Faction extends PluginCommand {
                         }
                         return true;
                     case "here":
-                        $chunk = $player->getLevel()->getChunkAtPosition($player);
-                        $chunkX = $chunk->getX();
-                        $chunkZ = $chunk->getZ();
-                        if (FactionsAPI::isInClaim($player->getLevel(), $chunkX, $chunkZ)) {
-                            $faction = FactionsAPI::getFactionClaim($player->getLevel(), $chunkX, $chunkZ);
-                            $player->sendMessage(Utils::getMessage($player, "HERE_SUCCESS", array($faction, $faction)));
-                        } else $player->sendMessage(Utils::getMessage($player, "HERE_NOT_CLAIMED"));
+                        if (in_array($player->getLevel()->getFolderName(), Utils::getIntoConfig("faction_worlds"))) {
+                            $chunk = $player->getLevel()->getChunkAtPosition($player);
+                            $chunkX = $chunk->getX();
+                            $chunkZ = $chunk->getZ();
+                            if (FactionsAPI::isInClaim($player->getLevel(), $chunkX, $chunkZ)) {
+                                $faction = FactionsAPI::getFactionClaim($player->getLevel(), $chunkX, $chunkZ);
+                                $player->sendMessage(Utils::getMessage($player, "HERE_SUCCESS", array($faction, $faction)));
+                            } else $player->sendMessage(Utils::getMessage($player, "HERE_NOT_CLAIMED"));
+                        } else $player->sendMessage(Utils::getMessage($player, "NOT_FACTION_WORLD"));
                         return true;
                     case "admin":
                         if ($player->hasPermission("simplefaction.admin")) {
@@ -626,23 +634,33 @@ class Faction extends PluginCommand {
                                         break;
                                     case "rename":
                                         if (isset($args[2]) and isset($args[3])) {
-                                            if (FactionsAPI::existsFaction($args[2])) {
-                                                if (!FactionsAPI::existsFaction($args[3])) {
-                                                    FactionsAPI::renameFaction($args[2], $args[3]);
-                                                    $player->sendMessage(Utils::getMessage($player, "ADMIN_RENAME_SUCCESS", array($args[3])));
-                                                } else $player->sendMessage(Utils::getMessage($player, "FACTION_ALREADY_EXIST"));
-                                            } else $player->sendMessage(Utils::getMessage($player, "FACTION_NOT_EXIST"));
+                                            if (ctype_alnum($args[3])) {
+                                                if(strlen($args[3]) > (int)Utils::getIntoConfig("min_faction_name_lenght")) {
+                                                    if (strlen($args[3]) < (int)Utils::getIntoConfig("max_faction_name_lenght")) {
+                                                        if (!in_array(strtolower($args[1]), Utils::getIntoConfig("banned_names"))) {
+                                                            if (FactionsAPI::existsFaction($args[2])) {
+                                                                if (!FactionsAPI::existsFaction($args[3])) {
+                                                                    FactionsAPI::renameFaction($args[2], $args[3]);
+                                                                    $player->sendMessage(Utils::getMessage($player, "ADMIN_RENAME_SUCCESS", array($args[3])));
+                                                                } else $player->sendMessage(Utils::getMessage($player, "FACTION_ALREADY_EXIST"));
+                                                            } else $player->sendMessage(Utils::getMessage($player, "FACTION_NOT_EXIST"));
+                                                        } else $player->sendMessage(Utils::getMessage($player, "FACTION_NAME_BANNED"));
+                                                    } else $player->sendMessage(Utils::getMessage($player, "FACTION_NAME_TOO_LONG"));
+                                                } else $player->sendMessage(Utils::getMessage($player, "FACTION_NAME_TOO_SHORT"));
+                                            } else $player->sendMessage(Utils::getMessage($player, "INVALID_NAME"));
                                         } else $player->sendMessage(Utils::getMessage($player, "ADMIN_RENAME_USAGE"));
                                         break;
                                     case "unclaim":
-                                        $chunk = $player->getLevel()->getChunkAtPosition($player);
-                                        $chunkX = $chunk->getX();
-                                        $chunkZ = $chunk->getZ();
-                                        if (FactionsAPI::isInClaim($player->getLevel(), $chunkX, $chunkZ)) {
-                                            $faction = FactionsAPI::getFactionClaim($player->getLevel(), $chunkX, $chunkZ);
-                                            FactionsAPI::deleteClaim($player, $faction);
-                                            $player->sendMessage(Utils::getMessage($player, "ADMIN_UNCLAIM_SUCCESS"));
-                                        } else $player->sendMessage(Utils::getMessage($player, "ADMIN_NOT_IN_CLAIM"));
+                                        if (in_array($player->getLevel()->getFolderName(), Utils::getIntoConfig("faction_worlds"))) {
+                                            $chunk = $player->getLevel()->getChunkAtPosition($player);
+                                            $chunkX = $chunk->getX();
+                                            $chunkZ = $chunk->getZ();
+                                            if (FactionsAPI::isInClaim($player->getLevel(), $chunkX, $chunkZ)) {
+                                                $faction = FactionsAPI::getFactionClaim($player->getLevel(), $chunkX, $chunkZ);
+                                                FactionsAPI::deleteClaim($player, $faction);
+                                                $player->sendMessage(Utils::getMessage($player, "ADMIN_UNCLAIM_SUCCESS"));
+                                            } else $player->sendMessage(Utils::getMessage($player, "ADMIN_NOT_IN_CLAIM"));
+                                        } else $player->sendMessage(Utils::getMessage($player, "NOT_FACTION_WORLD"));
                                         break;
                                 }
                             } else $player->sendMessage(Utils::getMessage($player, "ADMIN_USAGE"));
