@@ -69,7 +69,7 @@ class Main extends PluginBase {
 
     private function initDatabase() {
         if (Utils::getProvider() === "mysql") {
-            $db = \MySQLi(Utils::getIntoConfig("mysql_address"), Utils::getIntoConfig("mysql_user"), Utils::getIntoConfig("mysql_password"), Utils::getIntoConfig("mysql_db"));
+            $db = new \MySQLi(Utils::getIntoConfig("mysql_address"), Utils::getIntoConfig("mysql_user"), Utils::getIntoConfig("mysql_password"), Utils::getIntoConfig("mysql_db"));
         } else $db = new \SQLite3($this->getDataFolder() . "SimpleFaction.db");
 
         $db->query("CREATE TABLE IF NOT EXISTS faction (faction VARCHAR(255) PRIMARY KEY, players TEXT, power int, money int, allies TEXT, claims TEXT);");
