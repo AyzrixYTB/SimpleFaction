@@ -17,6 +17,7 @@ use Ayzrix\SimpleFaction\Commands\Faction;
 use Ayzrix\SimpleFaction\Events\Listener\BlockListener;
 use Ayzrix\SimpleFaction\Events\Listener\EntityListener;
 use Ayzrix\SimpleFaction\Events\Listener\PlayerListener;
+use Ayzrix\SimpleFaction\Events\PlayerMove;
 use Ayzrix\SimpleFaction\Tasks\Async\LoadItTask;
 use Ayzrix\SimpleFaction\Tasks\MapTask;
 use Ayzrix\SimpleFaction\Tasks\BorderTask;
@@ -48,7 +49,9 @@ class Main extends PluginBase {
         $this->getServer()->getPluginManager()->registerEvents(new EntityListener(), $this);
         $this->getScheduler()->scheduleRepeatingTask(new MapTask(), 20*3);
         $this->getScheduler()->scheduleRepeatingTask(new BorderTask(), 15);
-
+        if (Utils::getIntoConfig("entering_leaving") === true) {
+            $this->getServer()->getPluginManager()->registerEvents(new PlayerMove(), $this);
+        }
         if (Utils::getIntoConfig("economy_system") === true) {
             $economy = $this->getServer()->getPluginManager()->getPlugin("EconomyAPI");
             if (is_null($economy)) {

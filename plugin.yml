@@ -1,7 +1,7 @@
 name: SimpleFaction
 author: Ayzrix
 description: SimpleFaction plugin
-version: 1.3.0
+version: 1.3.5
 main: Ayzrix\SimpleFaction\Main
 softdepend: [EconomyAPI]
 api: [3.0.0]

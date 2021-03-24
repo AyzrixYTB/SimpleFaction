@@ -96,6 +96,10 @@ mysql_db: "YOUR DB"
 broadcast_message_created: true
 broadcast_message_disband: true
 
+# Activate or desactivate the entering and leaving messages.
+entering_leaving: true
+
+
 # Activate or deactivate the bank system (/f bank)
 economy_system: false
 
@@ -145,4 +149,10 @@ MAP_HEADER: "§6--------------------(§f{X}§6, §f{Z}§6)--------------------"
 
 # Banned faction names
 banned_names: ["op", "staff", "admin", "fuck", "shit"]
+
+zones_colors:
+  "Wilderness": "§2"
+  "Own-Faction": "§a"
+  "Allies": "§e"
+  "Ennemies": "§c"
 ```

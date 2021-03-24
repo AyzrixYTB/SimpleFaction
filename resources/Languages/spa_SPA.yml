@@ -129,3 +129,5 @@ HERE_SUCCESS: "{prefix} §aEste trozo es reclamado por la facción. % ! Uso /f i
 HERE_NOT_CLAIMED: "{prefix} §cEsta trozo no es reclamada por ninguna facción !"
 NOT_IN_FACTION: "{prefix} §cEste jugador no está en ninguna facción !"
 WHO_USAGE: "{prefix} §cPor favor utilise /f who <seudo>"
+LEAVING_MESSAGE: "{prefix} §cAhora saliendo % !"
+ENTERING_MESSAGE: "{prefix} §aAhora entrando % !"

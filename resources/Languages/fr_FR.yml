@@ -137,3 +137,5 @@ HERE_SUCCESS: "{prefix} §aCe chunk est claim par la faction % ! Utilise /f info
 HERE_NOT_CLAIMED: "{prefix} §cCe chunk n'est claim par aucune faction !"
 NOT_IN_FACTION: "{prefix} §cCe joueur n'est pas dans une faction !"
 WHO_USAGE: "{prefix} §cVeuillez utiliser /f who (name)"
+LEAVING_MESSAGE: "{prefix} §cVous quittez maintenant la zone % !"
+ENTERING_MESSAGE: "{prefix} §aVous entrez maintenant dans la zone % !"

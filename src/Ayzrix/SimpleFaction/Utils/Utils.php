@@ -18,6 +18,7 @@ use Ayzrix\SimpleFaction\Main;
 use Ayzrix\SimpleFaction\Tasks\Async\QueryTask;
 use pocketmine\Player;
 use pocketmine\utils\Config;
+use pocketmine\utils\TextFormat;
 
 class Utils {
 
@@ -72,13 +73,6 @@ class Utils {
         return $config->get($value);
     }
 
-    /**
-     * @param string $text
-     */
-    public static function query(string $text): void {
-        Main::getInstance()->getServer()->getAsyncPool()->submitTask(new QueryTask($text));
-    }
-
     public static function saveAll() {
         if (self::getProvider() === "mysql") {
             $db = new \MySQLi(Utils::getIntoConfig("mysql_address"), Utils::getIntoConfig("mysql_user"), Utils::getIntoConfig("mysql_password"), Utils::getIntoConfig("mysql_db"));
@@ -116,6 +110,25 @@ class Utils {
 
         foreach ($lang as $name => $language) {
             $db->query("INSERT INTO lang (player, lang) VALUES ('$name', '$language');");
+        }
+    }
+
+    public static function getZoneColor(Player $player, string $zone): string {
+        if ($zone === "Wilderness") {
+            return self::getIntoConfig("zones_colors")["Wilderness"];
+        } else {
+            if (FactionsAPI::isInFaction($player->getName())) {
+                $faction = FactionsAPI::getFaction($player->getName());
+                if ($faction === $zone) {
+                    return self::getIntoConfig("zones_colors")["Own-Faction"];
+                } else if (FactionsAPI::areAllies($faction, $zone)) {
+                    return self::getIntoConfig("zones_colors")["Allies"];
+                } else {
+                    return self::getIntoConfig("zones_colors")["Ennemies"];
+                }
+            } else {
+                return self::getIntoConfig("zones_colors")["Ennemies"];
+            }
         }
     }
 }
