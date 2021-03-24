@@ -71,7 +71,7 @@ class Faction extends PluginCommand {
                                     if (strlen($args[1]) < (int)Utils::getIntoConfig("max_faction_name_lenght")) {
                                         if (!in_array(strtolower($args[1]), Utils::getIntoConfig("banned_names"))) {
                                             if (!FactionsAPI::existsFaction($args[1])) {
-                                                if (!FactionsAPI::isInFaction($player)) {
+                                                if (!FactionsAPI::isInFaction($player->getName())) {
                                                     $player->sendMessage(Utils::getMessage($player, "SUCCESSFULL_CREATED", array($args[1])));
                                                     FactionsAPI::createFaction($player, $args[1]);
                                                 } else $player->sendMessage(Utils::getMessage($player, "ALREADY_IN_FACTION"));
@@ -85,10 +85,10 @@ class Faction extends PluginCommand {
                     case "delete":
                     case "del":
                     case "disband":
-                        if (FactionsAPI::isInFaction($player)) {
+                        if (FactionsAPI::isInFaction($player->getName())) {
                             if (FactionsAPI::getRank($player->getName()) === "Leader") {
-                                $player->sendMessage(Utils::getMessage($player, "SUCCESSFULL_DISBAND", array(FactionsAPI::getFaction($player))));
-                                FactionsAPI::disbandFaction($player, FactionsAPI::getFaction($player));
+                                $player->sendMessage(Utils::getMessage($player, "SUCCESSFULL_DISBAND", array(FactionsAPI::getFaction($player->getName()))));
+                                FactionsAPI::disbandFaction($player, FactionsAPI::getFaction($player->getName()));
                             } else $player->sendMessage(Utils::getMessage($player, "ONLY_LEADER"));
                         } else $player->sendMessage(Utils::getMessage($player, "MUST_BE_IN_FACTION"));
                         return true;
@@ -131,8 +131,8 @@ class Faction extends PluginCommand {
                                 $player->sendMessage($message);
                             } else $player->sendMessage(Utils::getMessage($player, "FACTION_NOT_EXIST"));
                         } else {
-                            if (FactionsAPI::isInFaction($player)) {
-                                $faction = FactionsAPI::getFaction($player);
+                            if (FactionsAPI::isInFaction($player->getName())) {
+                                $faction = FactionsAPI::getFaction($player->getName());
                                 $power = FactionsAPI::getPower($faction);
                                 $leader = FactionsAPI::getLeader($faction);
                                 if (Server::getInstance()->getPlayer($leader)) {
@@ -167,12 +167,52 @@ class Faction extends PluginCommand {
                             } else $player->sendMessage(Utils::getMessage($player, "MUST_BE_IN_FACTION"));
                         }
                         return true;
+                    case "who":
+                        if (isset($args[1])) {
+                            if (FactionsAPI::isInFaction($args[1])) {
+                                $faction = FactionsAPI::getFaction($args[1]);
+                                $power = FactionsAPI::getPower($faction);
+                                $leader = FactionsAPI::getLeader($faction);
+                                if (Server::getInstance()->getPlayer($leader)) {
+                                    $leaderMessage = "§a{$leader}";
+                                } else $leaderMessage = "§c{$leader}";
+
+
+                                $officers = FactionsAPI::getOfficers($faction);
+                                $officerMessage = "";
+                                foreach ($officers as $officer) {
+                                    if (Server::getInstance()->getPlayer($officer)) {
+                                        $officerMessage .= "§a{$officer}§f, ";
+                                    } else $officerMessage .= "§c{$officer}§f, ";
+                                }
+                                if ($officerMessage === "") $officerMessage = "§cNone";
+
+                                $members = FactionsAPI::getMembers($faction);
+                                $memberMessage = "";
+                                foreach ($members as $member) {
+                                    if (Server::getInstance()->getPlayer($member)) {
+                                        $memberMessage .= "§a{$member}§f, ";
+                                    } else $memberMessage .= "§c{$member}§f, ";
+                                }
+                                if ($memberMessage === "") $memberMessage = "§cNone";
+                                $memberscount = count(FactionsAPI::getAllPlayers($faction));
+                                $bank = FactionsAPI::getMoney($faction);
+                                $allies = FactionsAPI::getAllies($faction);
+                                $alliesMessage = implode(", ", $allies);
+                                if (empty($allies)) $alliesMessage = "§cNone";
+                                $player->sendMessage(Utils::getMessage($player, "FACTION_INFO_HEADER", array($faction)));
+                                $message = Utils::getMessage($player, "FACTON_INFO_CONTENT");
+                                $message = str_replace(["{faction}", "{power}", "{leader}", "{officers}", "{members}", "{memberscount}", "{bank}", "{allies}"], [$faction, $power, $leaderMessage, $officerMessage, $memberMessage, $memberscount, $bank, $alliesMessage], $message);
+                                $player->sendMessage($message);
+                            } else $player->sendMessage(Utils::getMessage($player, "NOT_IN_FACTION"));
+                        } else $player->sendMessage(Utils::getMessage($player, "WHO_USAGE"));
+                        break;
                     case "sethome":
-                        if (FactionsAPI::isInFaction($player)) {
+                        if (FactionsAPI::isInFaction($player->getName())) {
                             if (FactionsAPI::getRank($player->getName()) === "Leader" or FactionsAPI::getRank($player->getName()) === "Officer") {
-                                if (!FactionsAPI::existsHome(FactionsAPI::getFaction($player))) {
+                                if (!FactionsAPI::existsHome(FactionsAPI::getFaction($player->getName()))) {
                                     if (in_array($player->getLevel()->getFolderName(), Utils::getIntoConfig("faction_worlds"))) {
-                                        $faction = FactionsAPI::getFaction($player);
+                                        $faction = FactionsAPI::getFaction($player->getName());
                                         FactionsAPI::createHome($faction, $player->getPosition());
                                         $player->sendMessage(Utils::getMessage($player, "HOME_SET"));
                                     } else $player->sendMessage(Utils::getMessage($player, "NOT_FACTION_WORLD"));
@@ -181,10 +221,10 @@ class Faction extends PluginCommand {
                         } else $player->sendMessage(Utils::getMessage($player, "MUST_BE_IN_FACTION"));
                         return true;
                     case "delhome":
-                        if (FactionsAPI::isInFaction($player)) {
+                        if (FactionsAPI::isInFaction($player->getName())) {
                             if (FactionsAPI::getRank($player->getName()) === "Leader" or FactionsAPI::getRank($player->getName()) === "Officer") {
-                                if (FactionsAPI::existsHome(FactionsAPI::getFaction($player))) {
-                                    $faction = FactionsAPI::getFaction($player);
+                                if (FactionsAPI::existsHome(FactionsAPI::getFaction($player->getName()))) {
+                                    $faction = FactionsAPI::getFaction($player->getName());
                                     FactionsAPI::deleteHome($faction);
                                     $player->sendMessage(Utils::getMessage($player, "HOME_DELETE"));
                                 } else $player->sendMessage(Utils::getMessage($player, "NOT_HAVE_HOME"));
@@ -192,23 +232,23 @@ class Faction extends PluginCommand {
                         } else $player->sendMessage(Utils::getMessage($player, "MUST_BE_IN_FACTION"));
                         return true;
                     case "home":
-                        if (FactionsAPI::isInFaction($player)) {
-                            if (FactionsAPI::existsHome(FactionsAPI::getFaction($player))) {
-                                $faction = FactionsAPI::getFaction($player);
+                        if (FactionsAPI::isInFaction($player->getName())) {
+                            if (FactionsAPI::existsHome(FactionsAPI::getFaction($player->getName()))) {
+                                $faction = FactionsAPI::getFaction($player->getName());
                                 $player->teleport(FactionsAPI::getHome($faction));
                                 $player->sendMessage(Utils::getMessage($player, "HOME_TELEPORTED"));
                             } else $player->sendMessage(Utils::getMessage($player, "NOT_HAVE_HOME"));
                         } else $player->sendMessage(Utils::getMessage($player, "MUST_BE_IN_FACTION"));
                         return true;
                     case 'claim':
-                        if (FactionsAPI::isInFaction($player)) {
+                        if (FactionsAPI::isInFaction($player->getName())) {
                             if (FactionsAPI::getRank($player->getName()) === "Leader" or FactionsAPI::getRank($player->getName()) === "Officer") {
                                 if (in_array($player->getLevel()->getFolderName(), Utils::getIntoConfig("faction_worlds"))) {
                                     $chunk = $player->getLevel()->getChunkAtPosition($player);
                                     $chunkX = $chunk->getX();
                                     $chunkZ = $chunk->getZ();
                                     if (!FactionsAPI::isInClaim($player->getLevel(), $chunkX, $chunkZ)) {
-                                        $faction = FactionsAPI::getFaction($player);
+                                        $faction = FactionsAPI::getFaction($player->getName());
                                         $claimCount = FactionsAPI::getClaimCount($faction);
                                         if ($claimCount - 1 < count(Utils::getIntoConfig("claims"))) {
                                             $powerNeeded = (int)Utils::getIntoConfig("claims")[$claimCount];
@@ -223,14 +263,14 @@ class Faction extends PluginCommand {
                         } else $player->sendMessage(Utils::getMessage($player, "MUST_BE_IN_FACTION"));
                         return true;
                     case "unclaim":
-                        if (FactionsAPI::isInFaction($player)) {
+                        if (FactionsAPI::isInFaction($player->getName())) {
                             if (FactionsAPI::getRank($player->getName()) === "Leader" or FactionsAPI::getRank($player->getName()) === "Officer") {
                                 if (in_array($player->getLevel()->getFolderName(), Utils::getIntoConfig("faction_worlds"))) {
                                     $chunk = $player->getLevel()->getChunkAtPosition($player);
                                     $chunkX = $chunk->getX();
                                     $chunkZ = $chunk->getZ();
                                     if (FactionsAPI::isInClaim($player->getLevel(), $chunkX, $chunkZ)) {
-                                        $faction = FactionsAPI::getFaction($player);
+                                        $faction = FactionsAPI::getFaction($player->getName());
                                         if (FactionsAPI::getFactionClaim($player->getLevel(), $chunkX, $chunkZ) === $faction) {
                                             FactionsAPI::deleteClaim($player, $faction);
                                             $player->sendMessage(Utils::getMessage($player, "UNCLAIM_SUCCESS"));
@@ -241,7 +281,7 @@ class Faction extends PluginCommand {
                         } else $player->sendMessage(Utils::getMessage($player, "MUST_BE_IN_FACTION"));
                         return true;
                     case "leave":
-                        if (FactionsAPI::isInFaction($player)) {
+                        if (FactionsAPI::isInFaction($player->getName())) {
                             if (FactionsAPI::getRank($player->getName()) !== "Leader") {
                                 FactionsAPI::leaveFaction($player);
                                 $player->sendMessage(Utils::getMessage($player, "LEAVE_SUCCESS"));
@@ -250,10 +290,10 @@ class Faction extends PluginCommand {
                         return true;
                     case "kick":
                         if (isset($args[1])) {
-                            if (FactionsAPI::isInFaction($player)) {
+                            if (FactionsAPI::isInFaction($player->getName())) {
                                 if (FactionsAPI::getRank($player->getName()) === "Leader" or FactionsAPI::getRank($player->getName()) === "Officer") {
-                                    $faction = FactionsAPI::getFaction($player);
-                                    if (FactionsAPI::getPlayerFaction($args[1]) === $faction) {
+                                    $faction = FactionsAPI::getFaction($player->getName());
+                                    if (FactionsAPI::getFaction($args[1]) === $faction) {
                                         if (FactionsAPI::getRank($args[1]) !== "Leader" and FactionsAPI::getRank($args[1]) !== FactionsAPI::getRank($player->getName())) {
                                             FactionsAPI::kickFaction($args[1]);
                                             $player->sendMessage(Utils::getMessage($player, "KICK_SUCCESS", array($args[1])));
@@ -265,10 +305,10 @@ class Faction extends PluginCommand {
                         return true;
                     case "promote":
                         if (isset($args[1])) {
-                            if (FactionsAPI::isInFaction($player)) {
+                            if (FactionsAPI::isInFaction($player->getName())) {
                                 if (FactionsAPI::getRank($player->getName()) === "Leader") {
-                                    $faction = FactionsAPI::getFaction($player);
-                                    if (FactionsAPI::getPlayerFaction($args[1]) === $faction) {
+                                    $faction = FactionsAPI::getFaction($player->getName());
+                                    if (FactionsAPI::getFaction($args[1]) === $faction) {
                                         if (FactionsAPI::getRank($args[1]) === "Member") {
                                             FactionsAPI::promoteFaction($args[1]);
                                             $player->sendMessage(Utils::getMessage($player, "PROMOTE_SUCCESS", array($args[1])));
@@ -280,10 +320,10 @@ class Faction extends PluginCommand {
                         return true;
                     case "demote":
                         if (isset($args[1])) {
-                            if (FactionsAPI::isInFaction($player)) {
+                            if (FactionsAPI::isInFaction($player->getName())) {
                                 if (FactionsAPI::getRank($player->getName()) === "Leader") {
-                                    $faction = FactionsAPI::getFaction($player);
-                                    if (FactionsAPI::getPlayerFaction($args[1]) === $faction) {
+                                    $faction = FactionsAPI::getFaction($player->getName());
+                                    if (FactionsAPI::getFaction($args[1]) === $faction) {
                                         if (FactionsAPI::getRank($args[1]) === "Officer") {
                                             FactionsAPI::demoteFaction($args[1]);
                                             $player->sendMessage(Utils::getMessage($player, "DEMOTE_SUCCESS", array($args[1])));
@@ -295,13 +335,13 @@ class Faction extends PluginCommand {
                         return true;
                     case "invite":
                         if (isset($args[1])) {
-                            if (FactionsAPI::isInFaction($player)) {
+                            if (FactionsAPI::isInFaction($player->getName())) {
                                 if (FactionsAPI::getRank($player->getName()) === "Leader" or FactionsAPI::getRank($player->getName()) === "Officer") {
                                     if (Server::getInstance()->getPlayer($args[1])) {
                                         $target = Server::getInstance()->getPlayer($args[1]);
                                         if ($target instanceof Player) {
-                                            if (!FactionsAPI::isInFaction($target)) {
-                                                $faction = FactionsAPI::getFaction($player);
+                                            if (!FactionsAPI::isInFaction($target->getName())) {
+                                                $faction = FactionsAPI::getFaction($player->getName());
                                                 FactionsAPI::sendInvitation($target, $faction);
                                                 $target->sendMessage(Utils::getMessage($target, "INVITE_SUCCESS_TARGET", array($faction)));
                                                 $player->sendMessage(Utils::getMessage($player, "INVITE_SUCCESS", array($target->getName())));
@@ -313,7 +353,7 @@ class Faction extends PluginCommand {
                         } else $player->sendMessage(Utils::getMessage($player, "INVITE_USAGE"));
                         return true;
                     case "accept":
-                        if (!FactionsAPI::isInFaction($player)) {
+                        if (!FactionsAPI::isInFaction($player->getName())) {
                             if (isset(FactionsAPI::$invitation[$player->getName()])) {
                                 $timer = FactionsAPI::$invitationTimeout[$player->getName()];
                                 $timer = $timer - time();
@@ -328,7 +368,7 @@ class Faction extends PluginCommand {
                         } else $player->sendMessage(Utils::getMessage($player, "ALREADY_IN_FACTION"));
                     return true;
                     case "deny":
-                        if (!FactionsAPI::isInFaction($player)) {
+                        if (!FactionsAPI::isInFaction($player->getName())) {
                             if (isset(FactionsAPI::$invitation[$player->getName()])) {
                                 $timer = FactionsAPI::$invitationTimeout[$player->getName()];
                                 $timer = $timer - time();
@@ -348,10 +388,10 @@ class Faction extends PluginCommand {
                     case "transfer":
                     case "leader":
                     if (isset($args[1])) {
-                        if (FactionsAPI::isInFaction($player)) {
+                        if (FactionsAPI::isInFaction($player->getName())) {
                             if (FactionsAPI::getRank($player->getName()) === "Leader") {
-                                $faction = FactionsAPI::getFaction($player);
-                                if (FactionsAPI::getPlayerFaction($args[1]) === $faction) {
+                                $faction = FactionsAPI::getFaction($player->getName());
+                                if (FactionsAPI::getFaction($args[1]) === $faction) {
                                     if (strtolower($args[1]) !== strtolower($player->getName())) {
                                         FactionsAPI::demoteFaction($player->getName());
                                         FactionsAPI::transferFaction($args[1]);
@@ -367,11 +407,11 @@ class Faction extends PluginCommand {
                         if (isset($args[1])) {
                             switch ($args[1]) {
                                 case "add":
-                                    if (FactionsAPI::isInFaction($player)) {
+                                    if (FactionsAPI::isInFaction($player->getName())) {
                                         if (FactionsAPI::getRank($player->getName()) === "Leader") {
                                             if (isset($args[2])) {
                                                 if (FactionsAPI::existsFaction($args[2])) {
-                                                    $faction1 = FactionsAPI::getFaction($player);
+                                                    $faction1 = FactionsAPI::getFaction($player->getName());
                                                     $faction2 = $args[2];
                                                     FactionsAPI::sendAlliesInvitation($faction2, $faction1);
                                                     $player->sendMessage(Utils::getMessage($player, "ALLIES_INVITE_SUCCESS", array($faction2)));
@@ -381,11 +421,11 @@ class Faction extends PluginCommand {
                                     } else $player->sendMessage(Utils::getMessage($player, "MUST_BE_IN_FACTION"));
                                     return  true;
                                 case "remove":
-                                    if (FactionsAPI::isInFaction($player)) {
+                                    if (FactionsAPI::isInFaction($player->getName())) {
                                         if (FactionsAPI::getRank($player->getName()) === "Leader") {
                                             if (isset($args[2])) {
                                                 if (FactionsAPI::existsFaction($args[2])) {
-                                                    $faction1 = FactionsAPI::getFaction($player);
+                                                    $faction1 = FactionsAPI::getFaction($player->getName());
                                                     $faction2 = $args[2];
                                                     if (FactionsAPI::areAllies($faction1, $faction2)) {
                                                         FactionsAPI::removeAllies($faction1, $faction2);
@@ -396,8 +436,8 @@ class Faction extends PluginCommand {
                                     } else $player->sendMessage(Utils::getMessage($player, "MUST_BE_IN_FACTION"));
                                     return  true;
                                 case "list":
-                                    if (FactionsAPI::isInFaction($player)) {
-                                        $faction = FactionsAPI::getFaction($player);
+                                    if (FactionsAPI::isInFaction($player->getName())) {
+                                        $faction = FactionsAPI::getFaction($player->getName());
                                         $player->sendMessage(Utils::getMessage($player, "ALLIES_LIST_HEADER"));
                                         $message = Utils::getMessage($player, "ALLIES_LIST");
                                         $allies = FactionsAPI::getAllies($faction);
@@ -408,9 +448,9 @@ class Faction extends PluginCommand {
                                     } else $player->sendMessage(Utils::getMessage($player, "MUST_BE_IN_FACTION"));
                                     return  true;
                                 case "accept":
-                                    if (FactionsAPI::isInFaction($player)) {
+                                    if (FactionsAPI::isInFaction($player->getName())) {
                                         if (FactionsAPI::getRank($player->getName()) === "Leader") {
-                                            $faction = FactionsAPI::getFaction($player);
+                                            $faction = FactionsAPI::getFaction($player->getName());
                                             if (isset(FactionsAPI::$Alliesinvitation[$faction])) {
                                                 $faction2 = FactionsAPI::$Alliesinvitation[$faction];
                                                 $timer = FactionsAPI::$AlliesinvitationTimeout[$faction];
@@ -427,9 +467,9 @@ class Faction extends PluginCommand {
                                     } else $player->sendMessage(Utils::getMessage($player, "MUST_BE_IN_FACTION"));
                                     return  true;
                                 case "deny":
-                                    if (FactionsAPI::isInFaction($player)) {
+                                    if (FactionsAPI::isInFaction($player->getName())) {
                                         if (FactionsAPI::getRank($player->getName()) === "Leader") {
-                                            $faction = FactionsAPI::getFaction($player);
+                                            $faction = FactionsAPI::getFaction($player->getName());
                                             if (isset(FactionsAPI::$Alliesinvitation[$faction])) {
                                                 $timer = FactionsAPI::$AlliesinvitationTimeout[$faction];
                                                 $timer = $timer - time();
@@ -448,7 +488,7 @@ class Faction extends PluginCommand {
                         } else $player->sendMessage(Utils::getMessage($player, "ALLIES_USAGE"));
                         return true;
                     case "chat":
-                        if (FactionsAPI::isInFaction($player)) {
+                        if (FactionsAPI::isInFaction($player->getName())) {
                             if (isset($args[1])) {
                                 switch (strtolower($args[1])) {
                                     case "faction":
@@ -494,12 +534,12 @@ class Faction extends PluginCommand {
                     case "bank":
                         if (Utils::getIntoConfig("economy_system") === true) {
                             if (isset($args[1])) {
-                                if (FactionsAPI::isInFaction($player)) {
+                                if (FactionsAPI::isInFaction($player->getName())) {
                                     switch ($args[1]) {
                                         case "deposit":
                                         case "d":
                                             if (isset($args[2])) {
-                                                $faction = FactionsAPI::getFaction($player);
+                                                $faction = FactionsAPI::getFaction($player->getName());
                                                 $money = (int)$args[2];
                                                 if ($money > 0) {
                                                     if (Main::getEconomy()->myMoney($player) >= $money) {
@@ -514,7 +554,7 @@ class Faction extends PluginCommand {
                                         case "w":
                                             if (FactionsAPI::getRank($player->getName()) !== "Member") {
                                                 if (isset($args[2])) {
-                                                    $faction = FactionsAPI::getFaction($player);
+                                                    $faction = FactionsAPI::getFaction($player->getName());
                                                     $money = (int)$args[2];
                                                     if ($money > 0) {
                                                         if (FactionsAPI::getMoney($faction) >= $money) {
@@ -528,7 +568,7 @@ class Faction extends PluginCommand {
                                             break;
                                         case "status":
                                         case "s":
-                                            $faction = FactionsAPI::getFaction($player);
+                                            $faction = FactionsAPI::getFaction($player->getName());
                                             $money = FactionsAPI::getMoney($faction);
                                             $player->sendMessage(Utils::getMessage($player, "BANK_STATUS", array($money)));
                                             break;
@@ -623,6 +663,36 @@ class Faction extends PluginCommand {
                                                 } else $player->sendMessage(Utils::getMessage($player, "ENTER_VALID_NUMBER"));
                                             } else $player->sendMessage(Utils::getMessage($player, "FACTION_NOT_EXIST"));
                                         } else $player->sendMessage(Utils::getMessage($player, "ADMIN_SETPOWER_USAGE"));
+                                        break;
+                                    case "addmoney":
+                                        if (isset($args[2]) and isset($args[3])) {
+                                            if (FactionsAPI::existsFaction($args[2])) {
+                                                if (is_numeric($args[3])) {
+                                                    FactionsAPI::addMoney($args[2], (int)$args[3]);
+                                                    $player->sendMessage(Utils::getMessage($player, "ADMIN_ADDMONEY_SUCCESS", array((int)$args[3])));
+                                                } else $player->sendMessage(Utils::getMessage($player, "ENTER_VALID_NUMBER"));
+                                            } else $player->sendMessage(Utils::getMessage($player, "FACTION_NOT_EXIST"));
+                                        } else $player->sendMessage(Utils::getMessage($player, "ADMIN_ADDMONEY_USAGE"));
+                                        break;
+                                    case "removemoney":
+                                        if (isset($args[2]) and isset($args[3])) {
+                                            if (FactionsAPI::existsFaction($args[2])) {
+                                                if (is_numeric($args[3])) {
+                                                    FactionsAPI::removeMoney($args[2], (int)$args[3]);
+                                                    $player->sendMessage(Utils::getMessage($player, "ADMIN_REMOVEMONEY_SUCCESS", array((int)$args[3])));
+                                                } else $player->sendMessage(Utils::getMessage($player, "ENTER_VALID_NUMBER"));
+                                            } else $player->sendMessage(Utils::getMessage($player, "FACTION_NOT_EXIST"));
+                                        } else $player->sendMessage(Utils::getMessage($player, "ADMIN_REMOVEMONEY_USAGE"));
+                                        break;
+                                    case "setmoney":
+                                        if (isset($args[2]) and isset($args[3])) {
+                                            if (FactionsAPI::existsFaction($args[2])) {
+                                                if (is_numeric($args[3])) {
+                                                    FactionsAPI::setMoney($args[2], (int)$args[3]);
+                                                    $player->sendMessage(Utils::getMessage($player, "ADMIN_SETMONEY_SUCCESS", array((int)$args[3])));
+                                                } else $player->sendMessage(Utils::getMessage($player, "ENTER_VALID_NUMBER"));
+                                            } else $player->sendMessage(Utils::getMessage($player, "FACTION_NOT_EXIST"));
+                                        } else $player->sendMessage(Utils::getMessage($player, "ADMIN_SETMONEY_USAGE"));
                                         break;
                                     case "delete":
                                         if (isset($args[2])) {

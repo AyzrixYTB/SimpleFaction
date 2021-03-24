@@ -82,11 +82,11 @@ class FactionsAPI {
     const COLOR_INACTIVE = TextFormat::RED;
 
     /**
-     * @param Player $player
+     * @param string $name
      * @return bool
      */
-    public static function isInFaction(Player $player): bool {
-        return isset(self::$player[$player->getName()]);
+    public static function isInFaction(string $name): bool {
+        return isset(self::$player[strtolower($name)]);
     }
 
     /**
@@ -109,7 +109,7 @@ class FactionsAPI {
      */
     public static function createFaction(Player $player, string $faction): void {
         self::$faction[$faction] = array("players" => array($player->getName()), "power" => (int)Utils::getIntoConfig("default_power"), "money" => 0, "allies" => array());
-        self::$player[$player->getName()] = array("faction" => $faction, "role" => "Leader");
+        self::$player[strtolower($player->getName())] = array("faction" => $faction, "role" => "Leader");
         self::$claim[$faction] = array();
     }
 
@@ -126,7 +126,7 @@ class FactionsAPI {
 
         foreach (self::$player as $player => $value) {
             if ($value["faction"] === $faction) {
-                unset(self::$player[$faction]);
+                unset(self::$player[$player]);
             }
         }
 
@@ -140,20 +140,11 @@ class FactionsAPI {
     }
 
     /**
-     * @param Player $player
-     * @return string
-     */
-    public static function getFaction(Player $player): string {
-        $name = $player->getName();
-        return self::$player[$name]["faction"]?? "";
-    }
-
-    /**
      * @param string $name
      * @return string
      */
-    public static function getPlayerFaction(string $name): string {
-        return self::$player[$name]["faction"]?? "";
+    public static function getFaction(string $name): string {
+        return self::$player[strtolower($name)]["faction"]?? "";
     }
 
     /**
@@ -161,7 +152,7 @@ class FactionsAPI {
      * @return string
      */
     public static function getRank(string $name): string {
-        return self::$player[$name]["role"]?? "";
+        return self::$player[strtolower($name)]["role"]?? "";
     }
 
     /**
@@ -355,7 +346,7 @@ class FactionsAPI {
         $array = self::$faction[self::getFaction($player)]["players"];
         unset($array[$name]);
         self::$faction[self::getFaction($player)]["players"] = $array;
-        unset(self::$player[$name]);
+        unset(self::$player[strtolower($name)]);
     }
 
     /**
@@ -363,9 +354,9 @@ class FactionsAPI {
      */
     public static function kickFaction(string $name): void {
         $name = strtolower($name);
-        $array = self::$faction[self::getPlayerFaction($name)]["players"];
+        $array = self::$faction[self::getFaction($name)]["players"];
         unset($array[$name]);
-        self::$faction[self::getPlayerFaction($name)]["players"] = $array;
+        self::$faction[self::getFaction($name)]["players"] = $array;
         unset(self::$player[$name]);
     }
 
@@ -373,21 +364,21 @@ class FactionsAPI {
      * @param string $name
      */
     public static function promoteFaction(string $name): void {
-        self::$player[$name]["role"] = "Officer";
+        self::$player[strtolower($name)]["role"] = "Officer";
     }
 
     /**
      * @param string $name
      */
     public static function demoteFaction(string $name): void {
-        self::$player[$name]["role"] = "Member";
+        self::$player[strtolower($name)]["role"] = "Member";
     }
 
     /**
      * @param string $name
      */
     public static function transferFaction(string $name): void {
-        self::$player[$name]["role"] = "Leader";
+        self::$player[strtolower($name)]["role"] = "Leader";
     }
 
     /**
@@ -405,7 +396,7 @@ class FactionsAPI {
     public static function acceptInvitation(Player $player): void {
         $name = $player->getName();
         $faction = self::$invitation[$player->getName()];
-        self::$player[$name] = array("faction" => $faction, "role" => "Member");
+        self::$player[strtolower($name)] = array("faction" => $faction, "role" => "Member");
         $array = self::$faction[$faction]["players"];
         array_push($array, $name);
         self::$faction[$faction]["players"] = $array;
@@ -593,7 +584,7 @@ class FactionsAPI {
     }
 
     public static function factionMessage(Player $player, string $message) {
-        $faction = self::getFaction($player);
+        $faction = self::getFaction($player->getName());
         foreach (self::getAllPlayers($faction) as $target) {
             $target = Server::getInstance()->getPlayer($target);
             if ($target instanceof Player) {
@@ -605,7 +596,7 @@ class FactionsAPI {
     }
 
     public static function allyMessage(Player $player, string $message) {
-        $faction = self::getFaction($player);
+        $faction = self::getFaction($player->getName());
         foreach (self::getAllies($faction) as $ally) {
             if (self::existsFaction($ally)) {
                 foreach (self::getAllPlayers($ally) as $target) {
@@ -741,8 +732,8 @@ class FactionsAPI {
      * @return string
      */
     public static function getMapColor(Player $player, string $faction1): string {
-        if (self::isInFaction($player)) {
-            $faction2 = self::getFaction($player);
+        if (self::isInFaction($player->getName())) {
+            $faction2 = self::getFaction($player->getName());
             if ($faction1 !== $faction2) {
                 if (!self::areAllies($faction1, $faction2)) {
                     return TextFormat::RED;
