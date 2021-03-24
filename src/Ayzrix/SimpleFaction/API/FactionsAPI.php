@@ -23,6 +23,9 @@ use pocketmine\utils\TextFormat;
 
 class FactionsAPI {
 
+    /** @var array $moving */
+    public static $moving = [];
+
     /** @var array $faction */
     public static $faction = [];
 
@@ -111,6 +114,14 @@ class FactionsAPI {
         self::$faction[$faction] = array("players" => array($player->getName()), "power" => (int)Utils::getIntoConfig("default_power"), "money" => 0, "allies" => array());
         self::$player[strtolower($player->getName())] = array("faction" => $faction, "role" => "Leader");
         self::$claim[$faction] = array();
+
+        if (Utils::getIntoConfig("broadcast_message_created") === true) {
+            foreach (Server::getInstance()->getOnlinePlayers() as $player) {
+                if ($player instanceof Player) {
+                    $player->sendMessage(Utils::getMessage($player, "FACTION_CREATE_BROADCAST", array($player->getName(), $faction)));
+                }
+            }
+        }
     }
 
     /**
