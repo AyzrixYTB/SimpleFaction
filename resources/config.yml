@@ -25,7 +25,6 @@ broadcast_message_disband: true
 # Activate or desactivate the entering and leaving messages.
 entering_leaving: true
 
-
 # Activate or deactivate the bank system (/f bank)
 economy_system: false
 

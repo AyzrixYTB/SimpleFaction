@@ -870,9 +870,9 @@ class FactionsAPI {
      * @param string $faction2
      */
     public static function startWars(string $faction, string $faction2): void {
-        self::$Wars[$faction] = 0;
-        self::$Wars[$faction2] = 0;
+        self::$Wars[$faction] = array("faction" => $faction2, "kills" => 0);
+        self::$Wars[$faction2] = array("faction" => $faction, "kills" => 0);
 
-        Main::getInstance()->getScheduler()->scheduleRepeatingTask(new WarsTask($faction, $faction2), 20);
+        Main::getInstance()->getScheduler()->scheduleDelayedTask(new WarsTask($faction, $faction2), 20*(int)Utils::getIntoConfig("war_timer"));
     }
 }

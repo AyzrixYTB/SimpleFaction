@@ -27,6 +27,7 @@
 | `/f kick`      | Kicks a player from your faction.                        | <font color="#fca503"> officers       |
 | `/f sethome`   | Sets your faction home.                                  | <font color="#fca503"> officers       |
 | `/f delhome`   | Removes your faction home.                               | <font color="#fca503"> officers       |
+| `/f war`       | Manage faction wars.                                     | <font color="#fca503"> officers       |
 | `/f delete`    | Delete your faction.                                     | <font color="#1589F0"> leader         |
 | `/f allies`    | Manage your faction's alliance.                          | <font color="#1589F0"> leader         |
 | `/f promote`   |  Promote a member.                                       | <font color="#1589F0"> leader         |
@@ -99,9 +100,13 @@ broadcast_message_disband: true
 # Activate or desactivate the entering and leaving messages.
 entering_leaving: true
 
-
 # Activate or deactivate the bank system (/f bank)
 economy_system: false
+
+# Activate or deactivate the war system (/f war)
+war_system: true
+# War duration in seconds
+war_timer: 300
 
 # Faction name limit.
 min_faction_name_lenght: 3
