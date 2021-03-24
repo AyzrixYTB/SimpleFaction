@@ -42,15 +42,15 @@ class PlayerListener implements Listener {
             if ($cause instanceof EntityDamageByEntityEvent) {
                 $damager = $cause->getDamager();
                 if ($damager instanceof Player) {
-                    if (FactionsAPI::isInFaction($damager)) {
-                        $dFaction = FactionsAPI::getFaction($damager);
+                    if (FactionsAPI::isInFaction($damager->getName())) {
+                        $dFaction = FactionsAPI::getFaction($damager->getName());
                         FactionsAPI::addPower($dFaction, (int)Utils::getIntoConfig("power_gain_per_kill"));
                     }
                 }
             }
 
-            if (FactionsAPI::isInFaction($player)) {
-                $pFaction = FactionsAPI::getFaction($player);
+            if (FactionsAPI::isInFaction($player->getName())) {
+                $pFaction = FactionsAPI::getFaction($player->getName());
                 FactionsAPI::removePower($pFaction, (int)Utils::getIntoConfig("power_lost_per_death"));
             }
         }
@@ -79,9 +79,9 @@ class PlayerListener implements Listener {
                         case BlockIds::OAK_FENCE_GATE:
                         case BlockIds::CHEST:
                         case BlockIds::TRAPPED_CHEST:
-                            if (FactionsAPI::isInFaction($player)) {
+                            if (FactionsAPI::isInFaction($player->getName())) {
                                 $claimer = FactionsAPI::getFactionClaim($player->getLevel(), $chunkX, $chunkZ);
-                                $faction = FactionsAPI::getFaction($player);
+                                $faction = FactionsAPI::getFaction($player->getName());
                                 if ($faction !== $claimer) $event->setCancelled(true);
                             } else $event->setCancelled(true);
                     }
@@ -98,9 +98,9 @@ class PlayerListener implements Listener {
                         case ItemIds::IRON_SHOVEL:
                         case ItemIds::STONE_SHOVEL:
                         case ItemIds::WOODEN_SHOVEL:
-                            if (FactionsAPI::isInFaction($player)) {
+                            if (FactionsAPI::isInFaction($player->getName())) {
                                 $claimer = FactionsAPI::getFactionClaim($player->getLevel(), $chunkX, $chunkZ);
-                                $faction = FactionsAPI::getFaction($player);
+                                $faction = FactionsAPI::getFaction($player->getName());
                                 if ($faction !== $claimer) $event->setCancelled(true);
                             } else $event->setCancelled(true);
                     }

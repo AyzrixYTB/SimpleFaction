@@ -16,6 +16,7 @@ namespace Ayzrix\SimpleFaction\Events\Listener;
 use Ayzrix\SimpleFaction\API\FactionsAPI;
 use Ayzrix\SimpleFaction\Utils\Utils;
 use pocketmine\event\block\BlockBreakEvent;
+use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\Listener;
 use pocketmine\level\format\Chunk;
 
@@ -29,9 +30,9 @@ class BlockListener implements Listener {
                 $chunkX = $chunk->getX();
                 $chunkZ = $chunk->getZ();
                 if (FactionsAPI::isInClaim($player->getLevel(), $chunkX, $chunkZ)) {
-                    if (FactionsAPI::isInFaction($player)) {
+                    if (FactionsAPI::isInFaction($player->getName())) {
                         $claimer = FactionsAPI::getFactionClaim($player->getLevel(), $chunkX, $chunkZ);
-                        $faction = FactionsAPI::getFaction($player);
+                        $faction = FactionsAPI::getFaction($player->getName());
                         if ($faction !== $claimer) $event->setCancelled(true);
                     } else $event->setCancelled(true);
                 }
@@ -39,7 +40,7 @@ class BlockListener implements Listener {
         }
     }
 
-    public function BlockPlace(BlockBreakEvent $event) {
+    public function BlockPlace(BlockPlaceEvent $event) {
         $player = $event->getPlayer();
         if (in_array($player->getLevel()->getFolderName(), Utils::getIntoConfig("faction_worlds"))) {
             $chunk = $player->getLevel()->getChunkAtPosition($event->getBlock());
@@ -47,9 +48,9 @@ class BlockListener implements Listener {
                 $chunkX = $chunk->getX();
                 $chunkZ = $chunk->getZ();
                 if (FactionsAPI::isInClaim($player->getLevel(), $chunkX, $chunkZ)) {
-                    if (FactionsAPI::isInFaction($player)) {
+                    if (FactionsAPI::isInFaction($player->getName())) {
                         $claimer = FactionsAPI::getFactionClaim($player->getLevel(), $chunkX, $chunkZ);
-                        $faction = FactionsAPI::getFaction($player);
+                        $faction = FactionsAPI::getFaction($player->getName());
                         if ($faction !== $claimer) $event->setCancelled(true);
                     } else $event->setCancelled(true);
                 }

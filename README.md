@@ -9,7 +9,8 @@
 |----------------|----------------------------------------------------------|---------------------------------------|
 | `/f help`      | Allows you to teleport to a player.                      | <font color="#03fc73"> everyone       |
 | `/f create`    | Create a faction.                                        | <font color="#03fc73"> everyone       |
-| `/f info`      | Get information on a faction.                            | <font color="#03fc73"> everyone       |
+| `/f info`      | Get information of a faction.                            | <font color="#03fc73"> everyone       |
+| `/f who`       | Get information of a player's faction.                   | <font color="#03fc73"> everyone       |
 | `/f accept`    | Accept faction invitation.                               | <font color="#03fc73"> everyone       |
 | `/f deny`      | Deny faction invitation.                                 | <font color="#03fc73"> everyone       |
 | `/f chat`      | Change your chatting configuration.                      | <font color="#03fc73"> everyone       |
@@ -19,7 +20,7 @@
 | `/f leave`     | Leave your current faction.                              | <font color="#03fc73"> everyone       |
 | `/f map`       | Show the nearby claims.                                  | <font color="#03fc73"> everyone       |
 | `/f border`    | Show the chunk border limit.                             | <font color="#03fc73"> everyone       |
-| `/f here  `    | Show claims informations.                             | <font color="#03fc73"> everyone       |
+| `/f here  `    | Show claims informations.                                | <font color="#03fc73"> everyone       |
 | `/f claim`     | Claim a chunk.                                           | <font color="#fca503"> officers       |
 | `/f unclaim`   | Unclaim your claim.                                      | <font color="#fca503"> officers       |
 | `/f invite`    | Invite a player into your faction.                       | <font color="#fca503"> officers       |
@@ -31,14 +32,12 @@
 | `/f promote`   |  Promote a member.                                       | <font color="#1589F0"> leader         |
 | `/f demote`    | Demote an officer.                                       | <font color="#1589F0"> leader         |
 | `/f transfer`  | Make a new player the leader.                            | <font color="#1589F0"> leader         |
-| `/f admin`     | Manage all factions.                                     | <font color="red"> staff              | 
+| `/f admin`     | Administrative commands.                                 | <font color="red"> staff              | 
 
 ## Future additions
 
 | Name              | Description                                               | Type      |
 |-------------------|-----------------------------------------------------------|-----------|
-| `/f admin (bank)` | Manage factions banks.                                    | command   |
-| `/f who (player)` | Check the informations of a faction by a player name.     | command   |
 | `Safezone system` | Allows you to create safezones that cannot be claimed.    | system    |
 | `UI System`       | Add an UI extension plugin.                               | extension |
 
