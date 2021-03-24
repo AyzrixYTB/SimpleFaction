@@ -78,4 +78,44 @@ class Utils {
     public static function query(string $text): void {
         Main::getInstance()->getServer()->getAsyncPool()->submitTask(new QueryTask($text));
     }
+
+    public static function saveAll() {
+        if (self::getProvider() === "mysql") {
+            $db = new \MySQLi(Utils::getIntoConfig("mysql_address"), Utils::getIntoConfig("mysql_user"), Utils::getIntoConfig("mysql_password"), Utils::getIntoConfig("mysql_db"));
+        } else $db = new \SQLite3(Main::getInstance()->getDataFolder() . "SimpleFaction.db");
+        $db->query("DELETE FROM faction");
+        $db->query("DELETE FROM player");
+        $db->query("DELETE FROM home");
+        $db->query("DELETE FROM lang");
+
+        $faction = FactionsAPI::$faction;
+        $claim = FactionsAPI::$claim;
+        $player = FactionsAPI::$player;
+        $home = FactionsAPI::$home;
+        $lang = FactionsAPI::$lang;
+
+        foreach ($faction as $name => $values) {
+            $faction = $name;
+            $players = base64_encode(serialize($values["players"]));
+            $power = $values["power"];
+            $money = $values["money"];
+            $allies = base64_encode(serialize($values["allies"]));
+            $claims = base64_encode(serialize($claim[$faction]));
+            $db->query("INSERT INTO faction (faction, players, power, money, allies, claims) VALUES ('$faction', '$players', '$power', '$money', '$allies', '$claims')");
+        }
+
+        foreach ($player as $name => $values) {
+            $faction = $values["faction"];
+            $role = $values["role"];
+            $db->query("INSERT INTO player (player, faction, role) VALUES ('$name', '$faction', '$role');");
+        }
+
+        foreach ($home as $name => $values) {
+            $db->query("INSERT INTO home (faction, x, y, z, world) VALUES ('$name', '$values[0]', '$values[1]', '$values[2]', '$values[3]');");
+        }
+
+        foreach ($lang as $name => $language) {
+            $db->query("INSERT INTO lang (player, lang) VALUES ('$name', '$language');");
+        }
+    }
 }

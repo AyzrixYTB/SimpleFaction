@@ -13,6 +13,7 @@
 
 namespace Ayzrix\SimpleFaction\Tasks\Async;
 
+use Ayzrix\Auction\Utils\MySQL;
 use Ayzrix\SimpleFaction\API\FactionsAPI;
 use Ayzrix\SimpleFaction\Main;
 use Ayzrix\SimpleFaction\Utils\Utils;
@@ -38,49 +39,25 @@ class LoadItTask extends AsyncTask {
         switch ($provider) {
             case "mysql":
                 $db = new \MySQLi($this->db[0], $this->db[1], $this->db[2], $this->db[3]);
+                $data = $db->query("SELECT faction, players, power, money, allies, claims FROM faction");
+                while ($resultArr = $data->fetch_Array(MYSQLI_ASSOC)) {
+                    $results["faction"][$resultArr['faction']] = array(unserialize(base64_decode($resultArr['players'])), $resultArr['power'], $resultArr['money'], unserialize(base64_decode($resultArr['allies'])), unserialize(base64_decode($resultArr['claims'])));
+                }
 
-                $data = $db->prepare("SELECT faction, players, power, money, allies, claims FROM faction");
-                /**
-                 * @param string $faction
-                 * @param string $players
-                 * @param int $power
-                 * @param int $money
-                 * @param string $allies
-                 */
-                $data->bind_result($faction, $players, $power, $money, $allies);
-                $data->execute();
-                while ($data->fetch()) $results["faction"][$faction] = array(unserialize(base64_decode($players)), $power, $money, unserialize(base64_decode($allies)), unserialize(base64_decode($claims)));
+                $data = $db->query("SELECT player, faction, role FROM player");
+                while ($resultArr = $data->fetch_Array(MYSQLI_ASSOC)) {
+                    $results["player"][$resultArr['player']] = array($resultArr['faction'], $resultArr['role']);
+                }
 
-                $data = $db->prepare("SELECT player, faction, role FROM player");
-                /**
-                 * @param string $player
-                 * @param string $faction
-                 * @param string $role
-                 */
-                $data->bind_result($player, $faction, $role);
-                $data->execute();
-                while ($data->fetch()) $results["player"][$player] = array($faction, $role);
+                $data = $db->query("SELECT faction, x, y, z, world FROM home");
+                while ($resultArr = $data->fetch_Array(MYSQLI_ASSOC)) {
+                    $results["home"][$resultArr['faction']] = array($resultArr['x'], $resultArr['y'], $resultArr['z'], $resultArr['world']);
+                }
 
-                $data = $db->prepare("SELECT faction, x, y, z, world FROM home");
-                /**
-                 * @param string $faction
-                 * @param int $x
-                 * @param int $y
-                 * @param int $z
-                 * @param string $world
-                 */
-                $data->bind_result($faction, $x, $y, $z, $world);
-                $data->execute();
-                while ($data->fetch()) $results["home"][$faction] = array($x, $y, $z, $world);
-
-                $data = $db->prepare("SELECT player, lang FROM lang");
-                /**
-                 * @param string $player
-                 * @param string $lang
-                 */
-                $data->bind_result($player, $lang);
-                if (!$data->execute());
-                while ($data->fetch()) $results["lang"][$player] = $lang;
+                $data = $db->query("SELECT player, lang FROM lang");
+                while ($resultArr = $data->fetch_Array(MYSQLI_ASSOC)) {
+                    $results["lang"][$resultArr['player']] = $resultArr['lang'];
+                }
                 break;
             default:
                 $db = new \SQLite3($this->db[0]);
@@ -123,7 +100,7 @@ class LoadItTask extends AsyncTask {
             }
             if (isset($result["player"])) {
                 foreach ($result["player"] as $key => $array) {
-                    FactionsAPI::$player[$key] = array("faction" => $array[0], "role" => $array[1]);
+                    FactionsAPI::$player[strtolower($key)] = array("faction" => $array[0], "role" => $array[1]);
                 }
             }
 
