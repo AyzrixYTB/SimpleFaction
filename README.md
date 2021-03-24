@@ -57,13 +57,13 @@
 | `Simplicity`              | ✔               | ✔         | ❌            |
 
 ## Additional plugins
-| Name              | Usage                         | Download                                                      |
-|-------------------|-------------------------------|---------------------------------------------------------------| 
-| PureChat          | Chat integration              | [Download](https://github.com/AyzrixYTB/PureChat-UPDATED)     |
-| ScoreHUD          | Scoreboard integration        | [Download](https://poggit.pmmp.io/p/ScoreHud)                 |
-| EssentialsFaction | Chat & Scoreboard integration | [Download](https://github.com/Zoumi-Dev/FacEssential)         |
-| Scoreboard        | Scoreboard integration        | [Download](https://github.com/AyzrixYTB/Scoreboard)           |
-| EconomyAPI        | Bank system                   | [Download](https://poggit.pmmp.io/p/EconomyAPI)               |
+| Name              | Usage                         | Download                                                          |
+|-------------------|-------------------------------|-------------------------------------------------------------------| 
+| PureChat          | Chat integration              | [Download](https://poggit.pmmp.io/r/118622/PureChat_dev-1.phar)   |
+| ScoreHUD          | Scoreboard integration        | [Download](https://poggit.pmmp.io/p/ScoreHud)                     |
+| EssentialsFaction | Chat & Scoreboard integration | [Download](https://github.com/Zoumi-Dev/FacEssential)             |
+| Scoreboard        | Scoreboard integration        | [Download](https://github.com/AyzrixYTB/Scoreboard)               |
+| EconomyAPI        | Bank system                   | [Download](https://poggit.pmmp.io/p/EconomyAPI)                   |
 
 ## Translators
 - **English** - @Ayzrix & Se7en-dev.
