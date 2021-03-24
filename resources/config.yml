@@ -28,6 +28,11 @@ entering_leaving: true
 # Activate or deactivate the bank system (/f bank)
 economy_system: false
 
+# Activate or deactivate the war system (/f war)
+war_system: true
+# War duration in seconds
+war_timer: 300
+
 # Faction name limit.
 min_faction_name_lenght: 3
 max_faction_name_lenght: 16
