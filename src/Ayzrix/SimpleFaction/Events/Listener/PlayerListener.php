@@ -45,6 +45,9 @@ class PlayerListener implements Listener {
                     if (FactionsAPI::isInFaction($damager->getName())) {
                         $dFaction = FactionsAPI::getFaction($damager->getName());
                         FactionsAPI::addPower($dFaction, (int)Utils::getIntoConfig("power_gain_per_kill"));
+                        if (isset(FactionsApi::$Wars[$dFaction])) {
+                            FactionsAPI::$Wars[$dFaction] = FactionsAPI::$Wars[$dFaction] + 1;
+                        }
                     }
                 }
             }

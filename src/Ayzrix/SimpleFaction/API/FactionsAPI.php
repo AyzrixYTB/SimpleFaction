@@ -14,6 +14,7 @@
 namespace Ayzrix\SimpleFaction\API;
 
 use Ayzrix\SimpleFaction\Main;
+use Ayzrix\SimpleFaction\Tasks\WarsTask;
 use Ayzrix\SimpleFaction\Utils\Utils;
 use pocketmine\level\Level;
 use pocketmine\level\Position;
@@ -61,6 +62,12 @@ class FactionsAPI {
 
     /** @var array $border */
     public static $border = [];
+
+    /** @var array $Warsinvitation */
+    public static $Warsinvitation = [];
+
+    /** @var array $Wars */
+    public static $Wars = [];
 
     const MAP_KEY_CHARS = "\\/#?ç¬£$%=&^ABCDEFGHJKLMNOPQRSTUVWXYZÄÖÜÆØÅ1234567890abcdeghjmnopqrsuvwxyÿzäöüæøåâêîûô";
     const MAP_WIDTH = 48;
@@ -805,5 +812,67 @@ class FactionsAPI {
     public static function getLanguages(Player $player): string {
         $name = $player->getName();
         return self::$lang[$name];
+    }
+
+    /**
+     * @param string $faction
+     * @param string $faction2
+     */
+    public static function sendWarsInvitation(string $faction, string $faction2): void {
+        self::$Warsinvitation[$faction] = [$faction2, time() + 30];
+
+        foreach (self::getAllPlayers($faction) as $player) {
+            if (Server::getInstance()->getPlayer($player)) {
+                $player = Server::getInstance()->getPlayer($player);
+                if ($player instanceof Player) {
+                    $player->sendMessage(Utils::getMessage($player, "WARS_INVITE_SUCCESS_TARGET", array($faction2)));
+                }
+            }
+        }
+    }
+
+    /**
+     * @param string $faction
+     */
+    public static function acceptWarsInvitation(string $faction): void {
+        $faction2 = self::$Warsinvitation[$faction][0];
+
+        foreach (self::getAllPlayers($faction) as $player) {
+            if (Server::getInstance()->getPlayer($player)) {
+                $player = Server::getInstance()->getPlayer($player);
+                if ($player instanceof Player) {
+                    $player->sendMessage(Utils::getMessage($player, "WARS_FACTION_BROADCAST", array($faction2)));
+                }
+            }
+        }
+
+        foreach (self::getAllPlayers($faction2) as $player) {
+            if (Server::getInstance()->getPlayer($player)) {
+                $player = Server::getInstance()->getPlayer($player);
+                if ($player instanceof Player) {
+                    $player->sendMessage(Utils::getMessage($player, "WARS_FACTION_BROADCAST", array($faction)));
+                }
+            }
+        }
+        self::startWars($faction, $faction2);
+        unset(self::$Warsinvitation[$faction]);
+    }
+
+    /**
+     * @param string $faction
+     */
+    public static function denyWarsInvitation(string $faction): void {
+        unset(self::$Warsinvitation[$faction]);
+    }
+
+    /**
+     * @param string $faction
+     * @param string $faction2
+     */
+    public static function startWars(string $faction, string $faction2): void {
+        self::$Wars[$faction] = 0;
+        self::$Wars[$faction2] = 0;
+
+        Main::getInstance()->getScheduler()->scheduleRepeatingTask(new WarsTask($faction, $faction2), 20);
     }
 }
