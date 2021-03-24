@@ -167,6 +167,67 @@ class Faction extends PluginCommand {
                             } else $player->sendMessage(Utils::getMessage($player, "MUST_BE_IN_FACTION"));
                         }
                         return true;
+                    case "war":
+                    case "wars":
+                        if (isset($args[1])) {
+                            switch ($args[1]) {
+                                case "add":
+                                case "invite":
+                                    if (FactionsAPI::isInFaction($player->getName())) {
+                                        if (FactionsAPI::getRank($player->getName()) === "Leader" or FactionsAPI::getRank($player->getName()) === "Officer") {
+                                            if (isset($args[2])) {
+                                                if (FactionsAPI::existsFaction($args[2])) {
+                                                    $faction1 = FactionsAPI::getFaction($player->getName());
+                                                    $faction2 = $args[2];
+                                                    FactionsAPI::sendWarsInvitation($faction2, $faction1);
+                                                    $player->sendMessage(Utils::getMessage($player, "WARS_INVITE_SUCCESS", array($faction2)));
+                                                } else $player->sendMessage(Utils::getMessage($player, "FACTION_NOT_EXIST"));
+                                            } else $player->sendMessage(Utils::getMessage($player, "WARS_ADD_USAGE"));
+                                        } else $player->sendMessage(Utils::getMessage($player, "ONLY_LEADER_OR_OFFICER"));
+                                    } else $player->sendMessage(Utils::getMessage($player, "MUST_BE_IN_FACTION"));
+                                    return true;
+                                case "accept":
+                                    if (FactionsAPI::isInFaction($player->getName())) {
+                                        if (FactionsAPI::getRank($player->getName()) === "Leader") {
+                                            $faction = FactionsAPI::getFaction($player->getName());
+
+                                            if (isset(FactionsAPI::$Warsinvitation[$faction])) {
+                                                $time = FactionsAPI::$Warsinvitation[$faction][1];
+
+                                                if (time() < $time) {
+                                                    FactionsAPI::acceptWarsInvitation($faction);
+                                                } else {
+                                                    $player->sendMessage(Utils::getMessage($player, "WARS_REQUEST_EXPIRE"));
+                                                    unset(FactionsAPI::$Warsinvitation[$faction]);
+                                                }
+                                            } else $player->sendMessage(Utils::getMessage($player, "DONT_HAVE_WARS_REQUEST"));
+                                        } else $player->sendMessage(Utils::getMessage($player, "ONLY_LEADER"));
+                                    } else $player->sendMessage(Utils::getMessage($player, "MUST_BE_IN_FACTION"));
+                                    return true;
+                                case "deny":
+                                    if (FactionsAPI::isInFaction($player->getName())) {
+                                        if (FactionsAPI::getRank($player->getName()) === "Leader") {
+                                            $faction = FactionsAPI::getFaction($player->getName());
+
+                                            if (isset(FactionsAPI::$Warsinvitation[$faction])) {
+                                                $time = FactionsAPI::$Warsinvitation[$faction][1];
+
+                                                if (time() < $time) {
+                                                    FactionsAPI::denyWarsInvitation($faction);
+                                                } else {
+                                                    $player->sendMessage(Utils::getMessage($player, "WARS_REQUEST_EXPIRE"));
+                                                    unset(FactionsAPI::$Warsinvitation[$faction]);
+                                                }
+                                            } else $player->sendMessage(Utils::getMessage($player, "DONT_HAVE_WARS_REQUEST"));
+                                        } else $player->sendMessage(Utils::getMessage($player, "ONLY_LEADER"));
+                                    } else $player->sendMessage(Utils::getMessage($player, "MUST_BE_IN_FACTION"));
+                                    return true;
+                                default:
+                                    $player->sendMessage(Utils::getMessage($player, "WARS_USAGE"));
+                                    return true;
+                            }
+                        } else $player->sendMessage(Utils::getMessage($player, "WARS_USAGE"));
+                        return true;
                     case "who":
                         if (isset($args[1])) {
                             if (FactionsAPI::isInFaction($args[1])) {
@@ -416,7 +477,7 @@ class Faction extends PluginCommand {
                                                     FactionsAPI::sendAlliesInvitation($faction2, $faction1);
                                                     $player->sendMessage(Utils::getMessage($player, "ALLIES_INVITE_SUCCESS", array($faction2)));
                                                 } else $player->sendMessage(Utils::getMessage($player, "FACTION_NOT_EXIST"));
-                                            } else $player->sendMessage(Utils::getMessage($player, "ALLIES_REMOVE_USAGE"));
+                                            } else $player->sendMessage(Utils::getMessage($player, "ALLIES_ADD_USAGE"));
                                         } else $player->sendMessage(Utils::getMessage($player, "ONLY_LEADER"));
                                     } else $player->sendMessage(Utils::getMessage($player, "MUST_BE_IN_FACTION"));
                                     return  true;
