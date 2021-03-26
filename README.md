@@ -60,10 +60,10 @@
 ## Additional plugins
 | Name              | Usage                         | Download                                                          |
 |-------------------|-------------------------------|-------------------------------------------------------------------| 
-| PureChat          | Chat integration              | [Download](https://poggit.pmmp.io/r/118622/PureChat_dev-1.phar)   |
+| PureChat          | Chat integration              | [Download](https://poggit.pmmp.io/r/119566/PureChat_dev-2.phar)   |
 | ScoreHUD          | Scoreboard integration        | [Download](https://poggit.pmmp.io/p/ScoreHud)                     |
 | EssentialsFaction | Chat & Scoreboard integration | [Download](https://github.com/Zoumi-Dev/FacEssential)             |
-| Scoreboard        | Scoreboard integration        | [Download](https://github.com/AyzrixYTB/Scoreboard)               |
+| Scoreboard        | Scoreboard integration        | [Download](https://poggit.pmmp.io/r/119565/Scoreboard_dev-5.phar) |
 | EconomyAPI        | Bank system                   | [Download](https://poggit.pmmp.io/p/EconomyAPI)                   |
 
 ## Translators

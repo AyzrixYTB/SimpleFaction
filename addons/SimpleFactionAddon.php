@@ -33,8 +33,8 @@ namespace JackMD\ScoreHud\Addons
 		 * @return string
 		 */
 		public function getPlayerFaction(Player $player): string{
-            if (FactionsAPI::isInFaction($player)) {
-                return FactionsAPI::getFaction($player);
+            if (FactionsAPI::isInFaction($player->getName())) {
+                return FactionsAPI::getFaction($player->getName());
             } else return "No Faction";
 		}
 
@@ -43,8 +43,8 @@ namespace JackMD\ScoreHud\Addons
          * @return string|int
          */
         public function getFactionPower(Player $player) {
-            if (FactionsAPI::isInFaction($player)) {
-                return FactionsAPI::getPower(FactionsAPI::getFaction($player));
+            if (FactionsAPI::isInFaction($player->getName())) {
+                return FactionsAPI::getPower(FactionsAPI::getFaction($player->getName()));
             } else return "No Faction";
         }
 
@@ -53,7 +53,7 @@ namespace JackMD\ScoreHud\Addons
          * @return string
          */
         public function getFactionRank(Player $player): string {
-		    if (FactionsAPI::isInFaction($player)) {
+		    if (FactionsAPI::isInFaction($player->getName())) {
 		        return FactionsAPI::getRank($player->getName());
             } else return "No Faction";
         }
