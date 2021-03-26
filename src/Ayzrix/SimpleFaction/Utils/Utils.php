@@ -124,10 +124,10 @@ class Utils {
                 } else if (FactionsAPI::areAllies($faction, $zone)) {
                     return self::getIntoConfig("zones_colors")["Allies"];
                 } else {
-                    return self::getIntoConfig("zones_colors")["Ennemies"];
+                    return self::getIntoConfig("zones_colors")["Enemies"];
                 }
             } else {
-                return self::getIntoConfig("zones_colors")["Ennemies"];
+                return self::getIntoConfig("zones_colors")["Enemies"];
             }
         }
     }
