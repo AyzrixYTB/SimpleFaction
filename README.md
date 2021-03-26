@@ -74,6 +74,7 @@
 
 ## Config
 ```
+---
 #     _____ _                 _      ______         _   _
 #    / ____(_)               | |    |  ____|       | | (_)
 #   | (___  _ _ __ ___  _ __ | | ___| |__ __ _  ___| |_ _  ___  _ __
@@ -84,7 +85,7 @@
 #                      |_|
 #
 
-# SQLITE | MYSQL
+# Database provider (SQLITE | MYSQL)
 PROVIDER: "SQLITE"
 
 # Edit this only if 'PROVIDER' is on MYSQL
@@ -93,11 +94,11 @@ mysql_user: "USER"
 mysql_password: "YOUR PASSWORD"
 mysql_db: "YOUR DB"
 
-# Broadcast created system.
+# Broadcast a message on faction creation / deletion
 broadcast_message_created: true
 broadcast_message_disband: true
 
-# Activate or desactivate the entering and leaving messages.
+# Activate or deactivate entering and leaving messages.
 entering_leaving: true
 
 # Activate or deactivate the bank system (/f bank)
@@ -105,6 +106,7 @@ economy_system: false
 
 # Activate or deactivate the war system (/f war)
 war_system: true
+
 # War duration in seconds
 war_timer: 300
 
@@ -133,7 +135,7 @@ faction_max_members: 20
 # Max allies in a faction.
 faction_max_allies: 2
 
-# Default power in a faction
+# Default power of factions
 default_power: 0
 
 # Powers required for each claim.
@@ -159,5 +161,6 @@ zones_colors:
   "Wilderness": "§2"
   "Own-Faction": "§a"
   "Allies": "§e"
-  "Ennemies": "§c"
+  "Enemies": "§c"
+
 ```
