@@ -7,33 +7,33 @@
 
 | Command Name   | Command Description                                      | Available for                         |
 |----------------|----------------------------------------------------------|---------------------------------------|
-| `/f help`      | Allows you to teleport to a player.                      | <font color="#03fc73"> everyone       |
+| `/f help`      | Faction help menu.                                       | <font color="#03fc73"> everyone       |
 | `/f create`    | Create a faction.                                        | <font color="#03fc73"> everyone       |
 | `/f info`      | Get information of a faction.                            | <font color="#03fc73"> everyone       |
 | `/f who`       | Get information of a player's faction.                   | <font color="#03fc73"> everyone       |
-| `/f accept`    | Accept faction invitation.                               | <font color="#03fc73"> everyone       |
-| `/f deny`      | Deny faction invitation.                                 | <font color="#03fc73"> everyone       |
-| `/f chat`      | Change your chatting configuration.                      | <font color="#03fc73"> everyone       |
-| `/f home`      | Quick way to get to your faction's home.                 | <font color="#03fc73"> everyone       |
+| `/f accept`    | Accept a faction invitation.                             | <font color="#03fc73"> everyone       |
+| `/f deny`      | Deny a faction invitation.                               | <font color="#03fc73"> everyone       |
+| `/f chat`      | Change your chat configuration.                          | <font color="#03fc73"> everyone       |
+| `/f home`      | Teleport to your faction's home                          | <font color="#03fc73"> everyone       |
 | `/f top`       | Shows the top factions.                                  | <font color="#03fc73"> everyone       |
 | `/f bank`      | Manage your faction's bank.                              | <font color="#03fc73"> everyone       |
 | `/f leave`     | Leave your current faction.                              | <font color="#03fc73"> everyone       |
 | `/f map`       | Show the nearby claims.                                  | <font color="#03fc73"> everyone       |
 | `/f border`    | Show the chunk border limit.                             | <font color="#03fc73"> everyone       |
-| `/f here  `    | Show claims informations.                                | <font color="#03fc73"> everyone       |
+| `/f here  `    | Show claims information.                                 | <font color="#03fc73"> everyone       |
 | `/f claim`     | Claim a chunk.                                           | <font color="#fca503"> officers       |
-| `/f unclaim`   | Unclaim your claim.                                      | <font color="#fca503"> officers       |
-| `/f invite`    | Invite a player into your faction.                       | <font color="#fca503"> officers       |
-| `/f kick`      | Kicks a player from your faction.                        | <font color="#fca503"> officers       |
-| `/f sethome`   | Sets your faction home.                                  | <font color="#fca503"> officers       |
-| `/f delhome`   | Removes your faction home.                               | <font color="#fca503"> officers       |
+| `/f unclaim`   | Unclaim a chunk.                                         | <font color="#fca503"> officers       |
+| `/f invite`    | Invite a player to your faction.                         | <font color="#fca503"> officers       |
+| `/f kick`      | Kick a player from your faction.                         | <font color="#fca503"> officers       |
+| `/f sethome`   | Set your faction's home.                                 | <font color="#fca503"> officers       |
+| `/f delhome`   | Delete your faction's home.                              | <font color="#fca503"> officers       |
 | `/f war`       | Manage faction wars.                                     | <font color="#fca503"> officers       |
 | `/f delete`    | Delete your faction.                                     | <font color="#1589F0"> leader         |
-| `/f allies`    | Manage your faction's alliance.                          | <font color="#1589F0"> leader         |
-| `/f promote`   |  Promote a member.                                       | <font color="#1589F0"> leader         |
+| `/f allies`    | Manage your faction alliances.                           | <font color="#1589F0"> leader         |
+| `/f promote`   | Promote a member.                                        | <font color="#1589F0"> leader         |
 | `/f demote`    | Demote an officer.                                       | <font color="#1589F0"> leader         |
-| `/f transfer`  | Make a new player the leader.                            | <font color="#1589F0"> leader         |
-| `/f admin`     | Administrative commands.                                 | <font color="red"> staff              | 
+| `/f transfer`  | Transfer your leader status.                             | <font color="#1589F0"> leader         |
+| `/f admin`     | Administrative commands.                                 | <font color="red"> staff              |
 
 ## Future additions
 
@@ -44,7 +44,7 @@
 
 ## Features
 
-| Feature                   | SimpleFaction   | FactionsPro| PiggyFactions| 
+| Feature                   | SimpleFaction   | FactionsPro| PiggyFactions|
 |---------------------------|-----------------|------------|--------------|
 | `SQLite3 Support`         | ✔               | ✔         | ✔            |
 | `MySQL Support`           | ✔               | ❌         | ✔            |
@@ -59,7 +59,7 @@
 
 ## Additional plugins
 | Name              | Usage                         | Download                                                          |
-|-------------------|-------------------------------|-------------------------------------------------------------------| 
+|-------------------|-------------------------------|-------------------------------------------------------------------|
 | PureChat          | Chat integration              | [Download](https://poggit.pmmp.io/r/119566/PureChat_dev-2.phar)   |
 | ScoreHUD          | Scoreboard integration        | [Download](https://poggit.pmmp.io/p/ScoreHud)                     |
 | EssentialsFaction | Chat & Scoreboard integration | [Download](https://github.com/Zoumi-Dev/FacEssential)             |
@@ -74,6 +74,7 @@
 
 ## Config
 ```
+---
 #     _____ _                 _      ______         _   _
 #    / ____(_)               | |    |  ____|       | | (_)
 #   | (___  _ _ __ ___  _ __ | | ___| |__ __ _  ___| |_ _  ___  _ __
@@ -84,7 +85,7 @@
 #                      |_|
 #
 
-# SQLITE | MYSQL
+# Database provider (SQLITE | MYSQL)
 PROVIDER: "SQLITE"
 
 # Edit this only if 'PROVIDER' is on MYSQL
@@ -93,11 +94,11 @@ mysql_user: "USER"
 mysql_password: "YOUR PASSWORD"
 mysql_db: "YOUR DB"
 
-# Broadcast created system.
+# Broadcast a message on faction creation / deletion
 broadcast_message_created: true
 broadcast_message_disband: true
 
-# Activate or desactivate the entering and leaving messages.
+# Activate or deactivate entering and leaving messages.
 entering_leaving: true
 
 # Activate or deactivate the bank system (/f bank)
@@ -105,6 +106,7 @@ economy_system: false
 
 # Activate or deactivate the war system (/f war)
 war_system: true
+
 # War duration in seconds
 war_timer: 300
 
@@ -133,7 +135,7 @@ faction_max_members: 20
 # Max allies in a faction.
 faction_max_allies: 2
 
-# Default power in a faction
+# Default power of factions
 default_power: 0
 
 # Powers required for each claim.
@@ -159,5 +161,6 @@ zones_colors:
   "Wilderness": "§2"
   "Own-Faction": "§a"
   "Allies": "§e"
-  "Ennemies": "§c"
+  "Enemies": "§c"
+
 ```
