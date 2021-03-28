@@ -811,7 +811,12 @@ class FactionsAPI {
      */
     public static function getLanguages(Player $player): string {
         $name = $player->getName();
-        return self::$lang[$name];
+        
+        if (self::hasLanguages($player)) {
+            return self::$lang[$name];
+        } else {
+            return "EN";
+        }
     }
 
     /**
@@ -862,7 +867,9 @@ class FactionsAPI {
      * @param string $faction
      */
     public static function denyWarsInvitation(string $faction): void {
-        unset(self::$Warsinvitation[$faction]);
+        if (isset(self::$Warsinvitation[$faction])) {
+            unset(self::$Warsinvitation[$faction]);
+        }
     }
 
     /**
