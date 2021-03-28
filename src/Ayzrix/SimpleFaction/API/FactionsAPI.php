@@ -118,6 +118,7 @@ class FactionsAPI {
      * @param string $faction
      */
     public static function createFaction(Player $player, string $faction): void {
+        $name = $player->getName();
         self::$faction[$faction] = array("players" => array($player->getName()), "power" => (int)Utils::getIntoConfig("default_power"), "money" => 0, "allies" => array());
         self::$player[strtolower($player->getName())] = array("faction" => $faction, "role" => "Leader");
         self::$claim[$faction] = array();
@@ -125,7 +126,7 @@ class FactionsAPI {
         if (Utils::getIntoConfig("broadcast_message_created") === true) {
             foreach (Server::getInstance()->getOnlinePlayers() as $player) {
                 if ($player instanceof Player) {
-                    $player->sendMessage(Utils::getMessage($player, "FACTION_CREATE_BROADCAST", array($player->getName(), $faction)));
+                    $player->sendMessage(Utils::getMessage($player, "FACTION_CREATE_BROADCAST", array($name, $faction)));
                 }
             }
         }
