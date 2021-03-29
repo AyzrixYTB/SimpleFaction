@@ -62,10 +62,6 @@ faction_max_allies: 2
 # Default power of factions
 default_power: 0
 
-# Powers required for each claim.
-# One - = 1 claim. If you setup 2 -, the max claim number would be 2.
-# Usage: - POWERS NEEDED
-
 # Select the claim mode you want (CUSTOM | MULTIPLICATIVE | ADDITIVE)
 claim-mode: "CUSTOM"
 
