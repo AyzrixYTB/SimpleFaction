@@ -320,7 +320,7 @@ class FactionsAPI {
             for ($x = -1; $x <= 1; $x++) {
                 for ($z = -1; $z <= 1; $z++) {
                     if(abs($x) === abs($z)) continue;
-                    if ($playerChunkX + $x === $factionClaim[0] && $playerChunkZ + $z === $factionClaim[1]) return true;
+                    if (($playerChunkX + $x === (int)$factionClaim[0]) && ($playerChunkZ + $z === (int)$factionClaim[1])) return true;
                 }
             }
         }
