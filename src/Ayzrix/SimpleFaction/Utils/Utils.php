@@ -73,7 +73,7 @@ class Utils {
         return $config->get($value);
     }
 
-    public static function saveAll() {
+    public static function saveAll(): void {
         if (self::getProvider() === "mysql") {
             $db = new \MySQLi(Utils::getIntoConfig("mysql_address"), Utils::getIntoConfig("mysql_user"), Utils::getIntoConfig("mysql_password"), Utils::getIntoConfig("mysql_db"));
         } else $db = new \SQLite3(Main::getInstance()->getDataFolder() . "SimpleFaction.db");
@@ -113,6 +113,11 @@ class Utils {
         }
     }
 
+    /**
+     * @param Player $player
+     * @param string $zone
+     * @return string
+     */
     public static function getZoneColor(Player $player, string $zone): string {
         if ($zone === "Wilderness") {
             return self::getIntoConfig("zones_colors")["Wilderness"];
@@ -129,6 +134,34 @@ class Utils {
             } else {
                 return self::getIntoConfig("zones_colors")["Enemies"];
             }
+        }
+    }
+
+    /**
+     * @param bool $claim
+     * @param string $faction1
+     * @param string $faction2
+     * @return array
+     */
+    public static function getBorderColor(bool $claim, string $faction1 = "", string $faction2 = ""): array {
+        if ($claim) {
+            if ($faction1 === $faction2) {
+                $color = self::getIntoConfig("border_colors")["Own-Faction"];
+                $color = explode(", ", $color);
+                return $color;
+            } else if (FactionsAPI::areAllies($faction1, $faction2)) {
+                $color = self::getIntoConfig("border_colors")["Allies"];
+                $color = explode(", ", $color);
+                return $color;
+            } else {
+                $color = self::getIntoConfig("border_colors")["Enemies"];
+                $color = explode(", ", $color);
+                return $color;
+            }
+        } else {
+            $color = self::getIntoConfig("border_colors")["Wilderness"];
+            $color = explode(", ", $color);
+            return $color;
         }
     }
 }

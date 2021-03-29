@@ -14,6 +14,7 @@
 namespace Ayzrix\SimpleFaction\Tasks;
 
 use Ayzrix\SimpleFaction\API\FactionsAPI;
+use Ayzrix\SimpleFaction\Utils\Utils;
 use pocketmine\level\particle\DustParticle;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
@@ -31,7 +32,10 @@ class BorderTask extends Task {
         foreach (FactionsAPI::$border as $name => $bool) {
             $player = Server::getInstance()->getPlayer($name);
             if ($player instanceof Player) {
-                $chunk = $player->getLevel()->getChunkAtPosition($player);
+                $level = $player->getLevel();
+                $chunk = $level->getChunkAtPosition($player);
+                $chunkX = $chunk->getX();
+                $chunkZ = $chunk->getZ();
                 $minX = (float)$chunk->getX() * 16;
                 $maxX = (float)$minX + 16;
                 $minZ = (float)$chunk->getZ() * 16;
@@ -40,7 +44,19 @@ class BorderTask extends Task {
                 for ($x = $minX; $x <= $maxX; $x += 0.5) {
                     for ($z = $minZ; $z <= $maxZ; $z += 0.5) {
                         if ($x === $minX || $x === $maxX || $z === $minZ || $z === $maxZ) {
-                            $player->getLevel()->addParticle(new DustParticle(new Vector3($x, $player->getY() + 0.8, $z), 212, 0, 255), [$player]);
+                            $claimedBy = FactionsAPI::getFactionClaim($level, $chunkX, $chunkZ);
+                            if ($claimedBy !== "") {
+                                if (FactionsAPI::isInFaction($player->getName())) {
+                                    $color = Utils::getBorderColor(true, $claimedBy, FactionsAPI::getFaction($player->getName()));
+                                    $player->getLevel()->addParticle(new DustParticle(new Vector3($x, $player->getY() + 0.8, $z), (int)$color[0], (int)$color[1], (int)$color[2]), [$player]);
+                                } else {
+                                    $color = Utils::getBorderColor(true, $claimedBy);
+                                    $player->getLevel()->addParticle(new DustParticle(new Vector3($x, $player->getY() + 0.8, $z), (int)$color[0], (int)$color[1], (int)$color[2]), [$player]);
+                                }
+                            } else {
+                                $color = Utils::getBorderColor(false);
+                                $player->getLevel()->addParticle(new DustParticle(new Vector3($x, $player->getY() + 0.8, $z), (int)$color[0], (int)$color[1], (int)$color[2]), [$player]);
+                            }
                         }
                     }
                 }

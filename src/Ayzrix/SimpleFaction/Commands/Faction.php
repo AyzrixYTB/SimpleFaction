@@ -314,10 +314,18 @@ class Faction extends PluginCommand {
                                     if (!FactionsAPI::isInClaim($player->getLevel(), $chunkX, $chunkZ)) {
                                         $faction = FactionsAPI::getFaction($player->getName());
                                         $claimCount = FactionsAPI::getClaimCount($faction);
+                                        if ($claimCount > 0) {
+                                            if (Utils::getIntoConfig("adjacent_claims")) {
+                                                if (!FactionsAPI::isChunkNextToClaim($player, $faction)) {
+                                                    $player->sendMessage(Utils::getMessage($player, "NOT_ADJACENT"));
+                                                    return false;
+                                                }
+                                            }
+                                        }
                                         $claimMode = Utils::getIntoConfig("claim-mode");
-                                        if($claimMode === "CUSTOM") {
+                                        if ($claimMode === "CUSTOM") {
                                             if ($claimCount - 1 < count(Utils::getIntoConfig("custom_claims"))) {
-                                                $powerNeeded = (int) Utils::getIntoConfig("custom_claims")[$claimCount];
+                                                $powerNeeded = (int)Utils::getIntoConfig("custom_claims")[$claimCount];
                                                 if (FactionsAPI::getPower($faction) >= $powerNeeded) {
                                                     FactionsAPI::claimChunk($player, $faction);
                                                     $player->sendMessage(Utils::getMessage($player, "CLAIM_SUCCESS"));
@@ -325,8 +333,8 @@ class Faction extends PluginCommand {
                                             } else $player->sendMessage(Utils::getMessage($player, "MAX_CLAIM"));
                                         } else {
                                             if ($claimCount < (int)Utils::getIntoConfig("max_claims")) {
-                                                if($claimMode === "ADDITIVE") $powerNeeded = (int)Utils::getIntoConfig("starting_claim_price") + (Utils::getIntoConfig("factor") * $claimCount);
-                                                else $powerNeeded = (int) Utils::getIntoConfig("starting_claim_price") * (Utils::getIntoConfig("factor") ** $claimCount);
+                                                if ($claimMode === "ADDITIVE") $powerNeeded = (int)Utils::getIntoConfig("starting_claim_price") + (Utils::getIntoConfig("factor") * $claimCount);
+                                                else $powerNeeded = (int)Utils::getIntoConfig("starting_claim_price") * (Utils::getIntoConfig("factor") ** $claimCount);
                                                 if (FactionsAPI::getPower($faction) >= (int)$powerNeeded) {
                                                     FactionsAPI::claimChunk($player, $faction);
                                                     $player->sendMessage(Utils::getMessage($player, "CLAIM_SUCCESS"));

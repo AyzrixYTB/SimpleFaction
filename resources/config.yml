@@ -93,6 +93,9 @@ starting_claim_price: 100
 factor: 2 # multiplicative or additive factor (depending on the claim mode you chose)
 max_claims: 5
 
+# Claims of the same faction have to be next to each other (first claim can be anywhere) (true|false)
+adjacent_claims: false
+
 # Prefix usable in languages. {prefix}
 PREFIX: "§6[§fSimpleFaction§6]§f"
 PLAYER_ONLY: "{prefix} §cThis command can't be used in the console !"
@@ -102,7 +105,15 @@ MAP_HEADER: "§6--------------------(§f{X}§6, §f{Z}§6)--------------------"
 banned_names: ["op", "staff", "admin", "fuck", "shit"]
 
 zones_colors:
-  "Wilderness": "§2"
+  "Wilderness": "§d"
   "Own-Faction": "§a"
   "Allies": "§e"
   "Enemies": "§c"
+
+# RGB Colors
+border_colors:
+  "Wilderness": "255, 0, 180"
+  "Own-Faction": "0, 255, 0"
+  "Allies": "255, 255, 0"
+  "Enemies": "255, 0, 0"
+
