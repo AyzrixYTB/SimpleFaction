@@ -66,11 +66,14 @@
 | Scoreboard        | Scoreboard integration        | [Download](https://poggit.pmmp.io/r/119565/Scoreboard_dev-5.phar) |
 | EconomyAPI        | Bank system                   | [Download](https://poggit.pmmp.io/p/EconomyAPI)                   |
 
+## Contributors
+- @Se7en-dev
+- @max-xoo
+
 ## Translators
 - **English** - @Ayzrix & Se7en-dev.
 - **French** - @Ayzrix.
 - **Spanish** - @Santi.
-- **German** - Soon.
 
 ## Config
 ```
@@ -168,8 +171,6 @@ custom_claims:
 starting_claim_price: 100
 factor: 2 # multiplicative or additive factor (depending on the claim mode you chose)
 max_claims: 5
-
-
 
 # Prefix usable in languages. {prefix}
 PREFIX: "§6[§fSimpleFaction§6]§f"
