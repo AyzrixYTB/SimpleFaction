@@ -823,7 +823,7 @@ class Faction extends PluginCommand {
                         return true;
                 }
             } else $player->sendMessage(Utils::getMessage($player, "COMMAND_USAGE"));
-        } else $player->sendMessage(Utils::getIntoConfig("PLAYER_ONLY"));
+        } else $player->sendMessage(str_replace("{prefix}", Utils::getPrefix(), Utils::getIntoConfig("PLAYER_ONLY")));
         return true;
     }
 }
