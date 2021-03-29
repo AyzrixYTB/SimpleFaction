@@ -229,7 +229,7 @@ class Faction extends PluginCommand {
                                         return true;
                                 }
                             } else $player->sendMessage(Utils::getMessage($player, "WARS_USAGE"));
-                        }
+                        } else $player->sendMessage(Utils::getMessage($player, "WARS_DISABLED"));
                         return true;
                     case "who":
                         if (isset($args[1])) {
@@ -314,13 +314,25 @@ class Faction extends PluginCommand {
                                     if (!FactionsAPI::isInClaim($player->getLevel(), $chunkX, $chunkZ)) {
                                         $faction = FactionsAPI::getFaction($player->getName());
                                         $claimCount = FactionsAPI::getClaimCount($faction);
-                                        if ($claimCount - 1 < count(Utils::getIntoConfig("claims"))) {
-                                            $powerNeeded = (int)Utils::getIntoConfig("claims")[$claimCount];
-                                            if (FactionsAPI::getPower($faction) >= $powerNeeded) {
-                                                FactionsAPI::claimChunk($player, $faction);
-                                                $player->sendMessage(Utils::getMessage($player, "CLAIM_SUCCESS"));
-                                            } else $player->sendMessage(Utils::getMessage($player, "NOT_ENOUGHT_POWER", array($powerNeeded)));
-                                        } else $player->sendMessage(Utils::getMessage($player, "MAX_CLAIM"));
+                                        $claimMode = Utils::getIntoConfig("claim-mode");
+                                        if($claimMode === "CUSTOM") {
+                                            if ($claimCount - 1 < count(Utils::getIntoConfig("custom_claims"))) {
+                                                $powerNeeded = (int) Utils::getIntoConfig("custom_claims")[$claimCount];
+                                                if (FactionsAPI::getPower($faction) >= $powerNeeded) {
+                                                    FactionsAPI::claimChunk($player, $faction);
+                                                    $player->sendMessage(Utils::getMessage($player, "CLAIM_SUCCESS"));
+                                                } else $player->sendMessage(Utils::getMessage($player, "NOT_ENOUGHT_POWER", array($powerNeeded)));
+                                            } else $player->sendMessage(Utils::getMessage($player, "MAX_CLAIM"));
+                                        } else {
+                                            if ($claimCount < Utils::getIntoConfig("max_claims")) {
+                                                if($claimMode === "ADDITIVE") $powerNeeded = (int) Utils::getIntoConfig("starting_claim_price") + (Utils::getIntoConfig("factor") * $claimCount);
+                                                else $powerNeeded = (int) Utils::getIntoConfig("starting_claim_price") * (Utils::getIntoConfig("factor") ** $claimCount);
+                                                if (FactionsAPI::getPower($faction) >= $powerNeeded) {
+                                                    FactionsAPI::claimChunk($player, $faction);
+                                                    $player->sendMessage(Utils::getMessage($player, "CLAIM_SUCCESS"));
+                                                } else $player->sendMessage(Utils::getMessage($player, "NOT_ENOUGHT_POWER", array($powerNeeded)));
+                                            } else $player->sendMessage(Utils::getMessage($player, "MAX_CLAIM"));
+                                        }
                                     } else $player->sendMessage(Utils::getMessage($player, "ALREADY_CLAIMED", array(FactionsAPI::getFactionClaim($player->getLevel(), $chunkX, $chunkZ))));
                                 } else $player->sendMessage(Utils::getMessage($player, "NOT_FACTION_WORLD"));
                             } else $player->sendMessage(Utils::getMessage($player, "ONLY_LEADER_OR_OFFICER"));
@@ -639,7 +651,7 @@ class Faction extends PluginCommand {
                                     }
                                 } else $player->sendMessage(Utils::getMessage($player, "MUST_BE_IN_FACTION"));
                             } else $player->sendMessage(Utils::getMessage($player, "BANK_USAGE"));
-                        }
+                        } else $player->sendMessage(Utils::getMessage($player, "BANK_DISABLED"));
                         return true;
                     case "lang":
                         $langs = "";
@@ -811,7 +823,7 @@ class Faction extends PluginCommand {
                         return true;
                 }
             } else $player->sendMessage(Utils::getMessage($player, "COMMAND_USAGE"));
-        } else $player->sendMessage(Utils::getIntoConfig("PLAYER_ONLY"));
+        } else $player->sendMessage(str_replace("{prefix}", Utils::getPrefix(), Utils::getIntoConfig("PLAYER_ONLY")));
         return true;
     }
 }

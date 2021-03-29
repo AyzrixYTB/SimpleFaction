@@ -62,16 +62,36 @@ faction_max_allies: 2
 # Default power of factions
 default_power: 0
 
-# Powers required for each claim.
-# One - = 1 claim. If you setup 2 -, the max claim number would be 2.
-# Usage: - POWERS NEEDED
-claims:
+# Select the claim mode you want (CUSTOM | MULTIPLICATIVE | ADDITIVE)
+claim-mode: "CUSTOM"
+
+# CUSTOM : Define the power needed for each individual claim.
+# Maximum claim number is defined by the amount of lines you add in the list below.
+# (1 line = 1 claim)
+
+# Edit this part ONLY if you select CUSTOM as the claim mode.
+custom_claims:
   - 100
   - 500
   - 800
   - 1000
   - 2500
   - 5000
+
+# MULTIPLICATIVE : Define the power needed for each claim with a multiplicative factor.
+# Claim cost = starting claim price*(multiplicative factor**claim count)
+# EXAMPLE with starting claim price = 100, multiplicative factor = 2 :
+# 1st claim costs 100*(2**0) = 100, 2nd claim costs 100*(2**1) = 200, 3rd claim 100*(2**2) = 400 etc...
+
+# ADDITIVE : Define the power needed for each claim with an additive factor.
+# Claim cost = starting claim price+(additive factor*claim count)
+# EXAMPLE with starting claim price = 100, additive factor = 500 :
+# 1st claim costs 100+(500*0) = 100, 2nd claim costs 100+(500*1) = 600, 3rd claim 100+(500*2) = 1100 etc...
+
+# Edit this part ONLY if you select MULTIPLICATIVE or ADDITIVE as the claim mode.
+starting_claim_price: 100
+factor: 2 # multiplicative or additive factor (depending on the claim mode you chose)
+max_claims: 5
 
 # Prefix usable in languages. {prefix}
 PREFIX: "§6[§fSimpleFaction§6]§f"
