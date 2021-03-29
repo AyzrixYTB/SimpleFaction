@@ -229,7 +229,7 @@ class Faction extends PluginCommand {
                                         return true;
                                 }
                             } else $player->sendMessage(Utils::getMessage($player, "WARS_USAGE"));
-                        }
+                        } else $player->sendMessage(Utils::getMessage($player, "WARS_DISABLED"));
                         return true;
                     case "who":
                         if (isset($args[1])) {
@@ -651,7 +651,7 @@ class Faction extends PluginCommand {
                                     }
                                 } else $player->sendMessage(Utils::getMessage($player, "MUST_BE_IN_FACTION"));
                             } else $player->sendMessage(Utils::getMessage($player, "BANK_USAGE"));
-                        }
+                        } else $player->sendMessage(Utils::getMessage($player, "BANK_DISABLED"));
                         return true;
                     case "lang":
                         $langs = "";
