@@ -324,10 +324,10 @@ class Faction extends PluginCommand {
                                                 } else $player->sendMessage(Utils::getMessage($player, "NOT_ENOUGHT_POWER", array($powerNeeded)));
                                             } else $player->sendMessage(Utils::getMessage($player, "MAX_CLAIM"));
                                         } else {
-                                            if ($claimCount < Utils::getIntoConfig("max_claims")) {
-                                                if($claimMode === "ADDITIVE") $powerNeeded = (int) Utils::getIntoConfig("starting_claim_price") + (Utils::getIntoConfig("factor") * $claimCount);
+                                            if ($claimCount < (int)Utils::getIntoConfig("max_claims")) {
+                                                if($claimMode === "ADDITIVE") $powerNeeded = (int)Utils::getIntoConfig("starting_claim_price") + (Utils::getIntoConfig("factor") * $claimCount);
                                                 else $powerNeeded = (int) Utils::getIntoConfig("starting_claim_price") * (Utils::getIntoConfig("factor") ** $claimCount);
-                                                if (FactionsAPI::getPower($faction) >= $powerNeeded) {
+                                                if (FactionsAPI::getPower($faction) >= (int)$powerNeeded) {
                                                     FactionsAPI::claimChunk($player, $faction);
                                                     $player->sendMessage(Utils::getMessage($player, "CLAIM_SUCCESS"));
                                                 } else $player->sendMessage(Utils::getMessage($player, "NOT_ENOUGHT_POWER", array($powerNeeded)));
