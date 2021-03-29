@@ -62,7 +62,7 @@
 |-------------------|-------------------------------|-------------------------------------------------------------------|
 | PureChat          | Chat integration              | [Download](https://poggit.pmmp.io/r/119566/PureChat_dev-2.phar)   |
 | ScoreHUD          | Scoreboard integration        | [Download](https://poggit.pmmp.io/p/ScoreHud)                     |
-| EssentialsFaction | Chat & Scoreboard integration | [Download](https://github.com/Zoumi-Dev/FacEssential)             |
+| FacEssential      | Chat & Scoreboard integration | [Download](https://github.com/Zoumi-Dev/FacEssential)             |
 | Scoreboard        | Scoreboard integration        | [Download](https://poggit.pmmp.io/r/119565/Scoreboard_dev-5.phar) |
 | EconomyAPI        | Bank system                   | [Download](https://poggit.pmmp.io/p/EconomyAPI)                   |
 
@@ -76,7 +76,7 @@
 - **Spanish** - @Santi.
 
 ## Config
-```
+```yaml
 ---
 #     _____ _                 _      ______         _   _
 #    / ____(_)               | |    |  ____|       | | (_)
