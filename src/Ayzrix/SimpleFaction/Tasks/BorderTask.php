@@ -31,7 +31,10 @@ class BorderTask extends Task {
         foreach (FactionsAPI::$border as $name => $bool) {
             $player = Server::getInstance()->getPlayer($name);
             if ($player instanceof Player) {
-                $chunk = $player->getLevel()->getChunkAtPosition($player);
+                $level = $player->getLevel();
+                $chunk = $level->getChunkAtPosition($player);
+                $chunkX = $chunk->getX();
+                $chunkZ = $chunk->getZ();
                 $minX = (float)$chunk->getX() * 16;
                 $maxX = (float)$minX + 16;
                 $minZ = (float)$chunk->getZ() * 16;
@@ -40,7 +43,12 @@ class BorderTask extends Task {
                 for ($x = $minX; $x <= $maxX; $x += 0.5) {
                     for ($z = $minZ; $z <= $maxZ; $z += 0.5) {
                         if ($x === $minX || $x === $maxX || $z === $minZ || $z === $maxZ) {
-                            $player->getLevel()->addParticle(new DustParticle(new Vector3($x, $player->getY() + 0.8, $z), 212, 0, 255), [$player]);
+                            $claimedBy = FactionsAPI::getFactionClaim($level, $chunkX, $chunkZ);
+                            if ($claimedBy !== "") {
+                                if ($claimedBy === FactionsAPI::getFaction($player->getName())) {
+                                    $player->getLevel()->addParticle(new DustParticle(new Vector3($x, $player->getY() + 0.8, $z), 0, 255, 0), [$player]);
+                                } else $player->getLevel()->addParticle(new DustParticle(new Vector3($x, $player->getY() + 0.8, $z), 255, 0, 0), [$player]);
+                            } else $player->getLevel()->addParticle(new DustParticle(new Vector3($x, $player->getY() + 0.8, $z), 212, 0, 255), [$player]);
                         }
                     }
                 }
