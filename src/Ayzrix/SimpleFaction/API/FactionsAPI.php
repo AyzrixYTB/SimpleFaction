@@ -211,7 +211,7 @@ class FactionsAPI {
      * @return array
      */
     public static function getAllPlayers(string $faction): array {
-        return self::$faction[$faction]["players"];
+        return self::$faction[$faction]["players"]?? array();
     }
 
     /**
@@ -376,7 +376,7 @@ class FactionsAPI {
      * @return int
      */
     public static function getClaimCount(string $faction): int {
-        return count(self::$claim[$faction]);
+        return count(self::$claim[$faction])?? 0;
     }
 
     /**
@@ -613,7 +613,7 @@ class FactionsAPI {
      * @return int
      */
     public static function getAlliesCount(string $faction): int {
-        return count(self::$faction[$faction]["allies"]);
+        return count(self::$faction[$faction]["allies"])?? 0;
     }
 
     /**
