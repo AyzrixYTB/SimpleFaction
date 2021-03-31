@@ -816,9 +816,19 @@ class Faction extends PluginCommand {
                                             } else $player->sendMessage(Utils::getMessage($player, "ADMIN_NOT_IN_CLAIM"));
                                         } else $player->sendMessage(Utils::getMessage($player, "NOT_FACTION_WORLD"));
                                         break;
+                                    case "home":
+                                        if(isset($args[2])) {
+                                            if(FactionsAPI::existsFaction($args[2])) {
+                                                if (FactionsAPI::existsHome($args[2])) {
+                                                    $player->teleport(FactionsAPI::getHome($args[2]));
+                                                    $player->sendMessage(Utils::getMessage($player, "ADMIN_HOME_TELEPORTED", [$args[2]]));
+                                                } else $player->sendMessage(Utils::getMessage($player, "ADMIN_NOT_HAVE_HOME"));
+                                            } else $player->sendMessage(Utils::getMessage($player, "FACTION_NOT_EXIST"));
+                                        } else $player->sendMessage(Utils::getMessage($player, "ADMIN_HOME_USAGE"));
+                                        break;
                                 }
                             } else $player->sendMessage(Utils::getMessage($player, "ADMIN_USAGE"));
-                        } else $player->sendMessage("§cYou don't have the permission to use this command");
+                        } else $player->sendMessage(Utils::getMessage($player, "ADMIN_NO_PERMISSION"));
                         break;
                     case "about":
                         $player->sendMessage("§c§lPlugin created by Ayzrix.");
