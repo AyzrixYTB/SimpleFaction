@@ -316,7 +316,7 @@ class FactionsAPI {
         $playerChunkZ = $playerChunk->getZ();
         foreach(self::$claim[$faction] as $factionClaim) {
             $factionClaim = explode(":", $factionClaim);
-            if ($player->getLevel()->getFolderName() !== $factionClaim[2]) break;
+            if ($player->getLevel()->getFolderName() !== $factionClaim[2]) continue;
             for ($x = -1; $x <= 1; $x++) {
                 for ($z = -1; $z <= 1; $z++) {
                     if(abs($x) === abs($z)) continue;
