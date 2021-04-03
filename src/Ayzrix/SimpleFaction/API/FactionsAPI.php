@@ -384,9 +384,9 @@ class FactionsAPI {
      */
     public static function leaveFaction(Player $player): void {
         $name = $player->getName();
-        $array = self::$faction[self::getFaction($player)]["players"];
+        $array = self::$faction[self::getFaction($player->getName())]["players"];
         unset($array[$name]);
-        self::$faction[self::getFaction($player)]["players"] = $array;
+        self::$faction[self::getFaction($player->getName())]["players"] = $array;
         unset(self::$player[strtolower($name)]);
     }
 
