@@ -368,7 +368,8 @@ class FactionsAPI {
         $chunkZ = $chunk->getZ();
         $world = $player->getLevel()->getFolderName();
         $claim = self::$claim[$faction];
-        unset($claim["{$chunkX}:{$chunkZ}:{$world}"]);
+        unset($claim[array_search("{$chunkX}:{$chunkZ}:{$world}", $claim)]);
+     	self::$claim[$faction] = $claim;
     }
 
     /**
@@ -621,7 +622,7 @@ class FactionsAPI {
      * @return array
      */
     public static function getAllies(string $faction): array {
-        return self::$faction[$faction]["allies"];
+        return self::$faction[$faction]["allies"]?? [];
     }
 
     public static function factionMessage(Player $player, string $message) {
@@ -675,7 +676,7 @@ class FactionsAPI {
             unset(self::$home[$faction]);
         }
 
-        $claims = self::$claim[$faction];
+        $claims = self::$claim[$faction]?? [];
         $claims[$name] = $claims;
         unset(self::$claim[$faction]);
     }
@@ -685,7 +686,7 @@ class FactionsAPI {
      * @return int
      */
     public static function getMoney(string $faction): int {
-        return self::$faction[$faction]["money"];
+        return self::$faction[$faction]["money"]?? 0;
     }
 
     /**
