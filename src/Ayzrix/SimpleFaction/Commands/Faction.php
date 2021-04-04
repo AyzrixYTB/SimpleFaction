@@ -722,8 +722,10 @@ class Faction extends PluginCommand {
                                         if (isset($args[2]) and isset($args[3])) {
                                             if (FactionsAPI::existsFaction($args[2])) {
                                                 if (is_numeric($args[3])) {
-                                                    FactionsAPI::addPower($args[2], (int)$args[3]);
-                                                    $player->sendMessage(Utils::getMessage($player, "ADMIN_ADDPOWER_SUCCESS", array((int)$args[3])));
+                                                    if ((int)$args[3] > 0) {
+                                                        FactionsAPI::addPower($args[2], (int)$args[3]);
+                                                        $player->sendMessage(Utils::getMessage($player, "ADMIN_ADDPOWER_SUCCESS", array((int)$args[3])));
+                                                    } else $player->sendMessage(Utils::getMessage($player, "ENTER_VALID_NUMBER"));
                                                 } else $player->sendMessage(Utils::getMessage($player, "ENTER_VALID_NUMBER"));
                                             } else $player->sendMessage(Utils::getMessage($player, "FACTION_NOT_EXIST"));
                                         } else $player->sendMessage(Utils::getMessage($player, "ADMIN_ADDPOWER_USAGE"));
@@ -732,8 +734,10 @@ class Faction extends PluginCommand {
                                         if (isset($args[2]) and isset($args[3])) {
                                             if (FactionsAPI::existsFaction($args[2])) {
                                                 if (is_numeric($args[3])) {
-                                                    FactionsAPI::removePower($args[2], (int)$args[3]);
-                                                    $player->sendMessage(Utils::getMessage($player, "ADMIN_REMOVEPOWER_SUCCESS", array((int)$args[3])));
+                                                    if ((int)$args[3] > 0) {
+                                                        FactionsAPI::removePower($args[2], (int)$args[3]);
+                                                        $player->sendMessage(Utils::getMessage($player, "ADMIN_REMOVEPOWER_SUCCESS", array((int)$args[3])));
+                                                    } else $player->sendMessage(Utils::getMessage($player, "ENTER_VALID_NUMBER"));
                                                 } else $player->sendMessage(Utils::getMessage($player, "ENTER_VALID_NUMBER"));
                                             } else $player->sendMessage(Utils::getMessage($player, "FACTION_NOT_EXIST"));
                                         } else $player->sendMessage(Utils::getMessage($player, "ADMIN_REMOVEPOWER_USAGE"));
@@ -742,8 +746,10 @@ class Faction extends PluginCommand {
                                         if (isset($args[2]) and isset($args[3])) {
                                             if (FactionsAPI::existsFaction($args[2])) {
                                                 if (is_numeric($args[3])) {
-                                                    FactionsAPI::setPower($args[2], (int)$args[3]);
-                                                    $player->sendMessage(Utils::getMessage($player, "ADMIN_SETPOWER_SUCCESS", array((int)$args[3])));
+                                                    if ((int)$args[3] > 0) {
+                                                        FactionsAPI::setPower($args[2], (int)$args[3]);
+                                                        $player->sendMessage(Utils::getMessage($player, "ADMIN_SETPOWER_SUCCESS", array((int)$args[3])));
+                                                    } else $player->sendMessage(Utils::getMessage($player, "ENTER_VALID_NUMBER"));
                                                 } else $player->sendMessage(Utils::getMessage($player, "ENTER_VALID_NUMBER"));
                                             } else $player->sendMessage(Utils::getMessage($player, "FACTION_NOT_EXIST"));
                                         } else $player->sendMessage(Utils::getMessage($player, "ADMIN_SETPOWER_USAGE"));
@@ -752,8 +758,10 @@ class Faction extends PluginCommand {
                                         if (isset($args[2]) and isset($args[3])) {
                                             if (FactionsAPI::existsFaction($args[2])) {
                                                 if (is_numeric($args[3])) {
-                                                    FactionsAPI::addMoney($args[2], (int)$args[3]);
-                                                    $player->sendMessage(Utils::getMessage($player, "ADMIN_ADDMONEY_SUCCESS", array((int)$args[3])));
+                                                    if ((int)$args[3] > 0) {
+                                                        FactionsAPI::addMoney($args[2], (int)$args[3]);
+                                                        $player->sendMessage(Utils::getMessage($player, "ADMIN_ADDMONEY_SUCCESS", array((int)$args[3])));
+                                                    } else $player->sendMessage(Utils::getMessage($player, "ENTER_VALID_NUMBER"));
                                                 } else $player->sendMessage(Utils::getMessage($player, "ENTER_VALID_NUMBER"));
                                             } else $player->sendMessage(Utils::getMessage($player, "FACTION_NOT_EXIST"));
                                         } else $player->sendMessage(Utils::getMessage($player, "ADMIN_ADDMONEY_USAGE"));
@@ -762,8 +770,10 @@ class Faction extends PluginCommand {
                                         if (isset($args[2]) and isset($args[3])) {
                                             if (FactionsAPI::existsFaction($args[2])) {
                                                 if (is_numeric($args[3])) {
-                                                    FactionsAPI::removeMoney($args[2], (int)$args[3]);
-                                                    $player->sendMessage(Utils::getMessage($player, "ADMIN_REMOVEMONEY_SUCCESS", array((int)$args[3])));
+                                                    if ((int)$args[3] > 0) {
+                                                        FactionsAPI::removeMoney($args[2], (int)$args[3]);
+                                                        $player->sendMessage(Utils::getMessage($player, "ADMIN_REMOVEMONEY_SUCCESS", array((int)$args[3])));
+                                                    } else $player->sendMessage(Utils::getMessage($player, "ENTER_VALID_NUMBER"));
                                                 } else $player->sendMessage(Utils::getMessage($player, "ENTER_VALID_NUMBER"));
                                             } else $player->sendMessage(Utils::getMessage($player, "FACTION_NOT_EXIST"));
                                         } else $player->sendMessage(Utils::getMessage($player, "ADMIN_REMOVEMONEY_USAGE"));
@@ -772,8 +782,10 @@ class Faction extends PluginCommand {
                                         if (isset($args[2]) and isset($args[3])) {
                                             if (FactionsAPI::existsFaction($args[2])) {
                                                 if (is_numeric($args[3])) {
-                                                    FactionsAPI::setMoney($args[2], (int)$args[3]);
-                                                    $player->sendMessage(Utils::getMessage($player, "ADMIN_SETMONEY_SUCCESS", array((int)$args[3])));
+                                                    if ((int)$args[3] > 0) {
+                                                        FactionsAPI::setMoney($args[2], (int)$args[3]);
+                                                        $player->sendMessage(Utils::getMessage($player, "ADMIN_SETMONEY_SUCCESS", array((int)$args[3])));
+                                                    } else $player->sendMessage(Utils::getMessage($player, "ENTER_VALID_NUMBER"));
                                                 } else $player->sendMessage(Utils::getMessage($player, "ENTER_VALID_NUMBER"));
                                             } else $player->sendMessage(Utils::getMessage($player, "FACTION_NOT_EXIST"));
                                         } else $player->sendMessage(Utils::getMessage($player, "ADMIN_SETMONEY_USAGE"));

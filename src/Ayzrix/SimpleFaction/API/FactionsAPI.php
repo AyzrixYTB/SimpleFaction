@@ -195,6 +195,10 @@ class FactionsAPI {
      * @param int $amount
      */
     public static function removePower(string $faction, int $amount): void {
+        if (self::getPower($faction) - $amount <= 0) {
+            self::setPower($faction, 0);
+            return;
+        }
         self::$faction[$faction]["power"] = self::getPower($faction) - $amount;
     }
 
@@ -702,7 +706,7 @@ class FactionsAPI {
      * @param int $amount
      */
     public static function removeMoney(string $faction, int $amount): void {
-        if(self::getMoney($faction) - $amount <= 0) {
+        if (self::getMoney($faction) - $amount <= 0) {
             self::setMoney($faction, 0);
             return;
         }
