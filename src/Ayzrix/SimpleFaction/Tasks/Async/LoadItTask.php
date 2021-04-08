@@ -94,7 +94,7 @@ class LoadItTask extends AsyncTask {
         if(!empty($result)) {
             if (isset($result["faction"])) {
                 foreach ($result["faction"] as $key => $array) {
-                    FactionsAPI::$faction[$key] = array("players" => $array[0], "power" => $array[1], "money" => $array[2], "allies" => $array[3]);
+                    FactionsAPI::$faction[$key] = array("players" => array_unique($array[0]), "power" => $array[1], "money" => $array[2], "allies" => $array[3]);
                     FactionsAPI::$claim[$key] = $array[4];
                 }
             }
