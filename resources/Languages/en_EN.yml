@@ -132,7 +132,7 @@ BANK_WITHDRAW_SUCCESS: "{prefix} §aYou successfully withdrew %$ from your facti
 LANG_CHANGE_SUCCESS: "{prefix} You have successfully changed your language to % !"
 LANG_NOT_EXIST: "{prefix} §cThis language does not exist"
 LANG_USAGE: "{prefix} §cUsage : /f lang <%>"
-TOO_MUCH_FACTION: "§c: Too much factions (>86) on the map."
+TOO_MUCH_FACTION: "§cToo much factions (>86) on the map."
 MAP_ON_SUCCESS: "{prefix} §aYou have successfully enabled the map !"
 MAP_OFF_SUCCESS: "{prefix} §aYou have successfully disabled the map !"
 MAP_USAGE: "{prefix} §cUsage : /f map <NONE | ON | OFF>"
