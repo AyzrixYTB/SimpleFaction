@@ -15,10 +15,8 @@ namespace Ayzrix\SimpleFaction\Utils;
 
 use Ayzrix\SimpleFaction\API\FactionsAPI;
 use Ayzrix\SimpleFaction\Main;
-use Ayzrix\SimpleFaction\Tasks\Async\QueryTask;
 use pocketmine\Player;
 use pocketmine\utils\Config;
-use pocketmine\utils\TextFormat;
 
 class Utils {
 
@@ -89,26 +87,34 @@ class Utils {
         $lang = FactionsAPI::$lang;
 
         foreach ($faction as $name => $values) {
-            $faction = $name;
-            $players = base64_encode(serialize($values["players"]));
-            $power = $values["power"];
-            $money = $values["money"];
-            $allies = base64_encode(serialize($values["allies"]));
-            $claims = base64_encode(serialize($claim[$faction]));
+            $faction = $db->real_escape_string($name);
+            $players = $db->real_escape_string(base64_encode(serialize($values["players"])));
+            $power = $db->real_escape_string($values["power"]);
+            $money = $db->real_escape_string($values["money"]);
+            $allies = $db->real_escape_string(base64_encode(serialize($values["allies"])));
+            $claims = $db->real_escape_string(base64_encode(serialize($claim[$faction])));
             $db->query("INSERT INTO faction (faction, players, power, money, allies, claims) VALUES ('$faction', '$players', '$power', '$money', '$allies', '$claims')");
         }
 
         foreach ($player as $name => $values) {
-            $faction = $values["faction"];
-            $role = $values["role"];
+            $name = $db->real_escape_string($name);
+            $faction = $db->real_escape_string($values["faction"]);
+            $role = $db->real_escape_string($values["role"]);
             $db->query("INSERT INTO player (player, faction, role) VALUES ('$name', '$faction', '$role');");
         }
 
         foreach ($home as $name => $values) {
+            $name = $db->real_escape_string($name);
+            $values[0] = $db->real_escape_string($values[0]);
+            $values[1] = $db->real_escape_string($values[1]);
+            $values[2] = $db->real_escape_string($values[2]);
+            $values[3] = $db->real_escape_string($values[3]);
             $db->query("INSERT INTO home (faction, x, y, z, world) VALUES ('$name', '$values[0]', '$values[1]', '$values[2]', '$values[3]');");
         }
 
         foreach ($lang as $name => $language) {
+            $name = $db->real_escape_string($name);
+            $language = $db->real_escape_string($language);
             $db->query("INSERT INTO lang (player, lang) VALUES ('$name', '$language');");
         }
     }
