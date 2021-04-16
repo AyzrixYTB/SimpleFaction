@@ -14,6 +14,7 @@
 namespace Ayzrix\SimpleFaction;
 
 use Ayzrix\SimpleFaction\Commands\Faction;
+use Ayzrix\SimpleFaction\Entity\FloatingTextEntity;
 use Ayzrix\SimpleFaction\Events\Listener\BlockListener;
 use Ayzrix\SimpleFaction\Events\Listener\EntityListener;
 use Ayzrix\SimpleFaction\Events\Listener\PlayerListener;
@@ -23,6 +24,8 @@ use Ayzrix\SimpleFaction\Tasks\MapTask;
 use Ayzrix\SimpleFaction\Tasks\BorderTask;
 use Ayzrix\SimpleFaction\Utils\Utils;
 use onebone\economyapi\EconomyAPI;
+use pocketmine\entity\Entity;
+use pocketmine\level\Position;
 use pocketmine\plugin\PluginBase;
 
 class Main extends PluginBase {
@@ -52,6 +55,7 @@ class Main extends PluginBase {
         if (Utils::getIntoConfig("entering_leaving") === true) {
             $this->getServer()->getPluginManager()->registerEvents(new PlayerMove(), $this);
         }
+
         if (Utils::getIntoConfig("economy_system") === true) {
             $economy = $this->getServer()->getPluginManager()->getPlugin("EconomyAPI");
             if (is_null($economy)) {
@@ -61,17 +65,27 @@ class Main extends PluginBase {
             }
             self::$economyAPI = EconomyAPI::getInstance();
         }
+
+        if (Utils::getIntoConfig("floating_text") === true) {
+            $this->initFloatingText();
+        }
     }
 
     public function onDisable() {
         Utils::saveAll();
+        foreach ($this->getServer()->getLevels() as $level) {
+            foreach ($level->getEntities() as $entity) {
+                if ($entity instanceof FloatingTextEntity) {
+                    $entity->close();
+                }
+            }
+        }
     }
 
     private function initDatabase() {
         if (Utils::getProvider() === "mysql") {
             $db = new \MySQLi(Utils::getIntoConfig("mysql_address"), Utils::getIntoConfig("mysql_user"), Utils::getIntoConfig("mysql_password"), Utils::getIntoConfig("mysql_db"));
         } else $db = new \SQLite3($this->getDataFolder() . "SimpleFaction.db");
-
         $db->query("CREATE TABLE IF NOT EXISTS faction (faction VARCHAR(255) PRIMARY KEY, players TEXT, power int, money int, allies TEXT, claims TEXT);");
         $db->query("CREATE TABLE IF NOT EXISTS player (player VARCHAR(255) PRIMARY KEY, faction VARCHAR(255), role VARCHAR(255));");
         $db->query("CREATE TABLE IF NOT EXISTS home (faction VARCHAR(255) PRIMARY KEY, x int, y int, z int, world VARCHAR(255));");
@@ -91,5 +105,20 @@ class Main extends PluginBase {
      */
     public static function getEconomy(): EconomyAPI {
         return self::$economyAPI;
+    }
+
+    public function initFloatingText() {
+        Entity::registerEntity(FloatingTextEntity::class, true);
+        $coordinates = Utils::getIntoConfig("floating_text_coordinates");
+        $coordinates = explode(":", $coordinates);
+        $levelName = $coordinates[3];
+        if ($this->getServer()->isLevelGenerated($levelName)) {
+            $level = $this->getServer()->getLevelByName($levelName);
+            $nbt = Entity::createBaseNBT(new Position((float)$coordinates[0], (float)$coordinates[1], (float)$coordinates[2], $level));
+            $floatingtext = Entity::createEntity("FloatingTextEntity", $level, $nbt);
+            $floatingtext->spawnToAll();
+        } else {
+            $this->getLogger()->notice("Please provide a valid world for the floatingtext system");
+        }
     }
 }

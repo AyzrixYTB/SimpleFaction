@@ -117,3 +117,14 @@ border_colors:
   "Allies": "255, 255, 0"
   "Enemies": "255, 0, 0"
 
+# Top floating text
+# true | false
+floating_text: true
+# "X:Y:Z:WORLD"
+floating_text_coordinates: "0:100:0:world"
+floating_text_title: "§6- §fTop 10 factions with the most power §6-"
+# TAGS: {number} {faction} {power} {members} {bank}
+# Sort by power.
+floating_text_line: "§6#{number} §f- §6{faction} §fwith §6{power} §fpower(s) and §6{bank} §fmoney"
+# Line limit
+floating_text_limit: 10
