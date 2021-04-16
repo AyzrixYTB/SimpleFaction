@@ -87,34 +87,62 @@ class Utils {
         $lang = FactionsAPI::$lang;
 
         foreach ($faction as $name => $values) {
-            $faction = $db->real_escape_string($name);
-            $players = $db->real_escape_string(base64_encode(serialize($values["players"])));
-            $power = $db->real_escape_string($values["power"]);
-            $money = $db->real_escape_string($values["money"]);
-            $allies = $db->real_escape_string(base64_encode(serialize($values["allies"])));
-            $claims = $db->real_escape_string(base64_encode(serialize($claim[$faction])));
+            if (self::getProvider() === "mysql") {
+                $faction = $db->real_escape_string($name);
+                $players = $db->real_escape_string(base64_encode(serialize($values["players"])));
+                $power = $db->real_escape_string($values["power"]);
+                $money = $db->real_escape_string($values["money"]);
+                $allies = $db->real_escape_string(base64_encode(serialize($values["allies"])));
+                $claims = $db->real_escape_string(base64_encode(serialize($claim[$faction])));
+            } else {
+                $faction = \SQLite3::escapeString($name);
+                $players = \SQLite3::escapeString(base64_encode(serialize($values["players"])));
+                $power = \SQLite3::escapeString($values["power"]);
+                $money = \SQLite3::escapeString($values["money"]);
+                $allies = \SQLite3::escapeString(base64_encode(serialize($values["allies"])));
+                $claims = \SQLite3::escapeString(base64_encode(serialize($claim[$faction])));
+            }
             $db->query("INSERT INTO faction (faction, players, power, money, allies, claims) VALUES ('$faction', '$players', '$power', '$money', '$allies', '$claims')");
         }
 
         foreach ($player as $name => $values) {
-            $name = $db->real_escape_string($name);
-            $faction = $db->real_escape_string($values["faction"]);
-            $role = $db->real_escape_string($values["role"]);
+            if (self::getProvider() === "mysql") {
+                $name = $db->real_escape_string($name);
+                $faction = $db->real_escape_string($values["faction"]);
+                $role = $db->real_escape_string($values["role"]);
+            } else {
+                $name = \SQLite3::escapeString($name);
+                $faction = \SQLite3::escapeString($values["faction"]);
+                $role = \SQLite3::escapeString($values["role"]);
+            }
             $db->query("INSERT INTO player (player, faction, role) VALUES ('$name', '$faction', '$role');");
         }
 
         foreach ($home as $name => $values) {
-            $name = $db->real_escape_string($name);
-            $values[0] = $db->real_escape_string($values[0]);
-            $values[1] = $db->real_escape_string($values[1]);
-            $values[2] = $db->real_escape_string($values[2]);
-            $values[3] = $db->real_escape_string($values[3]);
+            if (self::getProvider() === "mysql") {
+                $name = $db->real_escape_string($name);
+                $values[0] = $db->real_escape_string($values[0]);
+                $values[1] = $db->real_escape_string($values[1]);
+                $values[2] = $db->real_escape_string($values[2]);
+                $values[3] = $db->real_escape_string($values[3]);
+            } else {
+                $name = \SQLite3::escapeString($name);
+                $values[0] = \SQLite3::escapeString($values[0]);
+                $values[1] = \SQLite3::escapeString($values[1]);
+                $values[2] = \SQLite3::escapeString($values[2]);
+                $values[3] = \SQLite3::escapeString($values[3]);
+            }
             $db->query("INSERT INTO home (faction, x, y, z, world) VALUES ('$name', '$values[0]', '$values[1]', '$values[2]', '$values[3]');");
         }
 
         foreach ($lang as $name => $language) {
-            $name = $db->real_escape_string($name);
-            $language = $db->real_escape_string($language);
+            if (self::getProvider() === "mysql") {
+                $name = $db->real_escape_string($name);
+                $language = $db->real_escape_string($language);
+            } else {
+                $name = \SQLite3::escapeString($name);
+                $language = \SQLite3::escapeString($language);
+            }
             $db->query("INSERT INTO lang (player, lang) VALUES ('$name', '$language');");
         }
     }
