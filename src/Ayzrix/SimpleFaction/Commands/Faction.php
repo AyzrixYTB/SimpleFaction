@@ -324,7 +324,7 @@ class Faction extends PluginCommand {
                                         }
                                         $claimMode = Utils::getIntoConfig("claim-mode");
                                         if ($claimMode === "CUSTOM") {
-                                            if ($claimCount - 1 < count(Utils::getIntoConfig("custom_claims"))) {
+                                            if ($claimCount < count(Utils::getIntoConfig("custom_claims"))) {
                                                 $powerNeeded = (int)Utils::getIntoConfig("custom_claims")[$claimCount];
                                                 if (FactionsAPI::getPower($faction) >= $powerNeeded) {
                                                     FactionsAPI::claimChunk($player, $faction);
