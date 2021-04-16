@@ -73,7 +73,7 @@
 ## Translators
 - **English** - @Ayzrix & Se7en-dev.
 - **French** - @Ayzrix.
-- **Spanish** - @Santi.
+- **Spanish** - @Santi & UnEnanoMas.
 
 ## Config
 ```yaml
