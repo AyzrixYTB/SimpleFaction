@@ -33,7 +33,7 @@
 | `/f promote`   | Promote a member.                                        | <font color="#1589F0"> leader         |
 | `/f demote`    | Demote an officer.                                       | <font color="#1589F0"> leader         |
 | `/f transfer`  | Transfer your leader status.                             | <font color="#1589F0"> leader         |
-| `/f admin`     | Administrative commands.                                 | <font color="red"> staff              |
+| `/f admin`     | Administrative commands.                                 | <font color="red"> staff (simplefaction.admin)             |
 
 ## Future additions
 
@@ -56,6 +56,7 @@
 | `EconomyAPI Support`      | ✔               | ❌         | ✔            |
 | `ScoreHUD Support`        | ✔               | ❌         | ❌            |
 | `Simplicity`              | ✔               | ✔         | ❌            |
+| `Floating Text`           | ✔               | ❌         | ❌            |
 
 ## Additional plugins
 | Name              | Usage                         | Download                                                          |
@@ -71,13 +72,12 @@
 - @max-xoo
 
 ## Translators
-- **English** - @Ayzrix & Se7en-dev.
+- **English** - @Ayzrix, Se7en-dev & UnEnanoMas.
 - **French** - @Ayzrix.
 - **Spanish** - @Santi.
 
 ## Config
 ```yaml
----
 #     _____ _                 _      ______         _   _
 #    / ____(_)               | |    |  ____|       | | (_)
 #   | (___  _ _ __ ___  _ __ | | ___| |__ __ _  ___| |_ _  ___  _ __
@@ -172,6 +172,9 @@ starting_claim_price: 100
 factor: 2 # multiplicative or additive factor (depending on the claim mode you chose)
 max_claims: 5
 
+# Claims of the same faction have to be next to each other (first claim can be anywhere) (true|false)
+adjacent_claims: false
+
 # Prefix usable in languages. {prefix}
 PREFIX: "§6[§fSimpleFaction§6]§f"
 PLAYER_ONLY: "{prefix} §cThis command can't be used in the console !"
@@ -181,9 +184,27 @@ MAP_HEADER: "§6--------------------(§f{X}§6, §f{Z}§6)--------------------"
 banned_names: ["op", "staff", "admin", "fuck", "shit"]
 
 zones_colors:
-  "Wilderness": "§2"
+  "Wilderness": "§d"
   "Own-Faction": "§a"
   "Allies": "§e"
   "Enemies": "§c"
 
+# RGB Colors
+border_colors:
+  "Wilderness": "255, 0, 180"
+  "Own-Faction": "0, 255, 0"
+  "Allies": "255, 255, 0"
+  "Enemies": "255, 0, 0"
+
+# Top floating text
+# true | false
+floating_text: true
+# "X:Y:Z:WORLD"
+floating_text_coordinates: "0:100:0:world"
+floating_text_title: "§6- §fTop 10 factions with the most power §6-"
+# TAGS: {number} {faction} {power} {members} {bank}
+# Sort by power.
+floating_text_line: "§6#{number} §f- §6{faction} §fwith §6{power} §fpower(s) and §6{bank} §fmoney"
+# Line limit
+floating_text_limit: 10
 ```
