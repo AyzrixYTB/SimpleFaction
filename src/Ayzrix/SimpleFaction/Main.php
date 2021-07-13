@@ -25,6 +25,7 @@ use Ayzrix\SimpleFaction\Tasks\BorderTask;
 use Ayzrix\SimpleFaction\Utils\Utils;
 use onebone\economyapi\EconomyAPI;
 use pocketmine\entity\Entity;
+use pocketmine\level\Level;
 use pocketmine\level\Position;
 use pocketmine\plugin\PluginBase;
 
@@ -112,8 +113,10 @@ class Main extends PluginBase {
         $coordinates = Utils::getIntoConfig("floating_text_coordinates");
         $coordinates = explode(":", $coordinates);
         $levelName = $coordinates[3];
-        if ($this->getServer()->isLevelGenerated($levelName)) {
-            $level = $this->getServer()->getLevelByName($levelName);
+        var_dump($this->getServer()->isLevelGenerated($levelName));
+        $level = $this->getServer()->getLevelByName($levelName);
+        if ($level instanceof Level) {
+            $level->loadChunk($coordinates[0] >> 4, $coordinates[2] >> 4);
             $nbt = Entity::createBaseNBT(new Position((float)$coordinates[0], (float)$coordinates[1], (float)$coordinates[2], $level));
             $floatingtext = Entity::createEntity("FloatingTextEntity", $level, $nbt);
             $floatingtext->spawnToAll();
