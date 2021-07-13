@@ -113,7 +113,6 @@ class Main extends PluginBase {
         $coordinates = Utils::getIntoConfig("floating_text_coordinates");
         $coordinates = explode(":", $coordinates);
         $levelName = $coordinates[3];
-        var_dump($this->getServer()->isLevelGenerated($levelName));
         $level = $this->getServer()->getLevelByName($levelName);
         if ($level instanceof Level) {
             $level->loadChunk($coordinates[0] >> 4, $coordinates[2] >> 4);

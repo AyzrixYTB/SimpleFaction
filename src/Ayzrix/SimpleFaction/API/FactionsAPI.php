@@ -400,9 +400,11 @@ class FactionsAPI {
      */
     public static function kickFaction(string $name): void {
         $name = strtolower($name);
-        $array = self::$faction[self::getFaction($name)]["players"];
-        unset($array[$name]);
-        self::$faction[self::getFaction($name)]["players"] = $array;
+        $faction = self::getFaction($name);
+        $array = self::$faction[$faction]["players"];
+        $arraylower = (array)json_decode(strtolower(json_encode($array)));
+        unset($array[array_search($name, $arraylower)]);
+        self::$faction[$faction]["players"] = $array;
         unset(self::$player[$name]);
     }
 
