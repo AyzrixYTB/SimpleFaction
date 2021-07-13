@@ -66,6 +66,7 @@
 | FacEssential      | Chat & Scoreboard integration | [Download](https://github.com/Zoumi-Dev/FacEssential)             |
 | Scoreboard        | Scoreboard integration        | [Download](https://poggit.pmmp.io/r/119565/Scoreboard_dev-5.phar) |
 | EconomyAPI        | Bank system                   | [Download](https://poggit.pmmp.io/p/EconomyAPI)                   |
+| Rank              | Chat integration              | [Download](https://github.com/Virvolta/Rank)                      |
 
 ## Contributors
 - @Se7en-dev
@@ -198,7 +199,7 @@ border_colors:
 
 # Top floating text
 # true | false
-floating_text: true
+floating_text: false
 # "X:Y:Z:WORLD"
 floating_text_coordinates: "0:100:0:world"
 floating_text_title: "§6- §fTop 10 factions with the most power §6-"
