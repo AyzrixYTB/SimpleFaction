@@ -119,7 +119,7 @@ border_colors:
 
 # Top floating text
 # true | false
-floating_text: true
+floating_text: false
 # "X:Y:Z:WORLD"
 floating_text_coordinates: "0:100:0:world"
 floating_text_title: "§6- §fTop 10 factions with the most power §6-"
