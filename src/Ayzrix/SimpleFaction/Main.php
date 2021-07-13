@@ -115,7 +115,7 @@ class Main extends PluginBase {
         $levelName = $coordinates[3];
         $level = $this->getServer()->getLevelByName($levelName);
         if ($level instanceof Level) {
-            $level->loadChunk($coordinates[0] >> 4, $coordinates[2] >> 4);
+            $level->loadChunk((float)$coordinates[0] >> 4, (float)$coordinates[2] >> 4);
             $nbt = Entity::createBaseNBT(new Position((float)$coordinates[0], (float)$coordinates[1], (float)$coordinates[2], $level));
             $floatingtext = Entity::createEntity("FloatingTextEntity", $level, $nbt);
             $floatingtext->spawnToAll();
