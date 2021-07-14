@@ -604,7 +604,7 @@ class FactionsAPI {
         array_push($allies, $faction);
         self::$faction[$faction2]["allies"] = $allies;
         $allies = Utils::real_escape_string(base64_encode(serialize($allies)));
-        $factioN2E = Utils::real_escape_string($faction2);
+        $faction2E = Utils::real_escape_string($faction2);
         Utils::query("UPDATE faction SET allies = '$allies' WHERE faction='$faction2E'");
 
         foreach (self::getAllPlayers($faction) as $player) {
