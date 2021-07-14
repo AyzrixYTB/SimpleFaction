@@ -1,4 +1,4 @@
-[![Discord](https://img.shields.io/discord/800828802921529355.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/ruBKMD9a9J) [![](https://poggit.pmmp.io/shield.api/SimpleFaction)](https://poggit.pmmp.io/p/SimpleFaction) [![](https://poggit.pmmp.io/shield.dl.total/SimpleFaction)](https://poggit.pmmp.io/p/SimpleFaction)
+[![](https://poggit.pmmp.io/shield.api/SimpleFaction)](https://poggit.pmmp.io/p/SimpleFaction) [![](https://poggit.pmmp.io/shield.dl.total/SimpleFaction)](https://poggit.pmmp.io/p/SimpleFaction)
 # SimpleFaction
 
 ###### Simple faction plugin replacing FactionsPro which is no longer updated.
