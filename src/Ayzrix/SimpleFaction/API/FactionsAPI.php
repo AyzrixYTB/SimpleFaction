@@ -438,7 +438,7 @@ class FactionsAPI {
      */
     public static function promoteFaction(string $name): void {
         self::$player[strtolower($name)]["role"] = "Officer";
-        Utils::query("UPDATE player SET role = 'Officer' WHERE player='$player'");
+        Utils::query("UPDATE player SET role = 'Officer' WHERE player='$name'");
     }
 
     /**
@@ -446,7 +446,7 @@ class FactionsAPI {
      */
     public static function demoteFaction(string $name): void {
         self::$player[strtolower($name)]["role"] = "Member";
-        Utils::query("UPDATE player SET role = 'Member' WHERE player='$player'");
+        Utils::query("UPDATE player SET role = 'Member' WHERE player='$name'");
     }
 
     /**
@@ -454,7 +454,7 @@ class FactionsAPI {
      */
     public static function transferFaction(string $name): void {
         self::$player[strtolower($name)]["role"] = "Leader";
-        Utils::query("UPDATE player SET role = 'Leader' WHERE player='$player'");
+        Utils::query("UPDATE player SET role = 'Leader' WHERE player='$name'");
     }
 
     /**
@@ -709,7 +709,7 @@ class FactionsAPI {
     }
 
     /**
-     * @param string $faction
+     * @param string $factionName
      * @param string $name
      */
     public static function renameFaction(string $factionName, string $name): void {
