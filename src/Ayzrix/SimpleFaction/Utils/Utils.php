@@ -22,6 +22,9 @@ use pocketmine\utils\Config;
 
 class Utils {
 
+    /** @var null|\MySQLi  */
+    public static $db = null;
+
     /**
      * @return string
      */
@@ -130,5 +133,18 @@ class Utils {
      */
     public static function query(string $text) {
         Server::getInstance()->getAsyncPool()->submitTask(new QueryTask($text));
+    }
+
+    /**
+     * @param string $text
+     * @return string
+     */
+    public static function real_escape_string(string $text): string {
+        switch (self::getProvider()) {
+            case "mysql":
+                return self::$db->real_escape_string($text);
+            default:
+                return \SQLite3::escapeString($text);
+        }
     }
 }

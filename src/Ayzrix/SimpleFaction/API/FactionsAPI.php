@@ -123,11 +123,13 @@ class FactionsAPI {
         self::$player[strtolower($player->getName())] = array("faction" => $faction, "role" => "Leader");
         self::$claim[$faction] = array();
 
-        $players = base64_encode(serialize(array($player->getName())));
-        $allies = base64_encode(serialize(array()));
-        $claims = base64_encode(serialize(array()));
-        Utils::query("INSERT INTO faction (faction, players, power, money, allies, claims) VALUES ('$faction', '$players', 0, 0, '$allies', '$claims')");
-        Utils::query("INSERT INTO player (player, faction, role) VALUES ('$name', '$faction', 'Leader')");
+        $nameE = Utils::real_escape_string($name);
+        $factionE = Utils::real_escape_string($faction);
+        $players = Utils::real_escape_string(base64_encode(serialize(array($player->getName()))));
+        $allies = Utils::real_escape_string(base64_encode(serialize(array())));
+        $claims = Utils::real_escape_string(base64_encode(serialize(array())));
+        Utils::query("INSERT INTO faction (faction, players, power, money, allies, claims) VALUES ('$factionE', '$players', 0, 0, '$allies', '$claims')");
+        Utils::query("INSERT INTO player (player, faction, role) VALUES ('$nameE', '$factionE', 'Leader')");
 
         if (Utils::getIntoConfig("broadcast_message_created") === true) {
             foreach (Server::getInstance()->getOnlinePlayers() as $player) {
@@ -148,13 +150,15 @@ class FactionsAPI {
         if (isset(self::$faction[$faction]))unset(self::$faction[$faction]);
         if (isset(self::$home[$faction])) unset(self::$home[$faction]);
         if (isset(self::$claim[$faction])) unset(self::$claim[$faction]);
-        Utils::query("DELETE FROM faction WHERE faction='$faction'");
-        Utils::query("DELETE FROM home WHERE faction='$faction'");
+        $factionE = Utils::real_escape_string($faction);
+        Utils::query("DELETE FROM faction WHERE faction='$factionE'");
+        Utils::query("DELETE FROM home WHERE faction='$factionE'");
 
         foreach (self::$player as $player => $value) {
             if ($value["faction"] === $faction) {
                 unset(self::$player[$player]);
-                Utils::query("DELETE FROM player WHERE player='$player'");
+                $playerE = Utils::real_escape_string($player);
+                Utils::query("DELETE FROM player WHERE player='$playerE'");
             }
         }
 
@@ -197,7 +201,8 @@ class FactionsAPI {
      */
     public static function addPower(string $faction, int $amount): void {
         self::$faction[$faction]["power"] = self::getPower($faction) + $amount;
-        Utils::query("UPDATE faction SET power = power + $amount WHERE faction='$faction'");
+        $factionE = Utils::real_escape_string($faction);
+        Utils::query("UPDATE faction SET power = power + $amount WHERE faction='$factionE'");
     }
 
     /**
@@ -207,11 +212,13 @@ class FactionsAPI {
     public static function removePower(string $faction, int $amount): void {
         if (self::getPower($faction) - $amount <= 0) {
             self::setPower($faction, 0);
-            Utils::query("UPDATE faction SET power = 0 WHERE faction='$faction'");
+            $factionE = Utils::real_escape_string($faction);
+            Utils::query("UPDATE faction SET power = 0 WHERE faction='$factionE'");
             return;
         }
         self::$faction[$faction]["power"] = self::getPower($faction) - $amount;
-        Utils::query("UPDATE faction SET power = power - $amount WHERE faction='$faction'");
+        $factionE = Utils::real_escape_string($faction);
+        Utils::query("UPDATE faction SET power = power - $amount WHERE faction='$factionE'");
     }
 
     /**
@@ -220,7 +227,8 @@ class FactionsAPI {
      */
     public static function setPower(string $faction, int $amount): void {
         self::$faction[$faction]["power"] = $amount;
-        Utils::query("UPDATE faction SET power = $amount WHERE faction='$faction'");
+        $factionE = Utils::real_escape_string($faction);
+        Utils::query("UPDATE faction SET power = $amount WHERE faction='$factionE'");
     }
 
     /**
@@ -290,7 +298,10 @@ class FactionsAPI {
         $z = round($position->getZ()) + 0.5;
         $world = $position->getLevel()->getFolderName();
         self::$home[$faction] = array($x, $y, $z, $world);
-        Utils::query("INSERT INTO home (faction, x, y, z, world) VALUES ('$faction', '$x', '$y', '$z', '$world')");
+
+        $factionE = Utils::real_escape_string($faction);
+        $worldE = Utils::real_escape_string($world);
+        Utils::query("INSERT INTO home (faction, x, y, z, world) VALUES ('$factionE', '$x', '$y', '$z', '$worldE')");
     }
 
     /**
@@ -298,7 +309,8 @@ class FactionsAPI {
      */
     public static function deleteHome(string $faction): void {
         if (isset(self::$home[$faction])) unset(self::$home[$faction]);
-        Utils::query("DELETE FROM home WHERE faction='$faction'");
+        $factionE = Utils::real_escape_string($faction);
+        Utils::query("DELETE FROM home WHERE faction='$factionE'");
     }
 
     /**
@@ -322,8 +334,9 @@ class FactionsAPI {
         $claims = self::$claim[$faction];
         array_push($claims, "{$chunkX}:{$chunkZ}:{$world}");
         self::$claim[$faction] = $claims;
-        $claims = base64_encode(serialize($claims));
-        Utils::query("UPDATE faction SET claims = '$claims' WHERE faction='$faction'");
+        $claims = Utils::real_escape_string(base64_encode(serialize($claims)));
+        $factionE = Utils::real_escape_string($faction);
+        Utils::query("UPDATE faction SET claims = '$claims' WHERE faction='$factionE'");
     }
 
     /**
@@ -391,8 +404,9 @@ class FactionsAPI {
         $claim = self::$claim[$faction];
         unset($claim[array_search("{$chunkX}:{$chunkZ}:{$world}", $claim)]);
      	self::$claim[$faction] = $claim;
-        $claims = base64_encode(serialize($claim));
-        Utils::query("UPDATE faction SET claims = '$claims' WHERE faction='$faction'");
+        $claims = Utils::real_escape_string(base64_encode(serialize($claim)));
+        $factionE = Utils::real_escape_string($faction);
+        Utils::query("UPDATE faction SET claims = '$claims' WHERE faction='$factionE'");
     }
 
     /**
@@ -413,9 +427,11 @@ class FactionsAPI {
         unset($array[array_search($name, $array)]);
         self::$faction[$faction]["players"] = $array;
         unset(self::$player[strtolower($name)]);
-        $players = base64_encode(serialize($array));
-        Utils::query("UPDATE faction SET players = '$players' WHERE faction='$faction'");
-        Utils::query("DELETE FROM player WHERE player='$name'");
+        $players = Utils::real_escape_string(base64_encode(serialize($array)));
+        $factionE = Utils::real_escape_string($faction);
+        $nameE = Utils::real_escape_string($name);
+        Utils::query("UPDATE faction SET players = '$players' WHERE faction='$factionE'");
+        Utils::query("DELETE FROM player WHERE player='$nameE'");
     }
 
     /**
@@ -429,9 +445,11 @@ class FactionsAPI {
         unset($array[array_search($name, $arraylower)]);
         self::$faction[$faction]["players"] = $array;
         unset(self::$player[$name]);
-        $players = base64_encode(serialize($array));
-        Utils::query("UPDATE faction SET players = '$players' WHERE faction='$faction'");
-        Utils::query("DELETE FROM player WHERE player='$name'");
+        $players = Utils::real_escape_string(base64_encode(serialize($array)));
+        $factionE = Utils::real_escape_string($faction);
+        $nameE = Utils::real_escape_string($name);
+        Utils::query("UPDATE faction SET players = '$players' WHERE faction='$factionE'");
+        Utils::query("DELETE FROM player WHERE player='$nameE'");
     }
 
     /**
@@ -439,7 +457,8 @@ class FactionsAPI {
      */
     public static function promoteFaction(string $name): void {
         self::$player[strtolower($name)]["role"] = "Officer";
-        Utils::query("UPDATE player SET role = 'Officer' WHERE player='$name'");
+        $nameE = Utils::real_escape_string($name);
+        Utils::query("UPDATE player SET role = 'Officer' WHERE player='$nameE'");
     }
 
     /**
@@ -447,7 +466,8 @@ class FactionsAPI {
      */
     public static function demoteFaction(string $name): void {
         self::$player[strtolower($name)]["role"] = "Member";
-        Utils::query("UPDATE player SET role = 'Member' WHERE player='$name'");
+        $nameE = Utils::real_escape_string($name);
+        Utils::query("UPDATE player SET role = 'Member' WHERE player='$nameE'");
     }
 
     /**
@@ -455,7 +475,8 @@ class FactionsAPI {
      */
     public static function transferFaction(string $name): void {
         self::$player[strtolower($name)]["role"] = "Leader";
-        Utils::query("UPDATE player SET role = 'Leader' WHERE player='$name'");
+        $nameE = Utils::real_escape_string($name);
+        Utils::query("UPDATE player SET role = 'Leader' WHERE player='$nameE'");
     }
 
     /**
@@ -477,9 +498,11 @@ class FactionsAPI {
         $array = self::$faction[$faction]["players"];
         array_push($array, $name);
         self::$faction[$faction]["players"] = $array;
-        $players = base64_encode(serialize($array));
-        Utils::query("UPDATE faction SET players = '$players' WHERE faction='$faction'");
-        Utils::query("INSERT INTO player (player, faction, role) VALUES ('$name', '$faction', 'Member')");
+        $players = Utils::real_escape_string(base64_encode(serialize($array)));
+        $factionE = Utils::real_escape_string($name);
+        Utils::query("UPDATE faction SET players = '$players' WHERE faction='$factionE'");
+        $nameE = Utils::real_escape_string($name);
+        Utils::query("INSERT INTO player (player, faction, role) VALUES ('$nameE', '$factionE', 'Member')");
 
         foreach (self::getAllPlayers($faction) as $player) {
             if (Server::getInstance()->getPlayer($player)) {
@@ -573,14 +596,16 @@ class FactionsAPI {
         $allies = self::$faction[$faction]["allies"];
         array_push($allies, $faction2);
         self::$faction[$faction]["allies"] = $allies;
-        $allies = base64_encode(serialize($allies));
-        Utils::query("UPDATE faction SET allies = '$allies' WHERE faction='$faction'");
+        $allies = Utils::real_escape_string(base64_encode(serialize($allies)));
+        $factionE = Utils::real_escape_string($faction);
+        Utils::query("UPDATE faction SET allies = '$allies' WHERE faction='$factionE'");
 
         $allies = self::$faction[$faction2]["allies"];
         array_push($allies, $faction);
         self::$faction[$faction2]["allies"] = $allies;
-        $allies = base64_encode(serialize($allies));
-        Utils::query("UPDATE faction SET allies = '$allies' WHERE faction='$faction2'");
+        $allies = Utils::real_escape_string(base64_encode(serialize($allies)));
+        $factioN2E = Utils::real_escape_string($faction2);
+        Utils::query("UPDATE faction SET allies = '$allies' WHERE faction='$faction2E'");
 
         foreach (self::getAllPlayers($faction) as $player) {
             if (Server::getInstance()->getPlayer($player)) {
@@ -646,14 +671,16 @@ class FactionsAPI {
         $allies = self::$faction[$faction1]["allies"];
         unset($allies[array_search($faction2, $allies)]);
         self::$faction[$faction1]["allies"] = $allies;
-        $allies = base64_encode(serialize($allies));
-        Utils::query("UPDATE faction SET allies = '$allies' WHERE faction='$faction1'");
+        $allies = Utils::real_escape_string(base64_encode(serialize($allies)));
+        $faction1E = Utils::real_escape_string($faction1);
+        Utils::query("UPDATE faction SET allies = '$allies' WHERE faction='$faction1E'");
 
         $allies = self::$faction[$faction2]["allies"];
         unset($allies[array_search($faction1, $allies)]);
         self::$faction[$faction2]["allies"] = $allies;
-        $allies = base64_encode(serialize($allies));
-        Utils::query("UPDATE faction SET allies = '$allies' WHERE faction='$faction2'");
+        $allies = Utils::real_escape_string(base64_encode(serialize($allies)));
+        $faction2E = Utils::real_escape_string($faction2);
+        Utils::query("UPDATE faction SET allies = '$allies' WHERE faction='$faction2E'");
     }
 
     /**
@@ -716,18 +743,21 @@ class FactionsAPI {
     public static function renameFaction(string $factionName, string $name): void {
         $faction = self::$faction[$factionName];
         self::$faction[$name] = $faction;
-        Utils::query("UPDATE faction SET faction = '$name' WHERE faction='$factionName'");
+        $nameE = Utils::real_escape_string($name);
+        $factionNameE = Utils::real_escape_string($factionName);
+        Utils::query("UPDATE faction SET faction = '$nameE' WHERE faction='$factionNameE'");
 
         foreach (self::getAllPlayers($factionName) as $player) {
             self::$player[strtolower($player)]["faction"] = $name;
-            Utils::query("UPDATE player SET faction = '$name' WHERE player='$player'");
+            $playerE = Utils::real_escape_string($player);
+            Utils::query("UPDATE player SET faction = '$nameE' WHERE player='$playerE'");
         }
 
         if (self::existsHome($factionName)) {
             $home = self::$home[$factionName];
             self::$home[$name] = $home;
             unset(self::$home[$factionName]);
-            Utils::query("UPDATE home SET faction = '$name' WHERE faction='$factionName'");
+            Utils::query("UPDATE home SET faction = '$nameE' WHERE faction='$factionNameE'");
         }
 
         $claims = self::$claim[$factionName]?? [];
@@ -750,7 +780,8 @@ class FactionsAPI {
      */
     public static function addMoney(string $faction, int $amount): void {
         self::$faction[$faction]["money"] = self::getMoney($faction) + $amount;
-        Utils::query("UPDATE faction SET money = money + $amount WHERE faction='$faction'");
+        $factionE = Utils::real_escape_string($faction);
+        Utils::query("UPDATE faction SET money = money + $amount WHERE faction='$factionE'");
     }
 
     /**
@@ -763,7 +794,8 @@ class FactionsAPI {
             return;
         }
         self::$faction[$faction]["money"] = self::getMoney($faction) - $amount;
-        Utils::query("UPDATE faction SET money = money - $amount WHERE faction='$faction'");
+        $factionE = Utils::real_escape_string($faction);
+        Utils::query("UPDATE faction SET money = money - $amount WHERE faction='$factionE'");
     }
 
     /**
@@ -772,7 +804,8 @@ class FactionsAPI {
      */
     public static function setMoney(string $faction, int $amount): void {
         self::$faction[$faction]["money"] = $amount;
-        Utils::query("UPDATE faction SET money = $amount WHERE faction='$faction'");
+        $factionE = Utils::real_escape_string($faction);
+        Utils::query("UPDATE faction SET money = $amount WHERE faction='$factionE'");
     }
 
     /**
@@ -884,10 +917,11 @@ class FactionsAPI {
      */
     public static function setLanguages(Player $player, string $lang): void {
         $name = $player->getName();
+        $nameE = Utils::real_escape_string($name);
 
         if (self::hasLanguages($player)) {
-            Utils::query("UPDATE lang SET lang = '$lang' WHERE player='$name'");
-        } else Utils::query("INSERT INTO lang (player, lang) VALUES ('$name', '$lang')");
+            Utils::query("UPDATE lang SET lang = '$lang' WHERE player='$nameE'");
+        } else Utils::query("INSERT INTO lang (player, lang) VALUES ('$nameE', '$lang')");
 
         self::$lang[$name] = $lang;
     }
