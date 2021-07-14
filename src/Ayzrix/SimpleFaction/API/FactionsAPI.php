@@ -408,9 +408,10 @@ class FactionsAPI {
      */
     public static function leaveFaction(Player $player): void {
         $name = $player->getName();
-        $array = self::$faction[self::getFaction($player->getName())]["players"];
+        $faction = self::getFaction($player->getName());
+        $array = self::$faction[$faction]["players"];
         unset($array[array_search($name, $array)]);
-        self::$faction[self::getFaction($player->getName())]["players"] = $array;
+        self::$faction[$faction]["players"] = $array;
         unset(self::$player[strtolower($name)]);
         $players = base64_encode(serialize($array));
         Utils::query("UPDATE faction SET players = '$players' WHERE faction='$faction'");
