@@ -73,7 +73,6 @@ class Main extends PluginBase {
     }
 
     public function onDisable() {
-        Utils::saveAll();
         foreach ($this->getServer()->getLevels() as $level) {
             foreach ($level->getEntities() as $entity) {
                 if ($entity instanceof FloatingTextEntity) {

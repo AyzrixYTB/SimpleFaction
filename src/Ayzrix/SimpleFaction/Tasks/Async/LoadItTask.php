@@ -13,7 +13,6 @@
 
 namespace Ayzrix\SimpleFaction\Tasks\Async;
 
-use Ayzrix\Auction\Utils\MySQL;
 use Ayzrix\SimpleFaction\API\FactionsAPI;
 use Ayzrix\SimpleFaction\Main;
 use Ayzrix\SimpleFaction\Utils\Utils;
