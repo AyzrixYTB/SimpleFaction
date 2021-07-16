@@ -1,5 +1,4 @@
 <?php
-declare(strict_types = 1);
 
 /**
  * @name SimpleFactionAddon
@@ -7,8 +6,7 @@ declare(strict_types = 1);
  * @main JackMD\ScoreHud\Addons\SimpleFactionAddon
  * @depend SimpleFaction
  */
-namespace JackMD\ScoreHud\Addons
-{
+namespace JackMD\ScoreHud\Addons {
 
     use Ayzrix\SimpleFaction\API\FactionsAPI;
     use JackMD\ScoreHud\addon\AddonBase;

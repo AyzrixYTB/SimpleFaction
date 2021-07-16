@@ -61,12 +61,14 @@
 ## Additional plugins
 | Name              | Usage                         | Download                                                          |
 |-------------------|-------------------------------|-------------------------------------------------------------------|
+| EconomyAPI        | Bank system                   | [Download](https://poggit.pmmp.io/p/EconomyAPI)                   |
 | PureChat          | Chat integration              | [Download](https://poggit.pmmp.io/r/119566/PureChat_dev-2.phar)   |
-| ScoreHUD          | Scoreboard integration        | [Download](https://poggit.pmmp.io/p/ScoreHud)                     |
+| Rank              | Chat integration              | [Download](https://github.com/Virvolta/Rank)                      |
 | FacEssential      | Chat & Scoreboard integration | [Download](https://github.com/Zoumi-Dev/FacEssential)             |
 | Scoreboard        | Scoreboard integration        | [Download](https://poggit.pmmp.io/r/119565/Scoreboard_dev-5.phar) |
-| EconomyAPI        | Bank system                   | [Download](https://poggit.pmmp.io/p/EconomyAPI)                   |
-| Rank              | Chat integration              | [Download](https://github.com/Virvolta/Rank)                      |
+| ScoreHUD          | Scoreboard integration        | [Download](https://poggit.pmmp.io/p/ScoreHud)                     |
+| ScoreHUD V5 Addon | Scoreboard Integration        | [Download](https://github.com/AyzrixYTB/SimpleFaction/blob/master/addons/ScoreHUD5.2.0/SimpleFactionAddon.php) |
+| ScoreHUD V6 Addon | Scoreboard Integration        | [Download](https://github.com/AyzrixYTB/SimpleFaction/raw/master/addons/ScoreHUD6.0.0/SimpleFactionAddon.phar) |
 
 ## Contributors
 - @Se7en-dev
