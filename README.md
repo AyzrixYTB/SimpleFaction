@@ -44,19 +44,19 @@
 
 ## Features
 
-| Feature                   | SimpleFaction   | FactionsPro| PiggyFactions|
-|---------------------------|-----------------|------------|--------------|
-| `SQLite3 Support`         | ✔               | ✔         | ✔            |
-| `MySQL Support`           | ✔               | ❌         | ✔            |
-| `Async Queries`           | ✔               | ❌         | ✔            |
-| `Editable message`        | ✔               | ❌         | ✔            |
-| `Multiple claim`          | ✔               | ❌         | ✔            |                  
-| `Multi-Language Support`  | ✔               | ❌         | ✔            |
-| `Economy System`          | ✔               | ❌         | ✔            |
-| `EconomyAPI Support`      | ✔               | ❌         | ✔            |
-| `ScoreHUD Support`        | ✔               | ❌         | ❌            |
-| `Simplicity`              | ✔               | ✔         | ❌            |
-| `Floating Text`           | ✔               | ❌         | ❌            |
+| Feature                           | SimpleFaction   | FactionsPro| PiggyFactions|
+|-----------------------------------|-----------------|------------|--------------|
+| `SQLite3 Support`                 | ✔               | ✔         | ✔            |
+| `MySQL Support`                   | ✔               | ❌         | ✔            |
+| `Async Queries`                   | ✔               | ❌         | ✔            |
+| `Editable message`                | ✔               | ❌         | ✔            |
+| `Multiple claim`                  | ✔               | ❌         | ✔            |                  
+| `Multi-Language Support`          | ✔               | ❌         | ✔            |
+| `Economy System`                  | ✔               | ❌         | ✔            |
+| `EconomyAPI Support`              | ✔               | ❌         | ✔            |
+| `ScoreHUD Support (v5 & v6)`      | ✔               | ❌         | ✔            |
+| `Simplicity`                      | ✔               | ✔         | ❌            |
+| `Floating Text`                   | ✔               | ❌         | ❌            |
 
 ## Additional plugins
 | Name              | Usage                         | Download                                                          |
