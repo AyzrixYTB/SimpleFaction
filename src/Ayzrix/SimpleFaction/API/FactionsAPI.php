@@ -114,6 +114,14 @@ class FactionsAPI {
     }
 
     /**
+     * @param string $faction
+     * @return bool
+     */
+    public static function existsExactlyFaction(string $faction): bool {
+        return isset(self::$faction[$faction]);
+    }
+
+    /**
      * @param Player $player
      * @param string $faction
      */

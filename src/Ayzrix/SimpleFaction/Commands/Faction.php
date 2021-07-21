@@ -443,10 +443,12 @@ class Faction extends PluginCommand {
                                 $timer = $timer - time();
                                 if ($timer > 0) {
                                     $faction = FactionsAPI::$invitation[$player->getName()];
-                                    if (count(FactionsAPI::getAllPlayers($faction)) < (int)Utils::getIntoConfig("faction_max_members")) {
-                                        FactionsAPI::acceptInvitation($player);
-                                        $player->sendMessage(Utils::getMessage($player, "ACCEPT_SUCCESS", array($faction)));
-                                    } else $player->sendMessage(Utils::getMessage($player, "FACTION_FULL"));
+                                    if (FactionsAPI::existsFaction($faction)) {
+                                        if (count(FactionsAPI::getAllPlayers($faction)) < (int)Utils::getIntoConfig("faction_max_members")) {
+                                            FactionsAPI::acceptInvitation($player);
+                                            $player->sendMessage(Utils::getMessage($player, "ACCEPT_SUCCESS", array($faction)));
+                                        } else $player->sendMessage(Utils::getMessage($player, "FACTION_FULL"));
+                                    } else $player->sendMessage(Utils::getMessage($player, "FACTION_NOT_EXIST"));
                                 } else $player->sendMessage(Utils::getMessage($player, "INVITATION_EXPIRED"));
                             } else $player->sendMessage(Utils::getMessage($player, "DONT_HAVE_INVITATION"));
                         } else $player->sendMessage(Utils::getMessage($player, "ALREADY_IN_FACTION"));
@@ -804,7 +806,7 @@ class Faction extends PluginCommand {
                                                 if(strlen($args[3]) > (int)Utils::getIntoConfig("min_faction_name_lenght")) {
                                                     if (strlen($args[3]) < (int)Utils::getIntoConfig("max_faction_name_lenght")) {
                                                         if (!in_array(strtolower($args[1]), Utils::getIntoConfig("banned_names"))) {
-                                                            if (FactionsAPI::existsFaction($args[2])) {
+                                                            if (FactionsAPI::existsExactlyFaction($args[2])) {
                                                                 if (!FactionsAPI::existsFaction($args[3])) {
                                                                     FactionsAPI::renameFaction($args[2], $args[3]);
                                                                     $player->sendMessage(Utils::getMessage($player, "ADMIN_RENAME_SUCCESS", array($args[3])));
