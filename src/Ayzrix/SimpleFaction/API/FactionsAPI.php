@@ -166,7 +166,7 @@ class FactionsAPI {
             if ($value["faction"] === $faction) {
                 unset(self::$player[$player]);
                 $playerE = Utils::real_escape_string($player);
-                Utils::query("DELETE FROM player WHERE player='$playerE'");
+                Utils::query("DELETE FROM player WHERE lower(player)='$playerE'");
             }
         }
 
