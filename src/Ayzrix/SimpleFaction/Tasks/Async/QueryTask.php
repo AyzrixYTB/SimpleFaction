@@ -41,6 +41,7 @@ class QueryTask extends AsyncTask {
                 break;
             default:
                 $db = new \SQLite3($this->db[0]);
+                $db->busyTimeout(60000);
                 $db->query($this->text);
                 break;
         }
