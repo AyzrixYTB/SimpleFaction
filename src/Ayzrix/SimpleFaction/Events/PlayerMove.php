@@ -36,14 +36,38 @@ class PlayerMove implements Listener {
                             $claimer = FactionsAPI::getFactionClaim($player->getLevel(), $chunkXP, $chunkZP);
                             if ($zone !== $claimer) {
                                 FactionsAPI::$moving[$player->getName()] = $claimer;
-                                $player->sendMessage(Utils::getMessage($player, "LEAVING_MESSAGE", array(Utils::getZoneColor($player, $zone) . $zone)));
-                                $player->sendMessage(Utils::getMessage($player, "ENTERING_MESSAGE", array(Utils::getZoneColor($player, $claimer) . $claimer)));
+                                switch (strtolower(Utils::getIntoConfig("entering_leaving_messsage"))) {
+                                    case "message":
+                                        $player->sendMessage(Utils::getMessage($player, "LEAVING_MESSAGE", array(Utils::getZoneColor($player, $zone) . $zone)));
+                                        $player->sendMessage(Utils::getMessage($player, "ENTERING_MESSAGE", array(Utils::getZoneColor($player, $claimer) . $claimer)));
+                                        break;
+                                    case "popup":
+                                        $player->sendPopup(Utils::getMessage($player, "LEAVING_MESSAGE", array(Utils::getZoneColor($player, $zone) . $zone)));
+                                        $player->sendPopup(Utils::getMessage($player, "ENTERING_MESSAGE", array(Utils::getZoneColor($player, $claimer) . $claimer)));
+                                        break;
+                                    case "tip":
+                                        $player->sendTip(Utils::getMessage($player, "LEAVING_MESSAGE", array(Utils::getZoneColor($player, $zone) . $zone)));
+                                        $player->sendTip(Utils::getMessage($player, "ENTERING_MESSAGE", array(Utils::getZoneColor($player, $claimer) . $claimer)));
+                                        break;
+                                }
                             }
                         } else {
                             if ($zone !== "Wilderness") {
                                 FactionsAPI::$moving[$player->getName()] = "Wilderness";
-                                $player->sendMessage(Utils::getMessage($player, "LEAVING_MESSAGE", array(Utils::getZoneColor($player, $zone) . $zone)));
-                                $player->sendMessage(Utils::getMessage($player, "ENTERING_MESSAGE", array(Utils::getZoneColor($player, "Wilderness") . "Wilderness")));
+                                switch (strtolower(Utils::getIntoConfig("entering_leaving_messsage"))) {
+                                    case "message":
+                                        $player->sendMessage(Utils::getMessage($player, "LEAVING_MESSAGE", array(Utils::getZoneColor($player, $zone) . $zone)));
+                                        $player->sendMessage(Utils::getMessage($player, "ENTERING_MESSAGE", array(Utils::getZoneColor($player, "Wilderness") . "Wilderness")));
+                                        break;
+                                    case "popup":
+                                        $player->sendPopup(Utils::getMessage($player, "LEAVING_MESSAGE", array(Utils::getZoneColor($player, $zone) . $zone)));
+                                        $player->sendPopup(Utils::getMessage($player, "ENTERING_MESSAGE", array(Utils::getZoneColor($player, "Wilderness") . "Wilderness")));
+                                        break;
+                                    case "tip":
+                                        $player->sendTip(Utils::getMessage($player, "LEAVING_MESSAGE", array(Utils::getZoneColor($player, $zone) . $zone)));
+                                        $player->sendTip(Utils::getMessage($player, "ENTERING_MESSAGE", array(Utils::getZoneColor($player, "Wilderness") . "Wilderness")));
+                                        break;
+                                }
                             }
                         }
                     } else {

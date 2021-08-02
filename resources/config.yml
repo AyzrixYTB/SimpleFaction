@@ -24,6 +24,8 @@ broadcast_message_disband: true
 
 # Activate or deactivate entering and leaving messages.
 entering_leaving: true
+# message | popup | tip
+entering_leaving_messsage: "message"
 
 # Activate or deactivate the bank system (/f bank)
 economy_system: false
