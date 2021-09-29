@@ -69,6 +69,7 @@
 | ScoreHUD          | Scoreboard integration        | [Download](https://poggit.pmmp.io/p/ScoreHud)                     |
 | ScoreHUD V5 Addon | Scoreboard Integration        | [Download](https://github.com/AyzrixYTB/SimpleFaction/blob/master/addons/ScoreHUD5.2.0/SimpleFactionAddon.php) |
 | ScoreHUD V6 Addon | Scoreboard Integration        | [Download](https://github.com/AyzrixYTB/SimpleFaction/raw/master/addons/ScoreHUD6.0.0/SimpleFactionAddon.phar) |
+| InfoTag           | Nametag integration        | [Download](https://poggit.pmmp.io/p/InfoTag)                                                                      |
 
 ## Contributors
 - @Se7en-dev
