@@ -220,8 +220,6 @@ class FactionsAPI {
     public static function removePower(string $faction, int $amount): void {
         if (self::getPower($faction) - $amount <= 0) {
             self::setPower($faction, 0);
-            $factionE = Utils::real_escape_string($faction);
-            Utils::query("UPDATE faction SET power = 0 WHERE faction='$factionE'");
             return;
         }
         self::$faction[$faction]["power"] = self::getPower($faction) - $amount;
