@@ -507,7 +507,7 @@ class FactionsAPI {
         array_push($array, $name);
         self::$faction[$faction]["players"] = $array;
         $players = Utils::real_escape_string(base64_encode(serialize($array)));
-        $factionE = Utils::real_escape_string($name);
+        $factionE = Utils::real_escape_string($faction);
         Utils::query("UPDATE faction SET players = '$players' WHERE faction='$factionE'");
         $nameE = Utils::real_escape_string($name);
         Utils::query("INSERT INTO player (player, faction, role) VALUES ('$nameE', '$factionE', 'Member')");
