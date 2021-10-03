@@ -85,6 +85,15 @@ class PlayerListener implements Listener {
                         case BlockIds::OAK_FENCE_GATE:
                         case BlockIds::CHEST:
                         case BlockIds::TRAPPED_CHEST:
+                        case BlockIds::FURNACE:
+                        case BlockIds::IRON_DOOR_BLOCK:
+                        case BlockIds::ACACIA_DOOR_BLOCK:
+                        case BlockIds::BIRCH_DOOR_BLOCK:
+                        case BlockIds::DARK_OAK_DOOR_BLOCK:
+                        case BlockIds::JUNGLE_DOOR_BLOCK:
+                        case BlockIds::OAK_DOOR_BLOCK:
+                        case BlockIds::SPRUCE_DOOR_BLOCK:
+                        case BlockIds::ENDER_CHEST:
                             if (FactionsAPI::isInFaction($player->getName())) {
                                 $claimer = FactionsAPI::getFactionClaim($player->getLevel(), $chunkX, $chunkZ);
                                 $faction = FactionsAPI::getFaction($player->getName());
@@ -118,7 +127,6 @@ class PlayerListener implements Listener {
     public function PlayerChat(PlayerChatEvent $event) {
         $player = $event->getPlayer();
         $message = $event->getMessage();
-
         if (isset(FactionsAPI::$chat[$player->getName()])) {
             $chat = FactionsAPI::$chat[$player->getName()];
             switch ($chat) {
