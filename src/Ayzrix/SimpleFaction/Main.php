@@ -41,8 +41,8 @@ class Main extends PluginBase {
         self::$instance = $this;
         $this->saveDefaultConfig();
         $this->saveResource("lang.yml");
-        $this->initDatabase();
         Utils::loadConfig();
+        $this->initDatabase();
 
         @mkdir($this->getDataFolder() . "Languages/");
         foreach (Utils::getIntoLang("languages") as $prefix => $file) {
