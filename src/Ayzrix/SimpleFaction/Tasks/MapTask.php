@@ -14,25 +14,20 @@
 namespace Ayzrix\SimpleFaction\Tasks;
 
 use Ayzrix\SimpleFaction\API\FactionsAPI;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\scheduler\Task;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 
 class MapTask extends Task {
 
-    /**
-     * @param int $currentTick
-     * @return bool
-     */
-    public function onRun(int $currentTick): bool {
-        if (empty(FactionsAPI::$map)) return false;
+    public function onRun(): void {
+        if (empty(FactionsAPI::$map)) return;
         foreach (FactionsAPI::$map as $name => $bool) {
-            $player = Server::getInstance()->getPlayer($name);
+            $player = Server::getInstance()->getPlayerExact($name);
             if ($player instanceof Player) {
                 $player->sendMessage(implode(TextFormat::EOL, FactionsAPI::getMap($player)));
             } else unset(FactionsAPI::$map[$name]);
         }
-        return true;
     }
 }
