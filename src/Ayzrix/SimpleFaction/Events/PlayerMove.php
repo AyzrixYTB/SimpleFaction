@@ -17,23 +17,26 @@ use Ayzrix\SimpleFaction\API\FactionsAPI;
 use Ayzrix\SimpleFaction\Utils\Utils;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerMoveEvent;
-use pocketmine\level\format\Chunk;
+use pocketmine\math\Vector3;
+use pocketmine\world\format\Chunk;
 
 class PlayerMove implements Listener {
 
-    public function PlayerMove (PlayerMoveEvent $event) {
+    public function PlayerMove (PlayerMoveEvent $event): void {
         $player = $event->getPlayer();
-        if (in_array($player->getLevel()->getFolderName(), Utils::getIntoConfig("faction_worlds"))) {
-            $fromPos = $player->getLevel()->getChunkAtPosition($event->getFrom());
-            $toPos = $player->getLevel()->getChunkAtPosition($event->getTo());
-            if ($fromPos instanceof Chunk and $toPos instanceof Chunk) {
-                if ($fromPos->getX() !== $toPos->getX() || $fromPos->getZ() !== $toPos->getZ()) {
+        if (in_array($player->getWorld()->getFolderName(), Utils::getIntoConfig("faction_worlds"))) {
+            $chunkFrom = $event->getFrom()->asVector3();
+            $fromPosX = $chunkFrom->getFloorX() >> Chunk::COORD_BIT_SIZE;
+            $fromPosZ = $chunkFrom->getFloorZ() >> Chunk::COORD_BIT_SIZE;
+            $chunkTo = $event->getFrom()->asVector3();
+            $toPosX = $chunkTo->getFloorX() >> Chunk::COORD_BIT_SIZE;
+            $toPosZ = $chunkTo->getFloorZ() >> Chunk::COORD_BIT_SIZE;
+            if ($player->getWorld()->getOrLoadChunkAtPosition($chunkFrom) instanceof Chunk and $player->getWorld()->getOrLoadChunkAtPosition($chunkTo) instanceof Chunk) {
+                if ($fromPosX !== $toPosX || $fromPosZ !== $toPosZ) {
                     if (isset(FactionsAPI::$moving[$player->getName()])) {
                         $zone = FactionsAPI::$moving[$player->getName()];
-                        $chunkXP = $toPos->getX();
-                        $chunkZP = $toPos->getZ();
-                        if (FactionsAPI::isInClaim($player->getLevel(), $chunkXP, $chunkZP)) {
-                            $claimer = FactionsAPI::getFactionClaim($player->getLevel(), $chunkXP, $chunkZP);
+                        if (FactionsAPI::isInClaim($player->getWorld(), $toPosX, $toPosZ)) {
+                            $claimer = FactionsAPI::getFactionClaim($player->getWorld(), $toPosX, $toPosZ);
                             if ($zone !== $claimer) {
                                 FactionsAPI::$moving[$player->getName()] = $claimer;
                                 switch (strtolower(Utils::getIntoConfig("entering_leaving_messsage"))) {
@@ -71,10 +74,8 @@ class PlayerMove implements Listener {
                             }
                         }
                     } else {
-                        $chunkX = $toPos->getX();
-                        $chunkZ = $toPos->getZ();
-                        if (FactionsAPI::isInClaim($player->getLevel(), $chunkX, $chunkZ)) {
-                            $claimer = FactionsAPI::getFactionClaim($player->getLevel(), $chunkX, $chunkZ);
+                        if (FactionsAPI::isInClaim($player->getWorld(), $toPosX, $toPosZ)) {
+                            $claimer = FactionsAPI::getFactionClaim($player->getWorld(), $toPosX, $toPosZ);
                             FactionsAPI::$moving[$player->getName()] = $claimer;
                         } else {
                             FactionsAPI::$moving[$player->getName()] = "Wilderness";

@@ -16,16 +16,15 @@ namespace Ayzrix\SimpleFaction\Utils;
 use Ayzrix\SimpleFaction\API\FactionsAPI;
 use Ayzrix\SimpleFaction\Main;
 use Ayzrix\SimpleFaction\Tasks\Async\QueryTask;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\utils\Config;
 
 class Utils {
 
-    /** @var null|\MySQLi  */
-    public static $db = null;
+    public static ?\MySQLi $db = null;
 
-    private static $config = [];
+    private static array $config = [];
 
     public static function getPrefix(): string {
         return self::getIntoConfig("PREFIX");
@@ -33,7 +32,7 @@ class Utils {
 
     public static function getMessage(Player $player, string $text, array $args = array()): string {
         $lang = FactionsAPI::getLanguages($player);
-        $file = self::getIntoLang("languages")[$lang];
+        $file = ((array)self::getIntoLang("languages"))[$lang];
         $config = new Config(Main::getInstance()->getDataFolder() . "Languages/{$file}.yml", Config::YAML);
         $message = $config->get($text);
         if (!empty($args)) {
@@ -48,15 +47,15 @@ class Utils {
         return strtolower(self::getIntoConfig("PROVIDER"));
     }
 
-    public static function loadConfig() {
+    public static function loadConfig(): void {
         self::$config = Main::getInstance()->getConfig()->getAll();
     }
 
-    public static function getIntoConfig(string $value) {
+    public static function getIntoConfig(string $value): array|int|string {
         return self::$config[$value];
     }
 
-    public static function getIntoLang(string $value) {
+    public static function getIntoLang(string $value): array|int|string {
         $config = new Config(Main::getInstance()->getDataFolder() . "lang.yml", Config::YAML);
         return $config->get($value);
     }
@@ -94,7 +93,7 @@ class Utils {
         }
     }
 
-    public static function query(string $text) {
+    public static function query(string $text): void {
         Server::getInstance()->getAsyncPool()->submitTask(new QueryTask($text));
     }
 
@@ -103,11 +102,9 @@ class Utils {
      * @return string
      */
     public static function real_escape_string(string $text): string {
-        switch (self::getProvider()) {
-            case "mysql":
-                return self::$db->real_escape_string($text);
-            default:
-                return \SQLite3::escapeString($text);
-        }
+        return match (self::getProvider()) {
+            "mysql" => self::$db->real_escape_string($text),
+            default => \SQLite3::escapeString($text),
+        };
     }
 }

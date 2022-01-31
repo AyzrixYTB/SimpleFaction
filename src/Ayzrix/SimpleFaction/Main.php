@@ -25,19 +25,21 @@ use Ayzrix\SimpleFaction\Tasks\BorderTask;
 use Ayzrix\SimpleFaction\Utils\Utils;
 use onebone\economyapi\EconomyAPI;
 use pocketmine\entity\Entity;
-use pocketmine\level\Level;
-use pocketmine\level\Position;
+use pocketmine\entity\EntityDataHelper;
+use pocketmine\entity\EntityFactory;
+use pocketmine\entity\Location;
+use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\plugin\PluginBase;
+use pocketmine\world\Position;
+use pocketmine\world\World;
 
 class Main extends PluginBase {
 
-    /** @var Main */
-    private static $instance;
+    private static Main $instance;
 
-    /** @var EconomyAPI $economyAPI */
-    private static $economyAPI;
+    private static EconomyAPI $economyAPI;
 
-    public function onEnable() {
+    public function onEnable(): void {
         self::$instance = $this;
         $this->saveDefaultConfig();
         $this->saveResource("lang.yml");
@@ -73,8 +75,8 @@ class Main extends PluginBase {
         }
     }
 
-    public function onDisable() {
-        foreach ($this->getServer()->getLevels() as $level) {
+    public function onDisable(): void {
+        foreach ($this->getServer()->getWorldManager()->getWorlds() as $level) {
             foreach ($level->getEntities() as $entity) {
                 if ($entity instanceof FloatingTextEntity) {
                     $entity->close();
@@ -83,7 +85,7 @@ class Main extends PluginBase {
         }
     }
 
-    private function initDatabase() {
+    private function initDatabase(): void {
         if (Utils::getProvider() === "mysql") {
             $db = new \MySQLi(Utils::getIntoConfig("mysql_address"), Utils::getIntoConfig("mysql_user"), Utils::getIntoConfig("mysql_password"), Utils::getIntoConfig("mysql_db"));
             Utils::$db = $db;
@@ -109,16 +111,17 @@ class Main extends PluginBase {
         return self::$economyAPI;
     }
 
-    public function initFloatingText() {
-        Entity::registerEntity(FloatingTextEntity::class, true);
+    public function initFloatingText(): void {
+        EntityFactory::getInstance()->register(FloatingTextEntity::class, function(World $world, CompoundTag $nbt) : FloatingTextEntity{
+            return new FloatingTextEntity(EntityDataHelper::parseLocation($nbt, $world), $nbt);
+        }, ['SimpleFaction_FloatingText', 'minecraft:simplefaction_floatingtext'],'minecraft:simplefaction_floatingtext',true);
         $coordinates = Utils::getIntoConfig("floating_text_coordinates");
         $coordinates = explode(":", $coordinates);
         $levelName = $coordinates[3];
-        $level = $this->getServer()->getLevelByName($levelName);
-        if ($level instanceof Level) {
+        $level = $this->getServer()->getWorldManager()->getWorldByName($levelName);
+        if ($level instanceof World) {
             $level->loadChunk((float)$coordinates[0] >> 4, (float)$coordinates[2] >> 4);
-            $nbt = Entity::createBaseNBT(new Position((float)$coordinates[0], (float)$coordinates[1], (float)$coordinates[2], $level));
-            $floatingtext = Entity::createEntity("FloatingTextEntity", $level, $nbt);
+            $floatingtext = new FloatingTextEntity(new Location((float)$coordinates[0], (float)$coordinates[1], (float)$coordinates[2],0,0,$level));
             $floatingtext->spawnToAll();
         } else {
             $this->getLogger()->notice("Please provide a valid world for the floatingtext system");

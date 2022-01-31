@@ -4,4 +4,4 @@ description: SimpleFaction plugin
 version: 1.6.8
 main: Ayzrix\SimpleFaction\Main
 softdepend: [EconomyAPI]
-api: [3.0.0]
+api: [4.0.0]

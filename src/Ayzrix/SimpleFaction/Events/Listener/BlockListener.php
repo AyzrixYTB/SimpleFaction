@@ -18,42 +18,38 @@ use Ayzrix\SimpleFaction\Utils\Utils;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\Listener;
-use pocketmine\level\format\Chunk;
+use pocketmine\world\format\Chunk;
 
 class BlockListener implements Listener {
 
-    public function BlockBreak(BlockBreakEvent $event) {
+    public function BlockBreak(BlockBreakEvent $event): void{
         $player = $event->getPlayer();
-        if (in_array($player->getLevel()->getFolderName(), Utils::getIntoConfig("faction_worlds"))) {
-            $chunk = $player->getLevel()->getChunkAtPosition($event->getBlock());
-            if ($chunk instanceof Chunk) {
-                $chunkX = $chunk->getX();
-                $chunkZ = $chunk->getZ();
-                if (FactionsAPI::isInClaim($player->getLevel(), $chunkX, $chunkZ)) {
-                    if (FactionsAPI::isInFaction($player->getName())) {
-                        $claimer = FactionsAPI::getFactionClaim($player->getLevel(), $chunkX, $chunkZ);
-                        $faction = FactionsAPI::getFaction($player->getName());
-                        if ($faction !== $claimer) $event->setCancelled(true);
-                    } else $event->setCancelled(true);
-                }
+        if (in_array($player->getWorld()->getFolderName(), Utils::getIntoConfig("faction_worlds"))) {
+            $pos = $event->getBlock()->getPosition()->asVector3();
+            $chunkX = $pos->getFloorX() >> Chunk::COORD_BIT_SIZE;
+            $chunkZ = $pos->getFloorZ() >> Chunk::COORD_BIT_SIZE;
+            if (FactionsAPI::isInClaim($player->getWorld(), $chunkX, $chunkZ)) {
+                if (FactionsAPI::isInFaction($player->getName())) {
+                    $claimer = FactionsAPI::getFactionClaim($player->getWorld(), $chunkX, $chunkZ);
+                    $faction = FactionsAPI::getFaction($player->getName());
+                    if ($faction !== $claimer) $event->cancel();
+                } else $event->cancel();
             }
         }
     }
 
-    public function BlockPlace(BlockPlaceEvent $event) {
+    public function BlockPlace(BlockPlaceEvent $event): void {
         $player = $event->getPlayer();
-        if (in_array($player->getLevel()->getFolderName(), Utils::getIntoConfig("faction_worlds"))) {
-            $chunk = $player->getLevel()->getChunkAtPosition($event->getBlock());
-            if ($chunk instanceof Chunk) {
-                $chunkX = $chunk->getX();
-                $chunkZ = $chunk->getZ();
-                if (FactionsAPI::isInClaim($player->getLevel(), $chunkX, $chunkZ)) {
-                    if (FactionsAPI::isInFaction($player->getName())) {
-                        $claimer = FactionsAPI::getFactionClaim($player->getLevel(), $chunkX, $chunkZ);
-                        $faction = FactionsAPI::getFaction($player->getName());
-                        if ($faction !== $claimer) $event->setCancelled(true);
-                    } else $event->setCancelled(true);
-                }
+        if (in_array($player->getWorld()->getFolderName(), Utils::getIntoConfig("faction_worlds"))) {
+            $pos = $event->getBlock()->getPosition()->asVector3();
+            $chunkX = $pos->getFloorX() >> Chunk::COORD_BIT_SIZE;
+            $chunkZ = $pos->getFloorZ() >> Chunk::COORD_BIT_SIZE;
+            if (FactionsAPI::isInClaim($player->getWorld(), $chunkX, $chunkZ)) {
+                if (FactionsAPI::isInFaction($player->getName())) {
+                    $claimer = FactionsAPI::getFactionClaim($player->getWorld(), $chunkX, $chunkZ);
+                    $faction = FactionsAPI::getFaction($player->getName());
+                    if ($faction !== $claimer) $event->cancel();
+                } else $event->cancel();
             }
         }
     }

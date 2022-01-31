@@ -16,58 +16,45 @@ namespace Ayzrix\SimpleFaction\API;
 use Ayzrix\SimpleFaction\Main;
 use Ayzrix\SimpleFaction\Tasks\WarsTask;
 use Ayzrix\SimpleFaction\Utils\Utils;
-use pocketmine\level\Level;
-use pocketmine\level\Position;
-use pocketmine\Player;
+use JetBrains\PhpStorm\Pure;
+use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
+use pocketmine\world\format\Chunk;
+use pocketmine\world\Position;
+use pocketmine\world\World;
 
 class FactionsAPI {
 
-    /** @var array $moving */
-    public static $moving = [];
+    public static array $moving = [];
 
-    /** @var array $faction */
-    public static $faction = [];
+    public static array $faction = [];
 
-    /** @var array $player */
-    public static $player = [];
+    public static array $player = [];
 
-    /** @var array $home */
-    public static $home = [];
+    public static array $home = [];
 
-    /** @var array $lang */
-    public static $lang = [];
+    public static array $lang = [];
 
-    /** @var array $claim */
-    public static $claim = [];
+    public static array $claim = [];
 
-    /** @var array $invitation */
-    public static $invitation = [];
+    public static array $invitation = [];
 
-    /** @var array $invitationTimeout */
-    public static $invitationTimeout = [];
+    public static array $invitationTimeout = [];
 
-    /** @var array $Alliesinvitation */
-    public static $Alliesinvitation = [];
+    public static array $Alliesinvitation = [];
 
-    /** @var array $AlliesinvitationTimeout */
-    public static $AlliesinvitationTimeout = [];
+    public static array $AlliesinvitationTimeout = [];
 
-    /** @var array $chat */
-    public static $chat = [];
+    public static array $chat = [];
 
-    /** @var array $map */
-    public static $map = [];
+    public static array $map = [];
 
-    /** @var array $border */
-    public static $border = [];
+    public static array $border = [];
 
-    /** @var array $Warsinvitation */
-    public static $Warsinvitation = [];
+    public static array $Warsinvitation = [];
 
-    /** @var array $Wars */
-    public static $Wars = [];
+    public static array $Wars = [];
 
     const MAP_KEY_CHARS = "\\/#?ç¬£$%=&^ABCDEFGHJKLMNOPQRSTUVWXYZÄÖÜÆØÅ1234567890abcdeghjmnopqrsuvwxyÿzäöüæøåâêîûô";
     const MAP_WIDTH = 48;
@@ -139,7 +126,7 @@ class FactionsAPI {
         Utils::query("INSERT INTO faction (faction, players, power, money, allies, claims) VALUES ('$factionE', '$players', 0, 0, '$allies', '$claims')");
         Utils::query("INSERT INTO player (player, faction, role) VALUES ('$nameE', '$factionE', 'Leader')");
 
-        if (Utils::getIntoConfig("broadcast_message_created") === true) {
+        if (Utils::getIntoConfig("broadcast_message_created")) {
             foreach (Server::getInstance()->getOnlinePlayers() as $player) {
                 if ($player instanceof Player) {
                     $player->sendMessage(Utils::getMessage($player, "FACTION_CREATE_BROADCAST", array($name, $faction)));
@@ -302,7 +289,7 @@ class FactionsAPI {
         $x = round($position->getX()) + 0.5;
         $y = round($position->getY()) + 0.5;
         $z = round($position->getZ()) + 0.5;
-        $world = $position->getLevel()->getFolderName();
+        $world = $position->getWorld()->getFolderName();
         self::$home[$faction] = array($x, $y, $z, $world);
 
         $factionE = Utils::real_escape_string($faction);
@@ -325,7 +312,7 @@ class FactionsAPI {
      */
     public static function getHome(string $faction): Position {
         $array = self::$home[$faction];
-        return new Position((int)$array[0], (int)$array[1], (int)$array[2], Main::getInstance()->getServer()->getLevelByName($array[3]));
+        return new Position((int)$array[0], (int)$array[1], (int)$array[2], Main::getInstance()->getServer()->getWorldByName($array[3]));
     }
 
     /**
@@ -333,10 +320,10 @@ class FactionsAPI {
      * @param string $faction
      */
     public static function claimChunk(Player $player, string $faction): void {
-        $chunk = $player->getLevel()->getChunkAtPosition($player);
-        $chunkX = $chunk->getX();
-        $chunkZ = $chunk->getZ();
-        $world = $player->getLevel()->getFolderName();
+        $pos = $player->getPosition()->asVector3();
+        $chunkX = $pos->getFloorX() >> Chunk::COORD_BIT_SIZE;
+        $chunkZ = $pos->getFloorZ() >> Chunk::COORD_BIT_SIZE;
+        $world = $player->getWorld()->getFolderName();
         $claims = self::$claim[$faction];
         array_push($claims, "{$chunkX}:{$chunkZ}:{$world}");
         self::$claim[$faction] = $claims;
@@ -351,12 +338,12 @@ class FactionsAPI {
      * @return bool
      */
     public static function isChunkNextToClaim(Player $player, string $faction): bool {
-        $playerChunk = $player->getLevel()->getChunkAtPosition($player);
-        $playerChunkX = $playerChunk->getX();
-        $playerChunkZ = $playerChunk->getZ();
+        $pos = $player->getPosition()->asVector3();
+        $playerChunkX = $pos->getFloorX() >> Chunk::COORD_BIT_SIZE;
+        $playerChunkZ = $pos->getFloorZ() >> Chunk::COORD_BIT_SIZE;
         foreach(self::$claim[$faction] as $factionClaim) {
             $factionClaim = explode(":", $factionClaim);
-            if ($player->getLevel()->getFolderName() !== $factionClaim[2]) continue;
+            if ($player->getWorld()->getFolderName() !== $factionClaim[2]) continue;
             for ($x = -1; $x <= 1; $x++) {
                 for ($z = -1; $z <= 1; $z++) {
                     if(abs($x) === abs($z)) continue;
@@ -368,12 +355,12 @@ class FactionsAPI {
     }
 
     /**
-     * @param Level $level
+     * @param World $level
      * @param int $chunkX
      * @param int $chunkZ
      * @return bool
      */
-    public static function isInClaim(Level $level, int $chunkX, int $chunkZ): bool {
+    #[Pure] public static function isInClaim(World $level, int $chunkX, int $chunkZ): bool {
         $world = $level->getFolderName();
         $array = [];
         foreach (self::$claim as $faction => $claims) {
@@ -383,12 +370,12 @@ class FactionsAPI {
     }
 
     /**
-     * @param Level $level
+     * @param World $level
      * @param int $chunkX
      * @param int $chunkZ
      * @return string
      */
-    public static function getFactionClaim(Level $level, int $chunkX, int $chunkZ): string {
+    #[Pure] public static function getFactionClaim(World $level, int $chunkX, int $chunkZ): string {
         $world = $level->getFolderName();
         foreach (self::$claim as $faction => $claims) {
             foreach ($claims as $claim) {
@@ -402,11 +389,11 @@ class FactionsAPI {
      * @param Player $player
      * @param string $faction
      */
-    public static function deleteClaim(Player $player, string $faction) {
-        $chunk = $player->getLevel()->getChunkAtPosition($player);
-        $chunkX = $chunk->getX();
-        $chunkZ = $chunk->getZ();
-        $world = $player->getLevel()->getFolderName();
+    public static function deleteClaim(Player $player, string $faction): void {
+        $pos = $player->getPosition()->asVector3();
+        $chunkX = $pos->getFloorX() >> Chunk::COORD_BIT_SIZE;
+        $chunkZ = $pos->getFloorZ() >> Chunk::COORD_BIT_SIZE;
+        $world = $player->getWorld()->getFolderName();
         $claim = self::$claim[$faction];
         unset($claim[array_search("{$chunkX}:{$chunkZ}:{$world}", $claim)]);
      	self::$claim[$faction] = $claim;
@@ -511,8 +498,8 @@ class FactionsAPI {
         Utils::query("INSERT INTO player (player, faction, role) VALUES ('$nameE', '$factionE', 'Member')");
 
         foreach (self::getAllPlayers($faction) as $player) {
-            if (Server::getInstance()->getPlayer($player)) {
-                $player = Server::getInstance()->getPlayer($player);
+            if (Server::getInstance()->getPlayerExact($player)) {
+                $player = Server::getInstance()->getPlayerExact($player);
                 if ($player instanceof Player) {
                     $player->sendMessage(Utils::getMessage($player, "JOIN_FACTION_BROADCAST", array($name)));
                 }
@@ -584,8 +571,8 @@ class FactionsAPI {
         self::$AlliesinvitationTimeout[$faction] = time() + (int)Utils::getIntoConfig("allies_invitation_expire_time");
 
         foreach (self::getAllPlayers($faction) as $player) {
-            if (Server::getInstance()->getPlayer($player)) {
-                $player = Server::getInstance()->getPlayer($player);
+            if (Server::getInstance()->getPlayerExact($player)) {
+                $player = Server::getInstance()->getPlayerExact($player);
                 if ($player instanceof Player) {
                     $player->sendMessage(Utils::getMessage($player, "ALLIES_INVITE_SUCCESS_TARGET", array($faction2)));
                 }
@@ -614,8 +601,8 @@ class FactionsAPI {
         Utils::query("UPDATE faction SET allies = '$allies' WHERE faction='$faction2E'");
 
         foreach (self::getAllPlayers($faction) as $player) {
-            if (Server::getInstance()->getPlayer($player)) {
-                $player = Server::getInstance()->getPlayer($player);
+            if (Server::getInstance()->getPlayerExact($player)) {
+                $player = Server::getInstance()->getPlayerExact($player);
                 if ($player instanceof Player) {
                     $player->sendMessage(Utils::getMessage($player, "NEW_ALLIANCE_FACTION_BROADCAST", array($faction2)));
                 }
@@ -623,8 +610,8 @@ class FactionsAPI {
         }
 
         foreach (self::getAllPlayers($faction2) as $player) {
-            if (Server::getInstance()->getPlayer($player)) {
-                $player = Server::getInstance()->getPlayer($player);
+            if (Server::getInstance()->getPlayerExact($player)) {
+                $player = Server::getInstance()->getPlayerExact($player);
                 if ($player instanceof Player) {
                     $player->sendMessage(Utils::getMessage($player, "NEW_ALLIANCE_FACTION_BROADCAST", array($faction)));
                 }
@@ -657,8 +644,8 @@ class FactionsAPI {
      */
     public static function removeAllies(string $faction1, string $faction2): void {
         foreach (self::getAllPlayers($faction1) as $player) {
-            if (Server::getInstance()->getPlayer($player)) {
-                $player = Server::getInstance()->getPlayer($player);
+            if (Server::getInstance()->getPlayerExact($player)) {
+                $player = Server::getInstance()->getPlayerExact($player);
                 if ($player instanceof Player) {
                     $player->sendMessage(Utils::getMessage($player, "ALLIES_REMOVE_SUCCESS", array($faction2)));
                 }
@@ -666,8 +653,8 @@ class FactionsAPI {
         }
 
         foreach (self::getAllPlayers($faction2) as $player) {
-            if (Server::getInstance()->getPlayer($player)) {
-                $player = Server::getInstance()->getPlayer($player);
+            if (Server::getInstance()->getPlayerExact($player)) {
+                $player = Server::getInstance()->getPlayerExact($player);
                 if ($player instanceof Player) {
                     $player->sendMessage(Utils::getMessage($player, "ALLIES_REMOVE_SUCCESS", array($faction1)));
                 }
@@ -705,10 +692,10 @@ class FactionsAPI {
         return self::$faction[$faction]["allies"]?? [];
     }
 
-    public static function factionMessage(Player $player, string $message) {
+    public static function factionMessage(Player $player, string $message): void {
         $faction = self::getFaction($player->getName());
         foreach (self::getAllPlayers($faction) as $target) {
-            $target = Server::getInstance()->getPlayer($target);
+            $target = Server::getInstance()->getPlayerExact($target);
             if ($target instanceof Player) {
                 $msg = Utils::getMessage($target, "FACTION_SAY");
                 $msg = str_replace(["{player}", "{faction}", "{message}", "{rank}"], [$player->getName(), $faction, $message, self::getRank($player->getName())], $msg);
@@ -717,12 +704,12 @@ class FactionsAPI {
         }
     }
 
-    public static function allyMessage(Player $player, string $message) {
+    public static function allyMessage(Player $player, string $message) : void {
         $faction = self::getFaction($player->getName());
         foreach (self::getAllies($faction) as $ally) {
             if (self::existsFaction($ally)) {
                 foreach (self::getAllPlayers($ally) as $target) {
-                    $target = Server::getInstance()->getPlayer($target);
+                    $target = Server::getInstance()->getPlayerExact($target);
                     if ($target instanceof Player) {
                         $msg = Utils::getMessage($target, "ALLY_SAY");
                         $msg = str_replace(["{player}", "{faction}", "{message}", "{rank}"], [$player->getName(), $faction, $message, self::getRank($player->getName())], $msg);
@@ -733,7 +720,7 @@ class FactionsAPI {
         }
 
         foreach (self::getAllPlayers($faction) as $target) {
-            $target = Server::getInstance()->getPlayer($target);
+            $target = Server::getInstance()->getPlayerExact($target);
             if ($target instanceof Player) {
                 $msg = Utils::getMessage($target, "ALLY_SAY");
                 $msg = str_replace(["{player}", "{faction}", "{message}", "{rank}"], [$player->getName(), $faction, $message, self::getRank($player->getName())], $msg);
@@ -819,12 +806,12 @@ class FactionsAPI {
      * @return string[]
      */
     public static function getMap(Player $player): array {
-        $center = $player->getLevel()->getChunkAtPosition($player);
         $height = self::MAP_HEIGHT;
         $width = self::MAP_WIDTH;
-        $compass = self::getAsciiCompass($player->getYaw());
+        $center = $player->getPosition();
+        $compass = self::getAsciiCompass($player->getLocation()->getYaw());
         $header = Utils::getIntoConfig("MAP_HEADER");
-        $header = str_replace(["{X}", "{Z}"], [$center->getX(), $center->getZ()], $header);
+        $header = str_replace(["{X}", "{Z}"], [$center->getFloorX() >> Chunk::COORD_BIT_SIZE, $center->getFloorZ() >> Chunk::COORD_BIT_SIZE], $header);
         $map = [$header];
         $legend = [];
         $characterIndex = 0;
@@ -840,8 +827,8 @@ class FactionsAPI {
                     continue;
                 }
 
-                if (self::isInCLaim($player->getLevel(), $chunkX, $chunkZ)) {
-                    $faction = self::getFactionClaim($player->getLevel(), $chunkX, $chunkZ);
+                if (self::isInCLaim($player->getWorld(), $chunkX, $chunkZ)) {
+                    $faction = self::getFactionClaim($player->getWorld(), $chunkX, $chunkZ);
                     if (($symbol = array_search($faction, $legend)) === false && $overflown) {
                         $row .= self::MAP_KEY_OVERFLOW;
                     } else {
@@ -912,7 +899,7 @@ class FactionsAPI {
      * @param Player $player
      * @return bool
      */
-    public static function hasLanguages(Player $player): bool {
+    #[Pure] public static function hasLanguages(Player $player): bool {
         $name = $player->getName();
         return isset(self::$lang[$name]);
     }
@@ -936,7 +923,7 @@ class FactionsAPI {
      * @param Player $player
      * @return string
      */
-    public static function getLanguages(Player $player): string {
+    #[Pure] public static function getLanguages(Player $player): string {
         $name = $player->getName();
         
         if (self::hasLanguages($player)) {
@@ -954,8 +941,8 @@ class FactionsAPI {
         self::$Warsinvitation[$faction] = [$faction2, time() + 30];
 
         foreach (self::getAllPlayers($faction) as $player) {
-            if (Server::getInstance()->getPlayer($player)) {
-                $player = Server::getInstance()->getPlayer($player);
+            if (Server::getInstance()->getPlayerExact($player)) {
+                $player = Server::getInstance()->getPlayerExact($player);
                 if ($player instanceof Player) {
                     $player->sendMessage(Utils::getMessage($player, "WARS_INVITE_SUCCESS_TARGET", array($faction2)));
                 }
@@ -970,8 +957,8 @@ class FactionsAPI {
         $faction2 = self::$Warsinvitation[$faction][0];
 
         foreach (self::getAllPlayers($faction) as $player) {
-            if (Server::getInstance()->getPlayer($player)) {
-                $player = Server::getInstance()->getPlayer($player);
+            if (Server::getInstance()->getPlayerExact($player)) {
+                $player = Server::getInstance()->getPlayerExact($player);
                 if ($player instanceof Player) {
                     $player->sendMessage(Utils::getMessage($player, "WARS_FACTION_BROADCAST", array($faction2)));
                 }
@@ -979,8 +966,8 @@ class FactionsAPI {
         }
 
         foreach (self::getAllPlayers($faction2) as $player) {
-            if (Server::getInstance()->getPlayer($player)) {
-                $player = Server::getInstance()->getPlayer($player);
+            if (Server::getInstance()->getPlayerExact($player)) {
+                $player = Server::getInstance()->getPlayerExact($player);
                 if ($player instanceof Player) {
                     $player->sendMessage(Utils::getMessage($player, "WARS_FACTION_BROADCAST", array($faction)));
                 }

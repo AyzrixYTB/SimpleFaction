@@ -17,12 +17,11 @@ use Ayzrix\SimpleFaction\API\FactionsAPI;
 use Ayzrix\SimpleFaction\Main;
 use Ayzrix\SimpleFaction\Utils\Utils;
 use pocketmine\scheduler\AsyncTask;
-use pocketmine\Server;
 
 class LoadItTask extends AsyncTask {
 
-    private $provider;
-    private $db;
+    private string $provider;
+    private array $db;
 
     public function __construct() {
         $this->provider = Utils::getProvider();
@@ -31,7 +30,7 @@ class LoadItTask extends AsyncTask {
         } else $this->db = array(Main::getInstance()->getDataFolder() . "SimpleFaction.db");
     }
 
-    public function onRun() {
+    public function onRun(): void {
         $provider = $this->provider;
         $results = [];
 
@@ -84,10 +83,7 @@ class LoadItTask extends AsyncTask {
         $this->setResult($results);
     }
 
-    /**
-     * @param Server $server
-     */
-    public function onCompletion(Server $server) {
+    public function onCompletion(): void {
         $result = $this->getResult();
 
         if(!empty($result)) {
