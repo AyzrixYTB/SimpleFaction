@@ -19,9 +19,9 @@ use pocketmine\scheduler\AsyncTask;
 
 class QueryTask extends AsyncTask {
 
-    private $provider;
-    private $db;
-    private $text;
+    private string $provider;
+    private array $db;
+    private string $text;
 
     public function __construct(string $text) {
         $this->provider = Utils::getProvider();
@@ -31,7 +31,7 @@ class QueryTask extends AsyncTask {
         } else $this->db = array(Main::getInstance()->getDataFolder() . "SimpleFaction.db");
     }
 
-    public function onRun() {
+    public function onRun(): void {
         $provider = $this->provider;
 
         switch ($provider) {
