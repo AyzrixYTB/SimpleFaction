@@ -17,19 +17,19 @@ use Ayzrix\SimpleFaction\API\FactionsAPI;
 use Ayzrix\SimpleFaction\Utils\Utils;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\Listener;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class EntityListener implements Listener {
 
-    public function EntityDamageByEntity(EntityDamageByEntityEvent $event) {
+    public function EntityDamageByEntity(EntityDamageByEntityEvent $event): void {
         $player = $event->getEntity();
         $victime = $event->getDamager();
         if ($player instanceof Player and $victime instanceof Player) {
             if (FactionsAPI::isInFaction($player->getName()) and FactionsAPI::isInFaction($victime->getName())) {
                 $faction1 = FactionsAPI::getFaction($player->getName());
                 $faction2 = FactionsAPI::getFaction($victime->getName());
-                if (Utils::getIntoConfig("faction_pvp") === false and $faction1 === $faction2) $event->setCancelled();
-                if (Utils::getIntoConfig("alliance_pvp") === false and FactionsAPI::areAllies($faction1, $faction2)) $event->setCancelled();
+                if (Utils::getIntoConfig("faction_pvp") == false and $faction1 === $faction2) $event->cancel();
+                if (Utils::getIntoConfig("alliance_pvp") == false and FactionsAPI::areAllies($faction1, $faction2)) $event->cancel();
             }
         }
     }
